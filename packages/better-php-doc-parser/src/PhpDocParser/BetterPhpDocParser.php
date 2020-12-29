@@ -21,7 +21,6 @@ use Rector\BetterPhpDocParser\Attributes\Attribute\Attribute;
 use Rector\BetterPhpDocParser\Contract\GenericPhpDocNodeFactoryInterface;
 use Rector\BetterPhpDocParser\Contract\PhpDocNodeFactoryInterface;
 use Rector\BetterPhpDocParser\Contract\SpecificPhpDocNodeFactoryInterface;
-use Rector\BetterPhpDocParser\PhpDocNodeFactory\ParamPhpDocNodeFactory;
 use Rector\BetterPhpDocParser\PhpDocNodeFactory\PHPUnitDataProviderDocNodeFactory;
 use Rector\BetterPhpDocParser\Printer\MultilineSpaceFormatPreserver;
 use Rector\BetterPhpDocParser\ValueObject\StartAndEnd;
@@ -88,11 +87,6 @@ final class BetterPhpDocParser extends PhpDocParser
     private $annotationContentResolver;
 
     /**
-     * @var ParamPhpDocNodeFactory
-     */
-    private $paramPhpDocNodeFactory;
-
-    /**
      * @var PHPUnitDataProviderDocNodeFactory
      */
     private $phpUnitDataProviderDocNodeFactory;
@@ -100,7 +94,7 @@ final class BetterPhpDocParser extends PhpDocParser
     /**
      * @param PhpDocNodeFactoryInterface[] $phpDocNodeFactories
      */
-    public function __construct(TypeParser $typeParser, ConstExprParser $constExprParser, AttributeAwareNodeFactory $attributeAwareNodeFactory, MultilineSpaceFormatPreserver $multilineSpaceFormatPreserver, CurrentNodeProvider $currentNodeProvider, ClassAnnotationMatcher $classAnnotationMatcher, Lexer $lexer, AnnotationContentResolver $annotationContentResolver, ParamPhpDocNodeFactory $paramPhpDocNodeFactory, PHPUnitDataProviderDocNodeFactory $phpUnitDataProviderDocNodeFactory, array $phpDocNodeFactories = [])
+    public function __construct(TypeParser $typeParser, ConstExprParser $constExprParser, AttributeAwareNodeFactory $attributeAwareNodeFactory, MultilineSpaceFormatPreserver $multilineSpaceFormatPreserver, CurrentNodeProvider $currentNodeProvider, ClassAnnotationMatcher $classAnnotationMatcher, Lexer $lexer, AnnotationContentResolver $annotationContentResolver, PHPUnitDataProviderDocNodeFactory $phpUnitDataProviderDocNodeFactory, array $phpDocNodeFactories = [])
     {
         parent::__construct($typeParser, $constExprParser);
         $this->privatesCaller = new PrivatesCaller();
@@ -111,7 +105,6 @@ final class BetterPhpDocParser extends PhpDocParser
         $this->classAnnotationMatcher = $classAnnotationMatcher;
         $this->lexer = $lexer;
         $this->annotationContentResolver = $annotationContentResolver;
-        $this->paramPhpDocNodeFactory = $paramPhpDocNodeFactory;
         $this->phpUnitDataProviderDocNodeFactory = $phpUnitDataProviderDocNodeFactory;
         $this->setPhpDocNodeFactories($phpDocNodeFactories);
     }
@@ -162,11 +155,7 @@ final class BetterPhpDocParser extends PhpDocParser
             throw new ShouldNotHappenException();
         }
         $lowercasedTag = strtolower($tag);
-        if ($lowercasedTag === '@param') {
-            // to prevent circular reference of this service
-            $this->paramPhpDocNodeFactory->setPhpDocParser($this);
-            $tagValueNode = $this->paramPhpDocNodeFactory->createFromTokens($tokenIterator);
-        } elseif ($lowercasedTag === '@dataprovider') {
+        if ($lowercasedTag === '@dataprovider') {
             $this->phpUnitDataProviderDocNodeFactory->setPhpDocParser($this);
             $tagValueNode = $this->phpUnitDataProviderDocNodeFactory->createFromTokens($tokenIterator);
         } elseif ($lowercasedTag === '@' . TagName::REQUIRED) {

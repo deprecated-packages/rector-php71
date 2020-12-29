@@ -23,6 +23,6 @@ final class ParamPhpDocNodeFactory
 
     public function create(TypeNode $typeNode, Param $param): AttributeAwareParamTagValueNode
     {
-        return new AttributeAwareParamTagValueNode($typeNode, $param->variadic, '$' . $this->nodeNameResolver->getName($param), '', $param->byRef);
+        return new AttributeAwareParamTagValueNode($typeNode, $param->variadic, '$' . $this->nodeNameResolver->getName($param), '');
     }
 }
