@@ -61,7 +61,7 @@ final class ValidateFixtureSuffixCommand extends Command
     private function getInvalidFixtureFileInfos(): array
     {
         $finder = new Finder();
-        $finder = $finder->files()->name('#\.inc$#')->name('#\.php#')->notName('#\.php\.inc$#')->path('#/Fixture/#')->notPath('#TagValueNodeReprint#')->notPath('#PhpSpecToPHPUnitRector#')->notPath('#Source#')->notPath('#expected#')->notPath('DoctrineRepositoryAsService/Fixture/PostController.php')->notPath('Namespace_/ImportFullyQualifiedNamesRector/Fixture/SharedShortName.php')->notPath('Name/RenameClassRector/Fixture/DuplicatedClass.php')->notPath('Rector/FileNode/RenameSpecFileToTestFileRector/Fixture/some_file_Spec.php')->in(__DIR__ . '/../../../../tests')->in(__DIR__ . '/../../../../packages/*/tests')->in(__DIR__ . '/../../../../rules/*/tests');
+        $finder = $finder->files()->name('#\.inc$#')->name('#\.php#')->notName('#\.php\.inc$#')->path('#/Fixture/#')->notPath('#TagValueNodeReprint#')->notPath('#PhpSpecToPHPUnitRector#')->notPath('#Source#')->notPath('#expected#')->notPath('DoctrineRepositoryAsService/Fixture/PostController.php')->notPath('Namespace_/ImportFullyQualifiedNamesRector/Fixture/SharedShortName.php')->notPath('Name/RenameClassRector/Fixture/DuplicatedClass.php')->notPath('Rector/FileNode/RenameSpecFileToTestFileRector/Fixture/some_file_Spec.php')->notPath('Rector/FileWithoutNamespace/PseudoNamespaceToNamespaceRector/Fixture/DateTime.php')->in(__DIR__ . '/../../../../tests')->in(__DIR__ . '/../../../../packages/*/tests')->in(__DIR__ . '/../../../../rules/*/tests');
 
         return $this->finderSanitizer->sanitize($finder);
     }
