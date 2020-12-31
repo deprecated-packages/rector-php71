@@ -21,7 +21,6 @@ final class ResolvedConstantStaticCollector
         if (in_array($lowercasedIdentifier, ['true', 'false', 'null'], true)) {
             return;
         }
-
         self::$valuesByIdentifier[$identifier] = $value;
     }
 

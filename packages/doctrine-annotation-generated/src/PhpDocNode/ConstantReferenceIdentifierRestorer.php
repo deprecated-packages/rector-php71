@@ -29,28 +29,25 @@ final class ConstantReferenceIdentifierRestorer
      */
     private $annotationVisibilityDetector;
 
-    public function __construct(
-        PrivatesAccessor $privatesAccessor,
-        AnnotationItemsResolver $annotationItemsResolver,
-        AnnotationVisibilityDetector $annotationVisibilityDetector
-    ) {
+    public function __construct(PrivatesAccessor $privatesAccessor, AnnotationItemsResolver $annotationItemsResolver, AnnotationVisibilityDetector $annotationVisibilityDetector)
+    {
         $this->privatesAccessor = $privatesAccessor;
         $this->annotationItemsResolver = $annotationItemsResolver;
         $this->annotationVisibilityDetector = $annotationVisibilityDetector;
     }
 
-    public function restoreObject(object $annotation): void
+    /**
+     * @param object $annotation
+     */
+    public function restoreObject($annotation): void
     {
         // restore constant value back to original value
         $identifierToResolvedValues = ResolvedConstantStaticCollector::provide();
         if ($identifierToResolvedValues === []) {
             return;
         }
-
         $propertyNameToValues = $this->annotationItemsResolver->resolve($annotation);
-
         $isPrivate = $this->annotationVisibilityDetector->isPrivate($annotation);
-
         foreach ($propertyNameToValues as $propertyName => $value) {
             $originalIdentifier = $this->matchIdentifierBasedOnResolverValue($identifierToResolvedValues, $value);
             if ($originalIdentifier !== null) {
@@ -70,7 +67,6 @@ final class ConstantReferenceIdentifierRestorer
 
             $this->restoreNestedValue($value, $identifierToResolvedValues, $isPrivate, $annotation, $propertyName);
         }
-
         ResolvedConstantStaticCollector::clear();
     }
 
@@ -88,26 +84,18 @@ final class ConstantReferenceIdentifierRestorer
 
             return $identifier;
         }
-
         return null;
     }
 
     /**
      * @param mixed[] $value
      * @param array<string, mixed> $identifierToResolvedValues
+     * @param object $annotation
      */
-    private function restoreNestedValue(
-        array $value,
-        array $identifierToResolvedValues,
-        bool $isPrivate,
-        object $annotation,
-        string $propertyName
-    ): void {
+    private function restoreNestedValue(array $value, array $identifierToResolvedValues, bool $isPrivate, $annotation, string $propertyName): void
+    {
         foreach ($value as $key => $nestedValue) {
-            $originalIdentifier = $this->matchIdentifierBasedOnResolverValue(
-                $identifierToResolvedValues,
-                $nestedValue
-            );
+            $originalIdentifier = $this->matchIdentifierBasedOnResolverValue($identifierToResolvedValues, $nestedValue);
 
             if ($originalIdentifier === null) {
                 continue;
