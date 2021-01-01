@@ -182,7 +182,7 @@ CODE_SAMPLE
             if (! $node->var instanceof ArrayDimFetch) {
                 return false;
             }
-            if ($this->isObjectType($node->expr, 'Nette\Application\IRouter')) {
+            if ($this->isObjectTypes($node->expr, ['Nette\Application\IRouter', 'Nette\Routing\Router'])) {
                 return true;
             }
             if ($node->expr instanceof StaticCall) {
