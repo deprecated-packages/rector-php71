@@ -134,7 +134,6 @@ CODE_SAMPLE
         // - all ancestors + their descendant classes
         // - all implemented interfaces + their implementing classes
         foreach ($ancestorAndInterfaces as $ancestorClassOrInterface) {
-            /** @var string */
             $parentClassName = $ancestorClassOrInterface->getAttribute(AttributeKey::CLASS_NAME);
             $classMethod = $this->nodeRepository->findClassMethod($parentClassName, $methodName);
             /**
