@@ -22,7 +22,7 @@ trait DeprecateTrait
      * @param string $version The version of the package that introduced the deprecation
      * @param string $message The deprecation message to use
      *
-     * @return mixed
+     * @return $this
      *
      * @throws InvalidArgumentException when the message template is invalid
      */

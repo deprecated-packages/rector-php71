@@ -7,13 +7,12 @@ namespace Rector\Doctrine\Provider;
 use Nette\Utils\Strings;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Property;
-use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo;
+use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfoFactory;
 use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\Doctrine\Property_\ColumnTagValueNode;
 use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\Doctrine\Property_\IdTagValueNode;
 use Rector\Doctrine\PhpDocParser\DoctrineDocBlockResolver;
 use Rector\NodeCollector\NodeCollector\ParsedNodeCollector;
 use Rector\NodeNameResolver\NodeNameResolver;
-use Rector\NodeTypeResolver\Node\AttributeKey;
 
 final class EntityWithMissingUuidProvider
 {
@@ -43,11 +42,17 @@ final class EntityWithMissingUuidProvider
      */
     private $nodeNameResolver;
 
-    public function __construct(DoctrineDocBlockResolver $doctrineDocBlockResolver, NodeNameResolver $nodeNameResolver, ParsedNodeCollector $parsedNodeCollector)
+    /**
+     * @var PhpDocInfoFactory
+     */
+    private $phpDocInfoFactory;
+
+    public function __construct(DoctrineDocBlockResolver $doctrineDocBlockResolver, NodeNameResolver $nodeNameResolver, ParsedNodeCollector $parsedNodeCollector, PhpDocInfoFactory $phpDocInfoFactory)
     {
         $this->parsedNodeCollector = $parsedNodeCollector;
         $this->doctrineDocBlockResolver = $doctrineDocBlockResolver;
         $this->nodeNameResolver = $nodeNameResolver;
+        $this->phpDocInfoFactory = $phpDocInfoFactory;
     }
 
     /**
@@ -85,29 +90,24 @@ final class EntityWithMissingUuidProvider
 
     private function hasClassIdPropertyWithUuidType(Class_ $class): bool
     {
-        foreach ($class->stmts as $classStmt) {
-            if (! $classStmt instanceof Property) {
+        foreach ($class->getProperties() as $property) {
+            if (! $this->nodeNameResolver->isName($property, 'id')) {
                 continue;
             }
 
-            if (! $this->nodeNameResolver->isName($classStmt, 'id')) {
-                continue;
-            }
-
-            return $this->isPropertyClassIdWithUuidType($classStmt);
+            return $this->isPropertyClassIdWithUuidType($property);
         }
         return false;
     }
 
     private function isPropertyClassIdWithUuidType(Property $property): bool
     {
-        /** @var PhpDocInfo $propertyPhpDocInfo */
-        $propertyPhpDocInfo = $property->getAttribute(AttributeKey::PHP_DOC_INFO);
-        if (! $propertyPhpDocInfo->hasByType(IdTagValueNode::class)) {
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($property);
+        if (! $phpDocInfo->hasByType(IdTagValueNode::class)) {
             return false;
         }
-        $columnTagValueNode = $propertyPhpDocInfo->getByType(ColumnTagValueNode::class);
-        if ($columnTagValueNode === null) {
+        $columnTagValueNode = $phpDocInfo->getByType(ColumnTagValueNode::class);
+        if (! $columnTagValueNode instanceof ColumnTagValueNode) {
             return false;
         }
         if ($columnTagValueNode->getType() === null) {

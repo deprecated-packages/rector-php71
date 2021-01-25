@@ -17,7 +17,6 @@ use Rector\NodeTypeResolver\NodeVisitor\FirstLevelNodeVisitor;
 use Rector\NodeTypeResolver\NodeVisitor\FunctionLikeParamArgPositionNodeVisitor;
 use Rector\NodeTypeResolver\NodeVisitor\FunctionMethodAndClassNodeVisitor;
 use Rector\NodeTypeResolver\NodeVisitor\NamespaceNodeVisitor;
-use Rector\NodeTypeResolver\NodeVisitor\PhpDocInfoNodeVisitor;
 use Rector\NodeTypeResolver\NodeVisitor\StatementNodeVisitor;
 use Rector\NodeTypeResolver\PHPStan\Scope\PHPStanNodeScopeResolver;
 use Symplify\SmartFileSystem\SmartFileInfo;
@@ -65,11 +64,6 @@ final class NodeScopeAndMetadataDecorator
     private $configuration;
 
     /**
-     * @var PhpDocInfoNodeVisitor
-     */
-    private $phpDocInfoNodeVisitor;
-
-    /**
      * @var NodeConnectingVisitor
      */
     private $nodeConnectingVisitor;
@@ -84,7 +78,7 @@ final class NodeScopeAndMetadataDecorator
      */
     private $firstLevelNodeVisitor;
 
-    public function __construct(CloningVisitor $cloningVisitor, Configuration $configuration, FileInfoNodeVisitor $fileInfoNodeVisitor, FunctionMethodAndClassNodeVisitor $functionMethodAndClassNodeVisitor, NamespaceNodeVisitor $namespaceNodeVisitor, NodeCollectorNodeVisitor $nodeCollectorNodeVisitor, PHPStanNodeScopeResolver $phpStanNodeScopeResolver, PhpDocInfoNodeVisitor $phpDocInfoNodeVisitor, StatementNodeVisitor $statementNodeVisitor, NodeConnectingVisitor $nodeConnectingVisitor, FunctionLikeParamArgPositionNodeVisitor $functionLikeParamArgPositionNodeVisitor, FirstLevelNodeVisitor $firstLevelNodeVisitor)
+    public function __construct(CloningVisitor $cloningVisitor, Configuration $configuration, FileInfoNodeVisitor $fileInfoNodeVisitor, FunctionMethodAndClassNodeVisitor $functionMethodAndClassNodeVisitor, NamespaceNodeVisitor $namespaceNodeVisitor, NodeCollectorNodeVisitor $nodeCollectorNodeVisitor, PHPStanNodeScopeResolver $phpStanNodeScopeResolver, StatementNodeVisitor $statementNodeVisitor, NodeConnectingVisitor $nodeConnectingVisitor, FunctionLikeParamArgPositionNodeVisitor $functionLikeParamArgPositionNodeVisitor, FirstLevelNodeVisitor $firstLevelNodeVisitor)
     {
         $this->phpStanNodeScopeResolver = $phpStanNodeScopeResolver;
         $this->cloningVisitor = $cloningVisitor;
@@ -94,7 +88,6 @@ final class NodeScopeAndMetadataDecorator
         $this->fileInfoNodeVisitor = $fileInfoNodeVisitor;
         $this->nodeCollectorNodeVisitor = $nodeCollectorNodeVisitor;
         $this->configuration = $configuration;
-        $this->phpDocInfoNodeVisitor = $phpDocInfoNodeVisitor;
         $this->nodeConnectingVisitor = $nodeConnectingVisitor;
         $this->functionLikeParamArgPositionNodeVisitor = $functionLikeParamArgPositionNodeVisitor;
         $this->firstLevelNodeVisitor = $firstLevelNodeVisitor;
@@ -131,7 +124,6 @@ final class NodeScopeAndMetadataDecorator
         $nodeTraverser->addVisitor($this->nodeConnectingVisitor);
         $nodeTraverser->addVisitor($this->functionMethodAndClassNodeVisitor);
         $nodeTraverser->addVisitor($this->namespaceNodeVisitor);
-        $nodeTraverser->addVisitor($this->phpDocInfoNodeVisitor);
         $nodeTraverser->addVisitor($this->firstLevelNodeVisitor);
         $nodeTraverser->addVisitor($this->functionLikeParamArgPositionNodeVisitor);
         $nodes = $nodeTraverser->traverse($nodes);

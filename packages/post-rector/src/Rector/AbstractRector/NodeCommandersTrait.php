@@ -136,7 +136,7 @@ trait NodeCommandersTrait
         }
         /** @var string $propertyName */
         $propertyName = $this->getName($property);
-        $this->addConstructorDependencyToClass($classNode, $propertyType, $propertyName);
+        $this->addConstructorDependencyToClass($classNode, $propertyType, $propertyName, $property->flags);
     }
 
     protected function addServiceConstructorDependencyToClass(Class_ $class, string $className): void
@@ -146,9 +146,9 @@ trait NodeCommandersTrait
         $this->addConstructorDependencyToClass($class, $serviceObjectType, $propertyName);
     }
 
-    protected function addConstructorDependencyToClass(Class_ $class, ?Type $propertyType, string $propertyName): void
+    protected function addConstructorDependencyToClass(Class_ $class, ?Type $propertyType, string $propertyName, int $propertyFlags = 0): void
     {
-        $this->propertyToAddCollector->addPropertyToClass($propertyName, $propertyType, $class);
+        $this->propertyToAddCollector->addPropertyToClass($class, $propertyName, $propertyType, $propertyFlags);
         $this->rectorChangeCollector->notifyNodeFileInfo($class);
     }
 
@@ -174,14 +174,7 @@ trait NodeCommandersTrait
      */
     protected function removeNodeFromStatements(Node $nodeWithStatements, Node $nodeToRemove): void
     {
-        foreach ((array) $nodeWithStatements->stmts as $key => $stmt) {
-            if ($nodeToRemove !== $stmt) {
-                continue;
-            }
-
-            unset($nodeWithStatements->stmts[$key]);
-            break;
-        }
+        $this->nodeRemover->removeNodeFromStatements($nodeWithStatements, $nodeToRemove);
     }
 
     protected function isNodeRemoved(Node $node): bool
@@ -199,7 +192,7 @@ trait NodeCommandersTrait
         }
     }
 
-    protected function notifyNodeFileInfo(Node $node): void
+    private function notifyNodeFileInfo(Node $node): void
     {
         $this->rectorChangeCollector->notifyNodeFileInfo($node);
     }

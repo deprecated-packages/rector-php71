@@ -52,6 +52,9 @@ final class ComposerJsonFactory
     public function createFromArray(array $jsonArray): ComposerJson
     {
         $composerJson = new ComposerJson();
+        if (isset($jsonArray[ComposerJsonSection::CONFIG])) {
+            $composerJson->setConfig($jsonArray[ComposerJsonSection::CONFIG]);
+        }
         if (isset($jsonArray[ComposerJsonSection::NAME])) {
             $composerJson->setName($jsonArray[ComposerJsonSection::NAME]);
         }
@@ -63,6 +66,12 @@ final class ComposerJsonFactory
         }
         if (isset($jsonArray[ComposerJsonSection::DESCRIPTION])) {
             $composerJson->setDescription($jsonArray[ComposerJsonSection::DESCRIPTION]);
+        }
+        if (isset($jsonArray[ComposerJsonSection::KEYWORDS])) {
+            $composerJson->setKeywords($jsonArray[ComposerJsonSection::KEYWORDS]);
+        }
+        if (isset($jsonArray[ComposerJsonSection::HOMEPAGE])) {
+            $composerJson->setHomepage($jsonArray[ComposerJsonSection::HOMEPAGE]);
         }
         if (isset($jsonArray[ComposerJsonSection::LICENSE])) {
             $composerJson->setLicense($jsonArray[ComposerJsonSection::LICENSE]);
@@ -85,14 +94,14 @@ final class ComposerJsonFactory
         if (isset($jsonArray[ComposerJsonSection::REPLACE])) {
             $composerJson->setReplace($jsonArray[ComposerJsonSection::REPLACE]);
         }
-        if (isset($jsonArray[ComposerJsonSection::CONFIG])) {
-            $composerJson->setConfig($jsonArray[ComposerJsonSection::CONFIG]);
-        }
         if (isset($jsonArray[ComposerJsonSection::EXTRA])) {
             $composerJson->setExtra($jsonArray[ComposerJsonSection::EXTRA]);
         }
         if (isset($jsonArray[ComposerJsonSection::SCRIPTS])) {
             $composerJson->setScripts($jsonArray[ComposerJsonSection::SCRIPTS]);
+        }
+        if (isset($jsonArray[ComposerJsonSection::SCRIPTS_DESCRIPTIONS])) {
+            $composerJson->setScriptsDescriptions($jsonArray[ComposerJsonSection::SCRIPTS_DESCRIPTIONS]);
         }
         if (isset($jsonArray[ComposerJsonSection::MINIMUM_STABILITY])) {
             $composerJson->setMinimumStability($jsonArray[ComposerJsonSection::MINIMUM_STABILITY]);

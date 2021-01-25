@@ -204,7 +204,7 @@ class Table
      * Any cell within this column which contents exceeds the specified width will be wrapped into multiple lines, while
      * formatted strings are preserved.
      *
-     * @return mixed
+     * @return $this
      */
     public function setColumnMaxWidth(int $columnIndex, int $width)
     {
@@ -255,6 +255,7 @@ class Table
 
     /**
      * Adds a row to the table, and re-renders the table.
+     * @return $this
      */
     public function appendRow($row)
     {
@@ -275,18 +276,27 @@ class Table
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setHeaderTitle(?string $title)
     {
         $this->headerTitle = $title;
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setFooterTitle(?string $title)
     {
         $this->footerTitle = $title;
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setHorizontal(bool $horizontal = true)
     {
         $this->horizontal = $horizontal;

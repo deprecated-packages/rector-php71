@@ -107,7 +107,7 @@ final class AutoBindNodeFactory
         return new MethodCall($methodCall, YamlKey::AUTOWIRE, $args);
     }
 
-    private function createAutoconfigure($value, MethodCall $methodCall, string $type)
+    private function createAutoconfigure($value, MethodCall $methodCall, string $type): MethodCall
     {
         if ($value === true) {
             return new MethodCall($methodCall, YamlKey::AUTOCONFIGURE);

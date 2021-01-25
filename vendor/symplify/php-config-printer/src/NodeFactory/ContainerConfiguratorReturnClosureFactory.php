@@ -11,7 +11,6 @@ use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Return_;
 use Symplify\PhpConfigPrinter\Contract\CaseConverterInterface;
-use Symplify\PhpConfigPrinter\Contract\NestedCaseConverterInterface;
 use Symplify\PhpConfigPrinter\PhpParser\NodeFactory\ConfiguratorClosureNodeFactory;
 use Symplify\PhpConfigPrinter\ValueObject\MethodName;
 use Symplify\PhpConfigPrinter\ValueObject\VariableName;
@@ -30,19 +29,18 @@ final class ContainerConfiguratorReturnClosureFactory
     private $caseConverters = [];
 
     /**
-     * @var NestedCaseConverterInterface[]
+     * @var ContainerNestedNodesFactory
      */
-    private $nestedCaseConverters = [];
+    private $containerNestedNodesFactory;
 
     /**
      * @param CaseConverterInterface[] $caseConverters
-     * @param NestedCaseConverterInterface[] $nestedCaseConverters
      */
-    public function __construct(ConfiguratorClosureNodeFactory $configuratorClosureNodeFactory, array $caseConverters, array $nestedCaseConverters)
+    public function __construct(ConfiguratorClosureNodeFactory $configuratorClosureNodeFactory, array $caseConverters, ContainerNestedNodesFactory $containerNestedNodesFactory)
     {
         $this->configuratorClosureNodeFactory = $configuratorClosureNodeFactory;
         $this->caseConverters = $caseConverters;
-        $this->nestedCaseConverters = $nestedCaseConverters;
+        $this->containerNestedNodesFactory = $containerNestedNodesFactory;
     }
 
     public function createFromYamlArray(array $arrayData): Return_
@@ -72,21 +70,10 @@ final class ContainerConfiguratorReturnClosureFactory
             $nodes = $this->createInitializeNode($key, $nodes);
 
             foreach ($values as $nestedKey => $nestedValues) {
-                $expression = null;
-
                 $nestedNodes = [];
 
                 if (is_array($nestedValues)) {
-                    foreach ($nestedValues as $subNestedKey => $subNestedValue) {
-                        foreach ($this->nestedCaseConverters as $nestedCaseConverter) {
-                            if (! $nestedCaseConverter->match($key, $nestedKey)) {
-                                continue;
-                            }
-
-                            $expression = $nestedCaseConverter->convertToMethodCall($subNestedKey, $subNestedValue);
-                            $nestedNodes[] = $expression;
-                        }
-                    }
+                    $nestedNodes = $this->containerNestedNodesFactory->createFromValues($nestedValues, $key, $nestedKey);
                 }
 
                 if ($nestedNodes !== []) {
@@ -94,17 +81,8 @@ final class ContainerConfiguratorReturnClosureFactory
                     continue;
                 }
 
-                foreach ($this->caseConverters as $caseConverter) {
-                    if (! $caseConverter->match($key, $nestedKey, $nestedValues)) {
-                        continue;
-                    }
-
-                    /** @var string $nestedKey */
-                    $expression = $caseConverter->convertToMethodCall($nestedKey, $nestedValues);
-                    break;
-                }
-
-                if ($expression === null) {
+                $expression = $this->resolveExpression($key, $nestedKey, $nestedValues);
+                if (! $expression instanceof Expression) {
                     continue;
                 }
 
@@ -122,6 +100,9 @@ final class ContainerConfiguratorReturnClosureFactory
         return new Expression($assign);
     }
 
+    /**
+     * @return mixed[]
+     */
     private function createInitializeNode(string $key, array $nodes): array
     {
         if ($key === YamlKey::SERVICES) {
@@ -131,5 +112,22 @@ final class ContainerConfiguratorReturnClosureFactory
             $nodes[] = $this->createInitializeAssign(VariableName::PARAMETERS, MethodName::PARAMETERS);
         }
         return $nodes;
+    }
+
+    /**
+     * @param int|string $nestedKey
+     * @param mixed|mixed[] $nestedValues
+     */
+    private function resolveExpression(string $key, $nestedKey, $nestedValues): ?Expression
+    {
+        foreach ($this->caseConverters as $caseConverter) {
+            if (! $caseConverter->match($key, $nestedKey, $nestedValues)) {
+                continue;
+            }
+
+            /** @var string $nestedKey */
+            return $caseConverter->convertToMethodCall($nestedKey, $nestedValues);
+        }
+        return null;
     }
 }

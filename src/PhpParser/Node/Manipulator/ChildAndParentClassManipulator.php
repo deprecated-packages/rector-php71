@@ -7,6 +7,7 @@ namespace Rector\Core\PhpParser\Node\Manipulator;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Expression;
+use Rector\Core\NodeAnalyzer\PromotedPropertyParamCleaner;
 use Rector\Core\PhpParser\Node\NodeFactory;
 use Rector\Core\ValueObject\MethodName;
 use Rector\NodeCollector\NodeCollector\NodeRepository;
@@ -36,12 +37,18 @@ final class ChildAndParentClassManipulator
      */
     private $nodeRepository;
 
-    public function __construct(NodeFactory $nodeFactory, NodeNameResolver $nodeNameResolver, ParsedNodeCollector $parsedNodeCollector, NodeRepository $nodeRepository)
+    /**
+     * @var PromotedPropertyParamCleaner
+     */
+    private $promotedPropertyParamCleaner;
+
+    public function __construct(NodeFactory $nodeFactory, NodeNameResolver $nodeNameResolver, ParsedNodeCollector $parsedNodeCollector, NodeRepository $nodeRepository, PromotedPropertyParamCleaner $promotedPropertyParamCleaner)
     {
         $this->nodeFactory = $nodeFactory;
         $this->nodeNameResolver = $nodeNameResolver;
         $this->parsedNodeCollector = $parsedNodeCollector;
         $this->nodeRepository = $nodeRepository;
+        $this->promotedPropertyParamCleaner = $promotedPropertyParamCleaner;
     }
 
     /**
@@ -73,10 +80,10 @@ final class ChildAndParentClassManipulator
         if ($className === null) {
             return;
         }
-        $childClassNodes = $this->nodeRepository->findChildrenOfClass($className);
-        foreach ($childClassNodes as $childClassNode) {
-            $childConstructorClassMethod = $childClassNode->getMethod(MethodName::CONSTRUCT);
-            if ($childConstructorClassMethod === null) {
+        $childClasses = $this->nodeRepository->findChildrenOfClass($className);
+        foreach ($childClasses as $childClass) {
+            $childConstructorClassMethod = $childClass->getMethod(MethodName::CONSTRUCT);
+            if (! $childConstructorClassMethod instanceof ClassMethod) {
                 continue;
             }
 
@@ -92,11 +99,12 @@ final class ChildAndParentClassManipulator
     private function completeParentConstructorBasedOnParentNode(Class_ $parentClassNode, ClassMethod $classMethod): void
     {
         $firstParentConstructMethodNode = $this->findFirstParentConstructor($parentClassNode);
-        if ($firstParentConstructMethodNode === null) {
+        if (! $firstParentConstructMethodNode instanceof ClassMethod) {
             return;
         }
+        $cleanParams = $this->promotedPropertyParamCleaner->cleanFromFlags($firstParentConstructMethodNode->params);
         // replicate parent parameters
-        $classMethod->params = array_merge($firstParentConstructMethodNode->params, $classMethod->params);
+        $classMethod->params = array_merge($cleanParams, $classMethod->params);
         $staticCall = $this->nodeFactory->createParentConstructWithParams($firstParentConstructMethodNode->params);
         $classMethod->stmts[] = new Expression($staticCall);
     }

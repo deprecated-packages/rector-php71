@@ -38,7 +38,7 @@ class FlattenException
     private $asString;
 
     /**
-     * @return mixed
+     * @return static
      */
     public static function create(\Exception $exception, $statusCode = null, array $headers = [])
     {
@@ -46,7 +46,7 @@ class FlattenException
     }
 
     /**
-     * @return mixed
+     * @return static
      */
     public static function createFromThrowable(\Throwable $exception, int $statusCode = null, array $headers = [])
     {
@@ -101,7 +101,7 @@ class FlattenException
     }
 
     /**
-     * @return mixed
+     * @return $this
      */
     public function setStatusCode($code)
     {
@@ -115,7 +115,7 @@ class FlattenException
     }
 
     /**
-     * @return mixed
+     * @return $this
      */
     public function setHeaders(array $headers)
     {
@@ -129,7 +129,7 @@ class FlattenException
     }
 
     /**
-     * @return mixed
+     * @return $this
      */
     public function setClass($class)
     {
@@ -143,7 +143,7 @@ class FlattenException
     }
 
     /**
-     * @return mixed
+     * @return $this
      */
     public function setFile($file)
     {
@@ -157,7 +157,7 @@ class FlattenException
     }
 
     /**
-     * @return mixed
+     * @return $this
      */
     public function setLine($line)
     {
@@ -170,6 +170,9 @@ class FlattenException
         return $this->statusText;
     }
 
+    /**
+     * @return $this
+     */
     public function setStatusText(string $statusText)
     {
         $this->statusText = $statusText;
@@ -182,7 +185,7 @@ class FlattenException
     }
 
     /**
-     * @return mixed
+     * @return $this
      */
     public function setMessage($message)
     {
@@ -204,7 +207,7 @@ class FlattenException
     }
 
     /**
-     * @return mixed
+     * @return $this
      */
     public function setCode($code)
     {
@@ -213,7 +216,7 @@ class FlattenException
     }
 
     /**
-     * @return mixed|null
+     * @return $this|null
      */
     public function getPrevious()
     {
@@ -221,10 +224,9 @@ class FlattenException
     }
 
     /**
-     * @return mixed
-     * @param mixed $previous
+     * @return $this
      */
-    public function setPrevious($previous)
+    public function setPrevious(self $previous)
     {
         $this->previous = $previous;
         return $this;
@@ -250,7 +252,7 @@ class FlattenException
     }
 
     /**
-     * @return mixed
+     * @return $this
      */
     public function setTraceFromThrowable(\Throwable $throwable)
     {
@@ -259,7 +261,7 @@ class FlattenException
     }
 
     /**
-     * @return mixed
+     * @return $this
      */
     public function setTrace($trace, $file, $line)
     {
@@ -344,7 +346,7 @@ class FlattenException
     }
 
     /**
-     * @return mixed
+     * @return $this
      */
     public function setAsString(?string $asString)
     {

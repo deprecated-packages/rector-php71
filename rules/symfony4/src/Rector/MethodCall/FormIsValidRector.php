@@ -74,7 +74,7 @@ CODE_SAMPLE
     {
         $originalNode = $methodCall->getAttribute(AttributeKey::ORIGINAL_NODE);
         // skip just added calls
-        if ($originalNode === null) {
+        if (! $originalNode instanceof Node) {
             return true;
         }
         if (! $this->isObjectType($methodCall->var, 'Symfony\Component\Form\Form')) {

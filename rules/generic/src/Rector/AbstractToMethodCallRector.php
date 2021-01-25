@@ -17,6 +17,7 @@ use Rector\Core\Rector\AbstractRector;
 use Rector\Generic\NodeTypeAnalyzer\TypeProvidingExprFromClassResolver;
 use Rector\Naming\Naming\PropertyNaming;
 use Rector\StaticTypeMapper\ValueObject\Type\FullyQualifiedObjectType;
+use Rector\Transform\NodeFactory\PropertyFetchFactory;
 
 abstract class AbstractToMethodCallRector extends AbstractRector implements ConfigurableRectorInterface
 {
@@ -31,12 +32,18 @@ abstract class AbstractToMethodCallRector extends AbstractRector implements Conf
     private $typeProvidingExprFromClassResolver;
 
     /**
+     * @var PropertyFetchFactory
+     */
+    private $propertyFetchFactory;
+
+    /**
      * @required
      */
-    public function autowireAbstractToMethodCallRector(PropertyNaming $propertyNaming, TypeProvidingExprFromClassResolver $typeProvidingExprFromClassResolver): void
+    public function autowireAbstractToMethodCallRector(PropertyNaming $propertyNaming, TypeProvidingExprFromClassResolver $typeProvidingExprFromClassResolver, PropertyFetchFactory $propertyFetchFactory): void
     {
         $this->propertyNaming = $propertyNaming;
         $this->typeProvidingExprFromClassResolver = $typeProvidingExprFromClassResolver;
+        $this->propertyFetchFactory = $propertyFetchFactory;
     }
 
     /**
@@ -54,7 +61,7 @@ abstract class AbstractToMethodCallRector extends AbstractRector implements Conf
             return $expr;
         }
         $this->addPropertyTypeToClass($type, $class);
-        return $this->createPropertyFetchFromClass($type);
+        return $this->propertyFetchFactory->createFromType($type);
     }
 
     /**
@@ -74,12 +81,5 @@ abstract class AbstractToMethodCallRector extends AbstractRector implements Conf
         $fullyQualifiedObjectType = new FullyQualifiedObjectType($type);
         $propertyName = $this->propertyNaming->fqnToVariableName($fullyQualifiedObjectType);
         $this->addConstructorDependencyToClass($class, $fullyQualifiedObjectType, $propertyName);
-    }
-
-    private function createPropertyFetchFromClass(string $type): PropertyFetch
-    {
-        $thisVariable = new Variable('this');
-        $propertyName = $this->propertyNaming->fqnToVariableName($type);
-        return new PropertyFetch($thisVariable, $propertyName);
     }
 }

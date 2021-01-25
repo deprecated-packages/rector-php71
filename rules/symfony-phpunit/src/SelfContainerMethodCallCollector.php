@@ -8,9 +8,9 @@ use PhpParser\Node;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Stmt\Class_;
 use Rector\Core\PhpParser\Node\Value\ValueResolver;
-use Rector\Core\PhpParser\NodeTraverser\CallableNodeTraverser;
 use Rector\SymfonyPHPUnit\Node\KernelTestCaseNodeAnalyzer;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symplify\Astral\NodeTraverser\SimpleCallableNodeTraverser;
 
 final class SelfContainerMethodCallCollector
 {
@@ -20,19 +20,19 @@ final class SelfContainerMethodCallCollector
     private $kernelTestCaseNodeAnalyzer;
 
     /**
-     * @var CallableNodeTraverser
+     * @var SimpleCallableNodeTraverser
      */
-    private $callableNodeTraverser;
+    private $simpleCallableNodeTraverser;
 
     /**
      * @var ValueResolver
      */
     private $valueResolver;
 
-    public function __construct(CallableNodeTraverser $callableNodeTraverser, KernelTestCaseNodeAnalyzer $kernelTestCaseNodeAnalyzer, ValueResolver $valueResolver)
+    public function __construct(SimpleCallableNodeTraverser $simpleCallableNodeTraverser, KernelTestCaseNodeAnalyzer $kernelTestCaseNodeAnalyzer, ValueResolver $valueResolver)
     {
         $this->kernelTestCaseNodeAnalyzer = $kernelTestCaseNodeAnalyzer;
-        $this->callableNodeTraverser = $callableNodeTraverser;
+        $this->simpleCallableNodeTraverser = $simpleCallableNodeTraverser;
         $this->valueResolver = $valueResolver;
     }
 
@@ -42,7 +42,7 @@ final class SelfContainerMethodCallCollector
     public function collectContainerGetServiceTypes(Class_ $class, bool $skipSetUpMethod = true): array
     {
         $serviceTypes = [];
-        $this->callableNodeTraverser->traverseNodesWithCallable($class->stmts, function (Node $node) use (&$serviceTypes, $skipSetUpMethod): ?Node {
+        $this->simpleCallableNodeTraverser->traverseNodesWithCallable($class->stmts, function (Node $node) use (&$serviceTypes, $skipSetUpMethod): ?Node {
             if (! $node instanceof MethodCall) {
                 return null;
             }

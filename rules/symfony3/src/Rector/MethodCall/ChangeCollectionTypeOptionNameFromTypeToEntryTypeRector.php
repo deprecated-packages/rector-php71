@@ -88,7 +88,7 @@ CODE_SAMPLE
             return null;
         }
         $optionsArray = $this->matchOptionsArray($node);
-        if ($optionsArray === null) {
+        if (! $optionsArray instanceof Array_) {
             return null;
         }
         $this->refactorOptionsArray($optionsArray);

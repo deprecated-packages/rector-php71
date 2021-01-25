@@ -48,11 +48,6 @@ final class ImportCaseConverter implements CaseConverterInterface
         $this->commonNodeFactory = $commonNodeFactory;
     }
 
-    public function getKey(): string
-    {
-        return YamlKey::IMPORTS;
-    }
-
     public function match(string $rootKey, $key, $values): bool
     {
         return $rootKey === YamlKey::IMPORTS;
@@ -115,9 +110,15 @@ final class ImportCaseConverter implements CaseConverterInterface
             return false;
         }
         // follow by default value for "ignore_errors"
-        return isset($arguments[YamlKey::IGNORE_ERRORS]) && $arguments[YamlKey::IGNORE_ERRORS] === false;
+        if (! isset($arguments[YamlKey::IGNORE_ERRORS])) {
+            return false;
+        }
+        return $arguments[YamlKey::IGNORE_ERRORS] === false;
     }
 
+    /**
+     * @return mixed|string
+     */
     private function replaceImportedFileSuffix($value)
     {
         if (! is_string($value)) {
@@ -128,7 +129,10 @@ final class ImportCaseConverter implements CaseConverterInterface
 
     private function resolveExpr($value): Expr
     {
-        if (is_bool($value) || in_array($value, ['annotations', 'directory', 'glob'], true)) {
+        if (is_bool($value)) {
+            return BuilderHelpers::normalizeValue($value);
+        }
+        if (in_array($value, ['annotations', 'directory', 'glob'], true)) {
             return BuilderHelpers::normalizeValue($value);
         }
         if ($value === 'not_found') {

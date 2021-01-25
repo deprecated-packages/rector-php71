@@ -27,42 +27,63 @@ final class Cursor
         $this->input = $input ?? (\defined('STDIN') ? \STDIN : fopen('php://input', 'r+'));
     }
 
+    /**
+     * @return $this
+     */
     public function moveUp(int $lines = 1)
     {
         $this->output->write(sprintf("\x1b[%dA", $lines));
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function moveDown(int $lines = 1)
     {
         $this->output->write(sprintf("\x1b[%dB", $lines));
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function moveRight(int $columns = 1)
     {
         $this->output->write(sprintf("\x1b[%dC", $columns));
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function moveLeft(int $columns = 1)
     {
         $this->output->write(sprintf("\x1b[%dD", $columns));
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function moveToColumn(int $column)
     {
         $this->output->write(sprintf("\x1b[%dG", $column));
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function moveToPosition(int $column, int $row)
     {
         $this->output->write(sprintf("\x1b[%d;%dH", $row + 1, $column));
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function savePosition()
     {
         $this->output->write("\x1b7");
@@ -70,6 +91,9 @@ final class Cursor
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function restorePosition()
     {
         $this->output->write("\x1b8");
@@ -77,6 +101,9 @@ final class Cursor
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function hide()
     {
         $this->output->write("\x1b[?25l");
@@ -84,6 +111,9 @@ final class Cursor
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function show()
     {
         $this->output->write("\x1b[?25h\x1b[?0c");
@@ -93,6 +123,7 @@ final class Cursor
 
     /**
      * Clears all the output from the current line.
+     * @return $this
      */
     public function clearLine()
     {
@@ -103,6 +134,7 @@ final class Cursor
 
     /**
      * Clears all the output from the current line after the current position.
+     * @return $this
      */
     public function clearLineAfter()
     {
@@ -113,6 +145,7 @@ final class Cursor
 
     /**
      * Clears all the output from the cursors' current position to the end of the screen.
+     * @return $this
      */
     public function clearOutput()
     {
@@ -123,6 +156,7 @@ final class Cursor
 
     /**
      * Clears the entire screen.
+     * @return $this
      */
     public function clearScreen()
     {

@@ -62,7 +62,7 @@ final class UseManipulator
             }
 
             $parentNode = $nameNode->getAttribute(AttributeKey::PARENT_NODE);
-            if ($parentNode === null) {
+            if (! $parentNode instanceof Node) {
                 throw new ShouldNotHappenException();
             }
 
@@ -76,7 +76,7 @@ final class UseManipulator
         $classLikes = $this->betterNodeFinder->findClassLikes([$searchNode]);
         foreach ($classLikes as $classLike) {
             $classLikeName = $classLike->name;
-            if ($classLikeName === null) {
+            if (! $classLikeName instanceof Identifier) {
                 continue;
             }
 

@@ -51,7 +51,7 @@ abstract class AbstractUnicodeString extends AbstractString
     private static $transliterators = [];
 
     /**
-     * @return mixed
+     * @return static
      */
     public static function fromCodePoints(int ...$codes)
     {
@@ -76,6 +76,7 @@ abstract class AbstractUnicodeString extends AbstractString
      * Install the intl extension for best results.
      *
      * @param string[]|\Transliterator[]|\Closure[] $rules See "*-Latin" rules from Transliterator::listIDs()
+     * @return $this
      */
     public function ascii(array $rules = [])
     {
@@ -232,7 +233,7 @@ abstract class AbstractUnicodeString extends AbstractString
     }
 
     /**
-     * @return mixed
+     * @return static
      */
     public function normalize(int $form = self::NFC)
     {
@@ -418,9 +419,8 @@ abstract class AbstractUnicodeString extends AbstractString
 
     /**
      * @return mixed
-     * @param mixed $pad
      */
-    private function pad(int $len, $pad, int $type)
+    private function pad(int $len, self $pad, int $type)
     {
         $sLen = $this->length();
         if ($len <= $sLen) {

@@ -15,7 +15,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symplify\PackageBuilder\Console\ShellCode;
-use Symplify\SmartFileSystem\Finder\FinderSanitizer;
 use Symplify\SmartFileSystem\SmartFileInfo;
 use Symplify\SmartFileSystem\SmartFileSystem;
 
@@ -75,11 +74,6 @@ final class ValidateFixtureClassnameCommand extends Command
     ];
 
     /**
-     * @var FinderSanitizer
-     */
-    private $finderSanitizer;
-
-    /**
      * @var SymfonyStyle
      */
     private $symfonyStyle;
@@ -102,22 +96,21 @@ final class ValidateFixtureClassnameCommand extends Command
     /**
      * @var NamespaceMatcher
      */
-    private $namespaceMather;
+    private $namespaceMatcher;
 
     /**
      * @var ExpectedNameResolver
      */
     private $expectedNameResolver;
 
-    public function __construct(FinderSanitizer $finderSanitizer, SymfonyStyle $symfonyStyle, ExpectedNameResolver $expectedNameResolver, SmartFileSystem $smartFileSystem, FixtureFinder $fixtureFinder, NamespaceMatcher $namespaceMather)
+    public function __construct(SymfonyStyle $symfonyStyle, ExpectedNameResolver $expectedNameResolver, SmartFileSystem $smartFileSystem, FixtureFinder $fixtureFinder, NamespaceMatcher $namespaceMatcher)
     {
-        $this->finderSanitizer = $finderSanitizer;
+        parent::__construct();
         $this->symfonyStyle = $symfonyStyle;
         $this->currentDirectory = getcwd();
         $this->smartFileSystem = $smartFileSystem;
-        parent::__construct();
         $this->fixtureFinder = $fixtureFinder;
-        $this->namespaceMather = $namespaceMather;
+        $this->namespaceMatcher = $namespaceMatcher;
         $this->expectedNameResolver = $expectedNameResolver;
     }
 
@@ -139,7 +132,7 @@ final class ValidateFixtureClassnameCommand extends Command
                 continue;
             }
 
-            $path = ltrim(substr($paths[0], strlen($this->currentDirectory)) . '/tests', '/');
+            $path = ltrim(Strings::substring($paths[0], strlen($this->currentDirectory)) . '/tests', '/');
 
             $expectedNamespace = $this->expectedNameResolver->resolve($path, $paths[1]);
             if ($expectedNamespace === null) {
@@ -150,8 +143,9 @@ final class ValidateFixtureClassnameCommand extends Command
             $fileContent = $this->smartFileSystem->readFile((string) $fixtureFileInfo);
 
             $matchAll = Strings::matchAll($fileContent, self::NAMESPACE_REGEX);
+            $namespaceMatcherIsFoundCorrectNamespace = $this->namespaceMatcher->isFoundCorrectNamespace($matchAll, $expectedNamespace);
 
-            if (! $this->namespaceMather->isFoundCorrectNamespace($matchAll, $expectedNamespace)) {
+            if (! $namespaceMatcherIsFoundCorrectNamespace) {
                 continue;
             }
 
@@ -182,10 +176,13 @@ final class ValidateFixtureClassnameCommand extends Command
     private function checkAndFixClassName(string $fileContent, SmartFileInfo $fixtureFile, array $incorrectClassNameFiles, bool $optionFix): array
     {
         $matchAll = Strings::matchAll($fileContent, self::CLASS_REGEX);
-        if ($matchAll === [] || count($matchAll) > 2) {
+        if ($matchAll === []) {
             return $incorrectClassNameFiles;
         }
-        $fileName = substr($fixtureFile->getFileName(), 0, -8);
+        if (count($matchAll) > 2) {
+            return $incorrectClassNameFiles;
+        }
+        $fileName = Strings::substring($fixtureFile->getFileName(), 0, -8);
         if (in_array($fileName, self::EXCLUDE_NAMES, true)) {
             return $incorrectClassNameFiles;
         }
@@ -210,17 +207,17 @@ final class ValidateFixtureClassnameCommand extends Command
         return $incorrectClassNameFiles;
     }
 
-    private function fixClassName(string $incorrectClassNameFile, string $incorrectClassName, string $incorrectFileContent, string $expectedClassName): void
-    {
-        $newContent = str_replace('class ' . $incorrectClassName, 'class ' . $expectedClassName, $incorrectFileContent);
-        $this->smartFileSystem->dumpFile((string) $incorrectClassNameFile, $newContent);
-    }
-
     /**
      * @param array<int, array<int, string>> $matchAll
      */
     private function getClassName(array $matchAll): string
     {
         return $matchAll[0][2];
+    }
+
+    private function fixClassName(string $incorrectClassNameFile, string $incorrectClassName, string $incorrectFileContent, string $expectedClassName): void
+    {
+        $newContent = str_replace('class ' . $incorrectClassName, 'class ' . $expectedClassName, $incorrectFileContent);
+        $this->smartFileSystem->dumpFile($incorrectClassNameFile, $newContent);
     }
 }

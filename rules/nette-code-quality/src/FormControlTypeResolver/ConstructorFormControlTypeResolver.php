@@ -48,9 +48,8 @@ final class ConstructorFormControlTypeResolver implements FormControlTypeResolve
         if (! $this->nodeNameResolver->isName($node, MethodName::CONSTRUCT)) {
             return [];
         }
-        /** @var Variable|null $thisVariable */
         $thisVariable = $this->betterNodeFinder->findVariableOfName($node, 'this');
-        if ($thisVariable === null) {
+        if (! $thisVariable instanceof Variable) {
             return [];
         }
         return $this->methodNamesByInputNamesResolver->resolveExpr($thisVariable);

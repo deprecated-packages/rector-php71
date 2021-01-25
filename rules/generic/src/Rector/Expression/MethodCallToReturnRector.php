@@ -99,6 +99,7 @@ CODE_SAMPLE
 
     private function refactorMethodCall(MethodCall $methodCall): ?Node
     {
+        $parent = $methodCall->getAttribute(AttributeKey::PARENT_NODE);
         foreach ($this->methodCallWraps as $methodCallWrap) {
             if (! $this->isObjectType($methodCall->var, $methodCallWrap->getClass())) {
                 continue;
@@ -108,10 +109,8 @@ CODE_SAMPLE
                 continue;
             }
 
-            $parentNode = $methodCall->getAttribute(AttributeKey::PARENT_NODE);
-
             // already wrapped
-            if ($parentNode instanceof Return_) {
+            if ($parent instanceof Return_) {
                 continue;
             }
 

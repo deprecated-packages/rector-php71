@@ -64,7 +64,7 @@ final class ArrayDimFetchControlTypeResolver implements FormControlTypeResolverI
             return [];
         }
         $createComponentClassMethod = $this->matchCreateComponentClassMethod($node, $controlShortName);
-        if ($createComponentClassMethod === null) {
+        if (! $createComponentClassMethod instanceof ClassMethod) {
             return [];
         }
         $createComponentClassMethodReturnType = $this->returnTypeInferer->inferFunctionLike($createComponentClassMethod);

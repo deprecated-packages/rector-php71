@@ -30,16 +30,15 @@ final class PropertyNodeParamTypeInferer extends AbstractTypeInferer implements 
 
     public function inferParam(Param $param): Type
     {
-        /** @var Class_|null $classLike */
         $classLike = $param->getAttribute(AttributeKey::CLASS_NODE);
-        if ($classLike === null) {
+        if (! $classLike instanceof Class_) {
             return new MixedType();
         }
         $paramName = $this->nodeNameResolver->getName($param);
         /** @var ClassMethod $classMethod */
         $classMethod = $param->getAttribute(AttributeKey::PARENT_NODE);
         $propertyStaticTypes = [];
-        $this->callableNodeTraverser->traverseNodesWithCallable($classMethod, function (Node $node) use ($paramName, &$propertyStaticTypes) {
+        $this->simpleCallableNodeTraverser->traverseNodesWithCallable($classMethod, function (Node $node) use ($paramName, &$propertyStaticTypes) {
             if (! $node instanceof Assign) {
                 return null;
             }

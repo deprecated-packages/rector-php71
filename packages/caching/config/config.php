@@ -14,7 +14,7 @@ use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\ref;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return static function (ContainerConfigurator $containerConfigurator) : void {
     $parameters = $containerConfigurator->parameters();
@@ -26,12 +26,12 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
         ->public()
         ->autoconfigure();
     $services->load('Rector\Caching\\', __DIR__ . '/../src');
-    $services->set(DependencyResolver::class)->factory([ref(PHPStanServicesFactory::class), 'createDependencyResolver']);
-    $services->set(FileHelper::class)->factory([ref(PHPStanServicesFactory::class), 'createFileHelper']);
+    $services->set(DependencyResolver::class)->factory([service(PHPStanServicesFactory::class), 'createDependencyResolver']);
+    $services->set(FileHelper::class)->factory([service(PHPStanServicesFactory::class), 'createFileHelper']);
     $services->set(Psr16Cache::class);
     $services->alias(CacheInterface::class, Psr16Cache::class);
-    $services->set(FilesystemAdapter::class)->factory([ref(FilesystemAdapterFactory::class), 'create']);
-    $services->set(TagAwareAdapter::class)->arg('$itemsPool', ref(FilesystemAdapter::class));
+    $services->set(FilesystemAdapter::class)->factory([service(FilesystemAdapterFactory::class), 'create']);
+    $services->set(TagAwareAdapter::class)->arg('$itemsPool', service(FilesystemAdapter::class));
     $services->alias(CacheItemPoolInterface::class, FilesystemAdapter::class);
     $services->alias(TagAwareAdapterInterface::class, TagAwareAdapter::class);
 };

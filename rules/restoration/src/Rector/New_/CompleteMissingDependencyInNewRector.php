@@ -13,6 +13,7 @@ use Rector\Core\Rector\AbstractRector;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionParameter;
+use ReflectionType;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\ConfiguredCodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
@@ -120,7 +121,7 @@ CODE_SAMPLE
     private function shouldSkipNew(New_ $new): bool
     {
         $constructorMethodReflection = $this->getNewNodeClassConstructorMethodReflection($new);
-        if ($constructorMethodReflection === null) {
+        if (! $constructorMethodReflection instanceof ReflectionMethod) {
             return true;
         }
         return $constructorMethodReflection->getNumberOfRequiredParameters() <= count($new->args);
@@ -142,7 +143,7 @@ CODE_SAMPLE
     private function resolveClassToInstantiateByParameterReflection(ReflectionParameter $reflectionParameter): ?string
     {
         $parameterType = $reflectionParameter->getType();
-        if ($parameterType === null) {
+        if (! $parameterType instanceof ReflectionType) {
             return null;
         }
         $requiredType = (string) $parameterType;

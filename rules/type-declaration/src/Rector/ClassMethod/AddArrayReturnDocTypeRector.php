@@ -16,9 +16,12 @@ use PHPStan\Type\MixedType;
 use PHPStan\Type\Type;
 use PHPStan\Type\UnionType;
 use PHPStan\Type\VoidType;
+use Rector\AttributeAwarePhpDoc\Ast\Type\AttributeAwareArrayShapeNode;
+use Rector\AttributeAwarePhpDoc\Ast\Type\AttributeAwareGenericTypeNode;
 use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo;
+use Rector\BetterPhpDocParser\PhpDocManipulator\PhpDocTypeChanger;
 use Rector\Core\Rector\AbstractRector;
-use Rector\NodeTypeResolver\Node\AttributeKey;
+use Rector\Privatization\TypeManipulator\NormalizeTypeToRespectArrayScalarType;
 use Rector\TypeDeclaration\OverrideGuard\ClassMethodReturnTypeOverrideGuard;
 use Rector\TypeDeclaration\TypeAnalyzer\AdvancedArrayAnalyzer;
 use Rector\TypeDeclaration\TypeInferer\ReturnTypeInferer;
@@ -53,11 +56,23 @@ final class AddArrayReturnDocTypeRector extends AbstractRector
      */
     private $advancedArrayAnalyzer;
 
-    public function __construct(ReturnTypeInferer $returnTypeInferer, ClassMethodReturnTypeOverrideGuard $classMethodReturnTypeOverrideGuard, AdvancedArrayAnalyzer $advancedArrayAnalyzer)
+    /**
+     * @var PhpDocTypeChanger
+     */
+    private $phpDocTypeChanger;
+
+    /**
+     * @var NormalizeTypeToRespectArrayScalarType
+     */
+    private $normalizeTypeToRespectArrayScalarType;
+
+    public function __construct(ReturnTypeInferer $returnTypeInferer, ClassMethodReturnTypeOverrideGuard $classMethodReturnTypeOverrideGuard, AdvancedArrayAnalyzer $advancedArrayAnalyzer, PhpDocTypeChanger $phpDocTypeChanger, NormalizeTypeToRespectArrayScalarType $normalizeTypeToRespectArrayScalarType)
     {
         $this->returnTypeInferer = $returnTypeInferer;
         $this->classMethodReturnTypeOverrideGuard = $classMethodReturnTypeOverrideGuard;
         $this->advancedArrayAnalyzer = $advancedArrayAnalyzer;
+        $this->phpDocTypeChanger = $phpDocTypeChanger;
+        $this->normalizeTypeToRespectArrayScalarType = $normalizeTypeToRespectArrayScalarType;
     }
 
     public function getRuleDefinition(): RuleDefinition
@@ -112,27 +127,24 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        if ($this->shouldSkip($node)) {
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($node);
+        if ($this->shouldSkip($node, $phpDocInfo)) {
             return null;
         }
-        $inferedType = $this->returnTypeInferer->inferFunctionLikeWithExcludedInferers($node, [ReturnTypeDeclarationReturnTypeInferer::class]);
-        $currentReturnType = $this->getNodeReturnPhpDocType($node);
-        if ($currentReturnType !== null && $this->classMethodReturnTypeOverrideGuard->shouldSkipClassMethodOldTypeWithNewType($currentReturnType, $inferedType)) {
+        $inferredReturnType = $this->returnTypeInferer->inferFunctionLikeWithExcludedInferers($node, [ReturnTypeDeclarationReturnTypeInferer::class]);
+        $inferredReturnType = $this->normalizeTypeToRespectArrayScalarType->normalizeToArray($inferredReturnType, $node->returnType);
+        $currentReturnType = $phpDocInfo->getReturnType();
+        if ($this->classMethodReturnTypeOverrideGuard->shouldSkipClassMethodOldTypeWithNewType($currentReturnType, $inferredReturnType)) {
             return null;
         }
-        if ($this->shouldSkipType($inferedType, $node)) {
+        if ($this->shouldSkipType($inferredReturnType, $node, $phpDocInfo)) {
             return null;
         }
-        /** @var PhpDocInfo|null $phpDocInfo */
-        $phpDocInfo = $node->getAttribute(AttributeKey::PHP_DOC_INFO);
-        if ($phpDocInfo === null) {
-            return null;
-        }
-        $phpDocInfo->changeReturnType($inferedType);
+        $this->phpDocTypeChanger->changeReturnType($phpDocInfo, $inferredReturnType);
         return $node;
     }
 
-    private function shouldSkip(ClassMethod $classMethod): bool
+    private function shouldSkip(ClassMethod $classMethod, PhpDocInfo $phpDocInfo): bool
     {
         if ($this->shouldSkipClassMethod($classMethod)) {
             return true;
@@ -140,7 +152,7 @@ CODE_SAMPLE
         if ($this->hasArrayShapeNode($classMethod)) {
             return true;
         }
-        $currentPhpDocReturnType = $this->getNodeReturnPhpDocType($classMethod);
+        $currentPhpDocReturnType = $phpDocInfo->getReturnType();
         if ($currentPhpDocReturnType instanceof ArrayType && $currentPhpDocReturnType->getItemType() instanceof MixedType) {
             return true;
         }
@@ -150,21 +162,14 @@ CODE_SAMPLE
         return $currentPhpDocReturnType instanceof IterableType;
     }
 
-    private function getNodeReturnPhpDocType(ClassMethod $classMethod): ?Type
-    {
-        /** @var PhpDocInfo|null $phpDocInfo */
-        $phpDocInfo = $classMethod->getAttribute(AttributeKey::PHP_DOC_INFO);
-        return $phpDocInfo !== null ? $phpDocInfo->getReturnType() : null;
-    }
-
     /**
      * @deprecated
      * @todo merge to
      * @see \Rector\TypeDeclaration\TypeAlreadyAddedChecker\ReturnTypeAlreadyAddedChecker
      */
-    private function shouldSkipType(Type $newType, ClassMethod $classMethod): bool
+    private function shouldSkipType(Type $newType, ClassMethod $classMethod, PhpDocInfo $phpDocInfo): bool
     {
-        if ($newType instanceof ArrayType && $this->shouldSkipArrayType($newType, $classMethod)) {
+        if ($newType instanceof ArrayType && $this->shouldSkipArrayType($newType, $classMethod, $phpDocInfo)) {
             return true;
         }
         if ($newType instanceof UnionType && $this->shouldSkipUnionType($newType)) {
@@ -174,7 +179,7 @@ CODE_SAMPLE
         if ($newType instanceof VoidType) {
             return true;
         }
-        if ($this->advancedArrayAnalyzer->isMoreSpecificArrayTypeOverride($newType, $classMethod)) {
+        if ($this->advancedArrayAnalyzer->isMoreSpecificArrayTypeOverride($newType, $classMethod, $phpDocInfo)) {
             return true;
         }
         if (! $newType instanceof ConstantArrayType) {
@@ -194,32 +199,18 @@ CODE_SAMPLE
         return ! $this->isNames($classMethod->returnType, ['array', 'iterable']);
     }
 
-    private function shouldSkipArrayType(ArrayType $arrayType, ClassMethod $classMethod): bool
-    {
-        if ($this->advancedArrayAnalyzer->isNewAndCurrentTypeBothCallable($arrayType, $classMethod)) {
-            return true;
-        }
-        if ($this->advancedArrayAnalyzer->isClassStringArrayByStringArrayOverride($arrayType, $classMethod)) {
-            return true;
-        }
-        return $this->advancedArrayAnalyzer->isMixedOfSpecificOverride($arrayType, $classMethod);
-    }
-
-    private function shouldSkipUnionType(UnionType $unionType): bool
-    {
-        return count($unionType->getTypes()) > self::MAX_NUMBER_OF_TYPES;
-    }
-
     private function hasArrayShapeNode(ClassMethod $classMethod): bool
     {
-        /** @var PhpDocInfo|null $phpDocInfo */
-        $phpDocInfo = $classMethod->getAttribute(AttributeKey::PHP_DOC_INFO);
-        if (! $phpDocInfo instanceof PhpDocInfo) {
-            return false;
-        }
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($classMethod);
         $attributeAwareReturnTagValueNode = $phpDocInfo->getReturnTagValue();
         if (! $attributeAwareReturnTagValueNode instanceof ReturnTagValueNode) {
             return false;
+        }
+        if ($attributeAwareReturnTagValueNode->type instanceof AttributeAwareGenericTypeNode) {
+            return true;
+        }
+        if ($attributeAwareReturnTagValueNode->type instanceof AttributeAwareArrayShapeNode) {
+            return true;
         }
         if (! $attributeAwareReturnTagValueNode->type instanceof ArrayTypeNode) {
             return false;
@@ -229,10 +220,23 @@ CODE_SAMPLE
 
     private function hasInheritDoc(ClassMethod $classMethod): bool
     {
-        $phpDocInfo = $classMethod->getAttribute(AttributeKey::PHP_DOC_INFO);
-        if (! $phpDocInfo instanceof PhpDocInfo) {
-            return false;
-        }
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($classMethod);
         return $phpDocInfo->hasInheritDoc();
+    }
+
+    private function shouldSkipArrayType(ArrayType $arrayType, ClassMethod $classMethod, PhpDocInfo $phpDocInfo): bool
+    {
+        if ($this->advancedArrayAnalyzer->isNewAndCurrentTypeBothCallable($arrayType, $phpDocInfo)) {
+            return true;
+        }
+        if ($this->advancedArrayAnalyzer->isClassStringArrayByStringArrayOverride($arrayType, $classMethod)) {
+            return true;
+        }
+        return $this->advancedArrayAnalyzer->isMixedOfSpecificOverride($arrayType, $phpDocInfo);
+    }
+
+    private function shouldSkipUnionType(UnionType $unionType): bool
+    {
+        return count($unionType->getTypes()) > self::MAX_NUMBER_OF_TYPES;
     }
 }

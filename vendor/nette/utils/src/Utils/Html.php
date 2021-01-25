@@ -285,6 +285,7 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, HtmlStringab
 
 	/**
 	 * Returns an object representing HTML text.
+	 * @return $this
 	 */
 	public static function fromHtml(string $html)
 	{
@@ -294,6 +295,7 @@ class Html implements \ArrayAccess, \Countable, \IteratorAggregate, HtmlStringab
 
 	/**
 	 * Returns an object representing plain text.
+	 * @return $this
 	 */
 	public static function fromText(string $text)
 	{

@@ -16,7 +16,7 @@ trait PropertyTrait
     /**
      * Sets a specific property.
      *
-     * @return mixed
+     * @return $this
      */
     public final function property(string $name, $value)
     {

@@ -74,7 +74,8 @@ CODE_SAMPLE
         if (! $this->isName($node, '*Uuid')) {
             return null;
         }
-        if (! $this->hasPhpDocTagValueNode($node, DoctrineRelationTagValueNodeInterface::class)) {
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($node);
+        if (! $phpDocInfo->hasByType(DoctrineRelationTagValueNodeInterface::class)) {
             return null;
         }
         $this->removeNode($node);

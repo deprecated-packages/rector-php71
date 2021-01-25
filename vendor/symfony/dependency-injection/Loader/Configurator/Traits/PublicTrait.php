@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator\Traits;
 trait PublicTrait
 {
     /**
-     * @return mixed
+     * @return $this
      */
     final public function public()
     {
@@ -24,7 +24,7 @@ trait PublicTrait
     }
 
     /**
-     * @return mixed
+     * @return $this
      */
     final public function private()
     {

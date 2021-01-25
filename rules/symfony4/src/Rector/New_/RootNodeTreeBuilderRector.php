@@ -61,9 +61,8 @@ CODE_SAMPLE
         if (isset($node->args[1])) {
             return null;
         }
-        /** @var MethodCall|null $rootMethodCallNode */
         $rootMethodCallNode = $this->getRootMethodCallNode($node);
-        if ($rootMethodCallNode === null) {
+        if (! $rootMethodCallNode instanceof MethodCall) {
             return null;
         }
         $rootNameNode = $rootMethodCallNode->args[0]->value;

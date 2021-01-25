@@ -20,16 +20,18 @@ use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Descriptor\TextDescriptor;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\ref;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use Symfony\Component\Filesystem\Filesystem;
 use Symplify\PackageBuilder\Console\Command\CommandNaming;
 use Symplify\PackageBuilder\Console\Style\SymfonyStyleFactory;
 use Symplify\PackageBuilder\Parameter\ParameterProvider;
+use Symplify\PackageBuilder\Php\TypeChecker;
 use Symplify\PackageBuilder\Reflection\PrivatesAccessor;
 use Symplify\PackageBuilder\Reflection\PrivatesCaller;
 use Symplify\PackageBuilder\Strings\StringFormatConverter;
 use Symplify\SmartFileSystem\FileSystemFilter;
 use Symplify\SmartFileSystem\Finder\FinderSanitizer;
+use Symplify\SmartFileSystem\Json\JsonFileSystem;
 use Symplify\SmartFileSystem\SmartFileSystem;
 
 return static function (ContainerConfigurator $containerConfigurator) : void {
@@ -43,7 +45,6 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
         __DIR__ . '/../src/Exception',
         __DIR__ . '/../src/DependencyInjection/CompilerPass',
         __DIR__ . '/../src/DependencyInjection/Loader',
-        __DIR__ . '/../src/PhpParser/Builder',
         __DIR__ . '/../src/HttpKernel',
         __DIR__ . '/../src/ValueObject',
         __DIR__ . '/../src/Bootstrap',
@@ -51,13 +52,14 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
     ]);
     $services->alias(SymfonyApplication::class, ConsoleApplication::class);
     $services->set(NoRectorsLoadedReporter::class);
+    $services->set(\Symplify\Astral\NodeTraverser\SimpleCallableNodeTraverser::class);
     $services->set(TextDescriptor::class);
     $services->set(ParserFactory::class);
     $services->set(BuilderFactory::class);
     $services->set(CloningVisitor::class);
     $services->set(NodeFinder::class);
-    $services->set(Parser::class)->factory([ref(NikicPhpParserFactory::class), 'create']);
-    $services->set(Lexer::class)->factory([ref(PhpParserLexerFactory::class), 'create']);
+    $services->set(Parser::class)->factory([service(NikicPhpParserFactory::class), 'create']);
+    $services->set(Lexer::class)->factory([service(PhpParserLexerFactory::class), 'create']);
     // symplify/package-builder
     $services->set(Filesystem::class);
     $services->set(PrivatesAccessor::class);
@@ -65,14 +67,16 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
     $services->set(FinderSanitizer::class);
     $services->set(FileSystemFilter::class);
     $services->set(ParameterProvider::class);
-    $services->set(ParameterProvider::class)->arg('$container', ref('service_container'));
-    $services->set(RectorClassesProvider::class)->arg('$container', ref('service_container'));
+    $services->set(ParameterProvider::class)->arg('$container', service('service_container'));
+    $services->set(RectorClassesProvider::class)->arg('$container', service('service_container'));
     $services->set(CommandNaming::class);
     $services->set(SmartFileSystem::class);
     $services->set(StringFormatConverter::class);
     $services->set(SymfonyStyleFactory::class);
-    $services->set(SymfonyStyle::class)->factory([ref(SymfonyStyleFactory::class), 'create']);
+    $services->set(SymfonyStyle::class)->factory([service(SymfonyStyleFactory::class), 'create']);
+    $services->set(JsonFileSystem::class);
     $services->set(InflectorFactory::class);
-    $services->set(Inflector::class)->factory([ref(InflectorFactory::class), 'build']);
+    $services->set(Inflector::class)->factory([service(InflectorFactory::class), 'build']);
     $services->set(VersionParser::class);
+    $services->set(TypeChecker::class);
 };

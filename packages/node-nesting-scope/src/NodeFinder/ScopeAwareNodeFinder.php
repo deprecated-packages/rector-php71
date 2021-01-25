@@ -57,10 +57,12 @@ final class ScopeAwareNodeFinder
                 return true;
             }
             foreach ($parentNestingBreakTypes as $parentNestingBreakType) {
-                if (is_a($node, $parentNestingBreakType, true)) {
-                    $this->isBreakingNodeFoundFirst = true;
-                    return true;
+                if (! is_a($node, $parentNestingBreakType, true)) {
+                    continue;
                 }
+
+                $this->isBreakingNodeFoundFirst = true;
+                return true;
             }
             return false;
         });

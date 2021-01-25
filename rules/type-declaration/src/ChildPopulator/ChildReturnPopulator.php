@@ -59,7 +59,7 @@ final class ChildReturnPopulator extends AbstractChildPopulator
     {
         $methodName = $this->nodeNameResolver->getName($classMethod);
         $currentClassMethod = $classLike->getMethod($methodName);
-        if ($currentClassMethod === null) {
+        if (! $currentClassMethod instanceof ClassMethod) {
             return;
         }
         $resolvedChildTypeNode = $this->resolveChildTypeNode($returnType);

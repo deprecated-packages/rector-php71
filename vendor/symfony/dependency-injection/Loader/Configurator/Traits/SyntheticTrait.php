@@ -17,7 +17,7 @@ trait SyntheticTrait
      * Sets whether this definition is synthetic, that is not constructed by the
      * container, but dynamically injected.
      *
-     * @return mixed
+     * @return $this
      */
     public final function synthetic(bool $synthetic = true)
     {

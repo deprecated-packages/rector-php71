@@ -13,6 +13,7 @@ use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Name;
 use Rector\Core\PhpParser\Node\Manipulator\BinaryOpManipulator;
 use Rector\NodeNameResolver\NodeNameResolver;
+use Rector\Php71\ValueObject\TwoNodeMatch;
 
 final class IsArrayAndDualCheckToAble
 {
@@ -35,7 +36,7 @@ final class IsArrayAndDualCheckToAble
     public function processBooleanOr(BooleanOr $booleanOr, string $type, string $newMethodName): ?FuncCall
     {
         $twoNodeMatch = $this->binaryOpManipulator->matchFirstAndSecondConditionNode($booleanOr, Instanceof_::class, FuncCall::class);
-        if ($twoNodeMatch === null) {
+        if (! $twoNodeMatch instanceof TwoNodeMatch) {
             return null;
         }
         /** @var Instanceof_ $instanceOf */

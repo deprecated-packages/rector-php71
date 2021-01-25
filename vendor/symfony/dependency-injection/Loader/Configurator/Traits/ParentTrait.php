@@ -19,7 +19,7 @@ trait ParentTrait
     /**
      * Sets the Definition to inherit from.
      *
-     * @return mixed
+     * @return $this
      *
      * @throws InvalidArgumentException when parent cannot be set
      */

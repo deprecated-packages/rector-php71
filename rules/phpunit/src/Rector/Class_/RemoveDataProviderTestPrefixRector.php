@@ -9,9 +9,7 @@ use PhpParser\Node;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Stmt\Class_;
 use Rector\AttributeAwarePhpDoc\Ast\PhpDoc\DataProviderTagValueNode;
-use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo;
 use Rector\Core\Rector\AbstractPHPUnitRector;
-use Rector\NodeTypeResolver\Node\AttributeKey;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
@@ -94,11 +92,7 @@ CODE_SAMPLE
     private function renameDataProviderAnnotationsAndCollectRenamedMethods(Class_ $class): void
     {
         foreach ($class->getMethods() as $classMethod) {
-            /** @var PhpDocInfo|null $phpDocInfo */
-            $phpDocInfo = $classMethod->getAttribute(AttributeKey::PHP_DOC_INFO);
-            if ($phpDocInfo === null) {
-                continue;
-            }
+            $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($classMethod);
 
             /** @var DataProviderTagValueNode[] $dataProviderTagValueNodes */
             $dataProviderTagValueNodes = $phpDocInfo->findAllByType(DataProviderTagValueNode::class);
@@ -119,6 +113,8 @@ CODE_SAMPLE
                 $newMethodName = trim($newMethodName, '()');
 
                 $this->providerMethodNamesToNewNames[$oldMethodName] = $newMethodName;
+
+                $phpDocInfo->markAsChanged();
             }
         }
     }

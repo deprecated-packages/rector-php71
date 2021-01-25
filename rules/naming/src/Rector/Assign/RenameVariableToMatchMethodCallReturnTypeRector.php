@@ -130,9 +130,8 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        /** @var VariableAndCallAssign|null $variableAndCallAssign */
         $variableAndCallAssign = $this->variableAndCallAssignMatcher->match($node);
-        if ($variableAndCallAssign === null) {
+        if (! $variableAndCallAssign instanceof VariableAndCallAssign) {
             return null;
         }
         $call = $variableAndCallAssign->getCall();
@@ -197,7 +196,9 @@ CODE_SAMPLE
 
     private function renameVariable(VariableAndCallAssign $variableAndCallAssign, string $expectedName): void
     {
-        $this->varTagValueNodeRenamer->renameAssignVarTagVariableName($variableAndCallAssign->getAssign(), $variableAndCallAssign->getVariableName(), $expectedName);
+        $assign = $variableAndCallAssign->getAssign();
+        $assignPhpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($assign);
+        $this->varTagValueNodeRenamer->renameAssignVarTagVariableName($assignPhpDocInfo, $variableAndCallAssign->getVariableName(), $expectedName);
         $this->variableRenamer->renameVariableInFunctionLike($variableAndCallAssign->getFunctionLike(), $variableAndCallAssign->getAssign(), $variableAndCallAssign->getVariableName(), $expectedName);
     }
 

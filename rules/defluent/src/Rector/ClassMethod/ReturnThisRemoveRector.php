@@ -80,7 +80,7 @@ CODE_SAMPLE
     public function refactor(Node $node): ?Node
     {
         $returnThis = $this->matchSingleReturnThis($node);
-        if ($returnThis === null) {
+        if (! $returnThis instanceof Return_) {
             return null;
         }
         if ($this->shouldSkip($returnThis, $node)) {
@@ -88,13 +88,14 @@ CODE_SAMPLE
         }
         $this->removeNode($returnThis);
         $classMethod = $node->getAttribute(AttributeKey::METHOD_NODE);
-        if ($classMethod === null) {
+        if (! $classMethod instanceof \PhpParser\Node\Stmt\ClassMethod) {
             throw new ShouldNotHappenException();
         }
         if ($this->isAtLeastPhpVersion(PhpVersionFeature::VOID_TYPE)) {
             $classMethod->returnType = new Identifier('void');
         }
-        $this->removePhpDocTagValueNode($classMethod, ReturnTagValueNode::class);
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($node);
+        $phpDocInfo->removeByType(ReturnTagValueNode::class);
         return null;
     }
 

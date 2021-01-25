@@ -14,6 +14,7 @@ use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Property;
 use Rector\Core\Exception\ShouldNotHappenException;
 use Rector\Core\PhpParser\Node\Manipulator\PropertyManipulator;
+use Rector\Core\PhpParser\NodeFinder\PropertyFetchFinder;
 use Rector\Core\PhpParser\Printer\BetterStandardPrinter;
 use Rector\Core\ValueObject\MethodName;
 use Rector\DeadCode\NodeManipulator\LivingCodeManipulator;
@@ -60,9 +61,14 @@ trait ComplexRemovalTrait
     private $assignRemover;
 
     /**
+     * @var PropertyFetchFinder
+     */
+    private $propertyFetchFinder;
+
+    /**
      * @required
      */
-    public function autowireComplexRemovalTrait(PropertyManipulator $propertyManipulator, ParsedNodeCollector $parsedNodeCollector, LivingCodeManipulator $livingCodeManipulator, BetterStandardPrinter $betterStandardPrinter, ClassMethodRemover $classMethodRemover, AssignRemover $assignRemover): void
+    public function autowireComplexRemovalTrait(PropertyManipulator $propertyManipulator, ParsedNodeCollector $parsedNodeCollector, LivingCodeManipulator $livingCodeManipulator, BetterStandardPrinter $betterStandardPrinter, ClassMethodRemover $classMethodRemover, AssignRemover $assignRemover, PropertyFetchFinder $propertyFetchFinder): void
     {
         $this->parsedNodeCollector = $parsedNodeCollector;
         $this->propertyManipulator = $propertyManipulator;
@@ -70,6 +76,7 @@ trait ComplexRemovalTrait
         $this->betterStandardPrinter = $betterStandardPrinter;
         $this->classMethodRemover = $classMethodRemover;
         $this->assignRemover = $assignRemover;
+        $this->propertyFetchFinder = $propertyFetchFinder;
     }
 
     protected function removeClassMethodAndUsages(ClassMethod $classMethod): void
@@ -83,7 +90,7 @@ trait ComplexRemovalTrait
     protected function removePropertyAndUsages(Property $property, array $classMethodNamesToSkip = []): void
     {
         $shouldKeepProperty = false;
-        $propertyFetches = $this->propertyManipulator->getPrivatePropertyFetches($property);
+        $propertyFetches = $this->propertyFetchFinder->findPrivatePropertyFetches($property);
         foreach ($propertyFetches as $propertyFetch) {
             if ($this->shouldSkipPropertyForClassMethod($propertyFetch, $classMethodNamesToSkip)) {
                 $shouldKeepProperty = true;
@@ -117,9 +124,8 @@ trait ComplexRemovalTrait
      */
     private function shouldSkipPropertyForClassMethod(Expr $expr, array $classMethodNamesToSkip): bool
     {
-        /** @var ClassMethod|null $classMethodNode */
         $classMethodNode = $expr->getAttribute(AttributeKey::METHOD_NODE);
-        if ($classMethodNode === null) {
+        if (! $classMethodNode instanceof ClassMethod) {
             return false;
         }
         $classMethodName = $this->getName($classMethodNode);
@@ -151,9 +157,8 @@ trait ComplexRemovalTrait
         if (! $class instanceof Class_) {
             return;
         }
-        /** @var Class_|null $class */
         $constructClassMethod = $class->getMethod(MethodName::CONSTRUCT);
-        if ($constructClassMethod === null) {
+        if (! $constructClassMethod instanceof ClassMethod) {
             return;
         }
         $constructClassMethodStmts = $constructClassMethod->stmts;

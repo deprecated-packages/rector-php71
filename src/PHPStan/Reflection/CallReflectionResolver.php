@@ -57,9 +57,8 @@ final class CallReflectionResolver
 
     public function resolveConstructor(New_ $new): ?MethodReflection
     {
-        /** @var Scope|null $scope */
         $scope = $new->getAttribute(AttributeKey::SCOPE);
-        if ($scope === null) {
+        if (! $scope instanceof Scope) {
             return null;
         }
         $classType = $this->nodeTypeResolver->resolve($new->class);
@@ -101,9 +100,8 @@ final class CallReflectionResolver
         if ($nbVariants === 1) {
             return ParametersAcceptorSelector::selectSingle($variants);
         }
-        /** @var Scope|null $scope */
         $scope = $node->getAttribute(AttributeKey::SCOPE);
-        if ($scope === null) {
+        if (! $scope instanceof Scope) {
             return null;
         }
         return ParametersAcceptorSelector::selectFromArgs($scope, $node->args, $variants);
@@ -129,7 +127,6 @@ final class CallReflectionResolver
      */
     private function resolveFunctionCall(FuncCall $funcCall)
     {
-        /** @var Scope|null $scope */
         $scope = $funcCall->getAttribute(AttributeKey::SCOPE);
         if ($funcCall->name instanceof Name) {
             try {
@@ -138,7 +135,7 @@ final class CallReflectionResolver
                 return null;
             }
         }
-        if ($scope === null) {
+        if (! $scope instanceof Scope) {
             return null;
         }
         return $this->typeToCallReflectionResolverRegistry->resolve($scope->getType($funcCall->name), $scope);
@@ -149,9 +146,8 @@ final class CallReflectionResolver
      */
     private function resolveMethodCall(Node $node): ?MethodReflection
     {
-        /** @var Scope|null $scope */
         $scope = $node->getAttribute(AttributeKey::SCOPE);
-        if ($scope === null) {
+        if (! $scope instanceof Scope) {
             return null;
         }
         $classType = $this->nodeTypeResolver->resolve($node instanceof MethodCall ? $node->var : $node->class);

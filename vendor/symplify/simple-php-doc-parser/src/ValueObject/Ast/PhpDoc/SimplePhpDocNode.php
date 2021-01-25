@@ -9,7 +9,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 
 /**
- * @notfinal on purpose, so it can be extended by 3rd party
+ * @noRector final on purpose, so it can be extended by 3rd party
  */
 class SimplePhpDocNode extends PhpDocNode
 {
@@ -29,7 +29,7 @@ class SimplePhpDocNode extends PhpDocNode
     public function getParamType(string $desiredParamName): ?TypeNode
     {
         $paramTagValueNode = $this->getParam($desiredParamName);
-        if ($paramTagValueNode === null) {
+        if (! $paramTagValueNode instanceof ParamTagValueNode) {
             return null;
         }
         return $paramTagValueNode->type;

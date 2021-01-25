@@ -10,25 +10,25 @@ use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Stmt;
-use Rector\Core\PhpParser\NodeTraverser\CallableNodeTraverser;
 use Rector\NodeNameResolver\NodeNameResolver;
 use Rector\NodeTypeResolver\Node\AttributeKey;
+use Symplify\Astral\NodeTraverser\SimpleCallableNodeTraverser;
 
 final class ModifiedVariableNamesCollector
 {
     /**
-     * @var CallableNodeTraverser
+     * @var SimpleCallableNodeTraverser
      */
-    private $callableNodeTraverser;
+    private $simpleCallableNodeTraverser;
 
     /**
      * @var NodeNameResolver
      */
     private $nodeNameResolver;
 
-    public function __construct(CallableNodeTraverser $callableNodeTraverser, NodeNameResolver $nodeNameResolver)
+    public function __construct(SimpleCallableNodeTraverser $simpleCallableNodeTraverser, NodeNameResolver $nodeNameResolver)
     {
-        $this->callableNodeTraverser = $callableNodeTraverser;
+        $this->simpleCallableNodeTraverser = $simpleCallableNodeTraverser;
         $this->nodeNameResolver = $nodeNameResolver;
     }
 
@@ -48,7 +48,7 @@ final class ModifiedVariableNamesCollector
     private function collectFromArgs(Stmt $stmt): array
     {
         $variableNames = [];
-        $this->callableNodeTraverser->traverseNodesWithCallable($stmt, function (Node $node) use (&$variableNames) {
+        $this->simpleCallableNodeTraverser->traverseNodesWithCallable($stmt, function (Node $node) use (&$variableNames) {
             if (! $node instanceof Arg) {
                 return null;
             }
@@ -70,7 +70,7 @@ final class ModifiedVariableNamesCollector
     private function collectFromAssigns(Stmt $stmt): array
     {
         $modifiedVariableNames = [];
-        $this->callableNodeTraverser->traverseNodesWithCallable($stmt, function (Node $node) use (&$modifiedVariableNames) {
+        $this->simpleCallableNodeTraverser->traverseNodesWithCallable($stmt, function (Node $node) use (&$modifiedVariableNames) {
             if (! $node instanceof Assign) {
                 return null;
             }

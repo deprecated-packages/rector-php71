@@ -6,6 +6,7 @@ namespace Rector\Nette\Rector\Class_;
 
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\ClassMethod;
 use Rector\Core\Exception\NotImplementedYetException;
 use Rector\Core\PhpParser\Node\Manipulator\ClassInsertManipulator;
 use Rector\Core\Rector\AbstractRector;
@@ -86,7 +87,7 @@ CODE_SAMPLE
             return null;
         }
         $getUserClassMethod = $node->getMethod('getUser');
-        if ($getUserClassMethod === null) {
+        if (! $getUserClassMethod instanceof ClassMethod) {
             return null;
         }
         $checkRequirementsClassMethod = $node->getMethod('checkRequirements');

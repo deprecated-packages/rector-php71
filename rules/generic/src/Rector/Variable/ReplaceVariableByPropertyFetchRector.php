@@ -116,9 +116,8 @@ CODE_SAMPLE
         if (! Strings::endsWith($className, 'Controller')) {
             return false;
         }
-        /** @var ClassMethod|null $classMethod */
         $classMethod = $variable->getAttribute(AttributeKey::METHOD_NODE);
-        if ($classMethod === null) {
+        if (! $classMethod instanceof ClassMethod) {
             return false;
         }
         // is probably in controller action

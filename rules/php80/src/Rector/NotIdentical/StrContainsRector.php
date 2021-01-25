@@ -66,7 +66,7 @@ CODE_SAMPLE
     public function refactor(Node $node): ?Node
     {
         $funcCall = $this->matchNotIdenticalToFalse($node);
-        if ($funcCall === null) {
+        if (! $funcCall instanceof FuncCall) {
             return null;
         }
         $funcCall->name = new Name('str_contains');

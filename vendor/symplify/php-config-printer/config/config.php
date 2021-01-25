@@ -7,6 +7,7 @@ use PhpParser\NodeFinder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Yaml\Parser;
 use Symplify\PackageBuilder\Parameter\ParameterProvider;
+use Symplify\PackageBuilder\Reflection\ClassLikeExistenceChecker;
 
 return static function (ContainerConfigurator $containerConfigurator) : void {
     $services = $containerConfigurator->services();
@@ -19,4 +20,5 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
     $services->set(Parser::class);
     $services->set(BuilderFactory::class);
     $services->set(ParameterProvider::class);
+    $services->set(ClassLikeExistenceChecker::class);
 };

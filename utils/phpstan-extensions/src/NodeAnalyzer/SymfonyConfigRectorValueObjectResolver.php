@@ -41,19 +41,17 @@ final class SymfonyConfigRectorValueObjectResolver
         while (! $parent instanceof Expression) {
             $parent = $parent->getAttribute(PHPStanAttributeKey::PARENT);
         }
-        /** @var StaticCall|null $inlineStaticCall */
         $inlineStaticCall = $this->nodeFinder->findFirst($parent, function (Node $node): bool {
             if (! $node instanceof StaticCall) {
                 return false;
             }
             return $this->simpleNameResolver->isName($node->class, self::INLINE_CLASS_NAME);
         });
-        if ($inlineStaticCall === null) {
+        if (! $inlineStaticCall instanceof StaticCall) {
             return null;
         }
-        /** @var New_|null $new */
         $new = $this->nodeFinder->findFirstInstanceOf($inlineStaticCall, New_::class);
-        if ($new === null) {
+        if (! $new instanceof New_) {
             return null;
         }
         return $this->simpleNameResolver->getName($new->class);

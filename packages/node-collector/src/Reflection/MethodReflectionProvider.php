@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Rector\NodeCollector\Reflection;
 
-use PhpParser\Node;
+use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\New_;
 use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -64,6 +64,22 @@ final class MethodReflectionProvider
         return $parameterTypes;
     }
 
+    public function provideByMethodCall(MethodCall $methodCall): ?ReflectionMethod
+    {
+        $className = $methodCall->getAttribute(AttributeKey::CLASS_NAME);
+        if (! is_string($className)) {
+            return null;
+        }
+        $methodName = $this->nodeNameResolver->getName($methodCall->name);
+        if ($methodName === null) {
+            return null;
+        }
+        if (! method_exists($className, $methodName)) {
+            return null;
+        }
+        return new ReflectionMethod($className, $methodName);
+    }
+
     public function provideByClassAndMethodName(string $class, string $method, Scope $scope): ?MethodReflection
     {
         $classReflection = $this->reflectionProvider->getClass($class);
@@ -79,17 +95,10 @@ final class MethodReflectionProvider
     public function provideParameterTypesByStaticCall(StaticCall $staticCall): array
     {
         $methodReflection = $this->provideByStaticCall($staticCall);
-        if ($methodReflection === null) {
+        if (! $methodReflection instanceof MethodReflection) {
             return [];
         }
         return $this->provideParameterTypesFromMethodReflection($methodReflection);
-    }
-
-    public function provideByNew(New_ $new): ?MethodReflection
-    {
-        $objectType = $this->nodeTypeResolver->resolve($new->class);
-        $classes = TypeUtils::getDirectClassNames($objectType);
-        return $this->provideByClassNamesAndMethodName($classes, MethodName::CONSTRUCT, $new);
     }
 
     public function provideByStaticCall(StaticCall $staticCall): ?MethodReflection
@@ -109,7 +118,7 @@ final class MethodReflectionProvider
     public function provideParameterTypesByClassMethod(ClassMethod $classMethod): array
     {
         $methodReflection = $this->provideByClassMethod($classMethod);
-        if ($methodReflection === null) {
+        if (! $methodReflection instanceof MethodReflection) {
             return [];
         }
         return $this->provideParameterTypesFromMethodReflection($methodReflection);
@@ -165,10 +174,10 @@ final class MethodReflectionProvider
     /**
      * @param string[] $classes
      */
-    private function provideByClassNamesAndMethodName(array $classes, string $methodName, Node $node): ?MethodReflection
+    private function provideByClassNamesAndMethodName(array $classes, string $methodName, StaticCall $staticCall): ?MethodReflection
     {
         /** @var Scope|null $scope */
-        $scope = $node->getAttribute(AttributeKey::SCOPE);
+        $scope = $staticCall->getAttribute(AttributeKey::SCOPE);
         if (! $scope instanceof Scope) {
             throw new ShouldNotHappenException();
         }

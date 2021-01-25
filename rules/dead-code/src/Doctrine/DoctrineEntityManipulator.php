@@ -14,11 +14,11 @@ use Rector\BetterPhpDocParser\Contract\Doctrine\DoctrineRelationTagValueNodeInte
 use Rector\BetterPhpDocParser\Contract\Doctrine\InversedByNodeInterface;
 use Rector\BetterPhpDocParser\Contract\Doctrine\MappedByNodeInterface;
 use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo;
+use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfoFactory;
 use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\Doctrine\Class_\EntityTagValueNode;
 use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\Doctrine\Class_\InheritanceTypeTagValueNode;
 use Rector\Doctrine\PhpDocParser\DoctrineDocBlockResolver;
 use Rector\NodeNameResolver\NodeNameResolver;
-use Rector\NodeTypeResolver\Node\AttributeKey;
 use Rector\NodeTypeResolver\NodeTypeResolver;
 
 final class DoctrineEntityManipulator
@@ -38,19 +38,24 @@ final class DoctrineEntityManipulator
      */
     private $nodeTypeResolver;
 
-    public function __construct(DoctrineDocBlockResolver $doctrineDocBlockResolver, NodeNameResolver $nodeNameResolver, NodeTypeResolver $nodeTypeResolver)
+    /**
+     * @var PhpDocInfoFactory
+     */
+    private $phpDocInfoFactory;
+
+    public function __construct(DoctrineDocBlockResolver $doctrineDocBlockResolver, NodeNameResolver $nodeNameResolver, NodeTypeResolver $nodeTypeResolver, PhpDocInfoFactory $phpDocInfoFactory)
     {
         $this->nodeNameResolver = $nodeNameResolver;
         $this->doctrineDocBlockResolver = $doctrineDocBlockResolver;
         $this->nodeTypeResolver = $nodeTypeResolver;
+        $this->phpDocInfoFactory = $phpDocInfoFactory;
     }
 
     public function resolveOtherProperty(Property $property): ?string
     {
-        /** @var PhpDocInfo $phpDocInfo */
-        $phpDocInfo = $property->getAttribute(AttributeKey::PHP_DOC_INFO);
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($property);
         $relationTagValueNode = $phpDocInfo->getByType(DoctrineRelationTagValueNodeInterface::class);
-        if ($relationTagValueNode === null) {
+        if (! $relationTagValueNode instanceof DoctrineRelationTagValueNodeInterface) {
             return null;
         }
         $otherProperty = null;
@@ -74,35 +79,25 @@ final class DoctrineEntityManipulator
         if ($class->isAbstract()) {
             return false;
         }
-        /** @var PhpDocInfo|null $phpDocInfo */
-        $phpDocInfo = $class->getAttribute(AttributeKey::PHP_DOC_INFO);
-        if ($phpDocInfo === null) {
-            return false;
-        }
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($class);
         // is parent entity
-        if ($phpDocInfo->hasByType(InheritanceTypeTagValueNode::class)) {
-            return false;
-        }
-        return $phpDocInfo->hasByType(EntityTagValueNode::class);
+        return $phpDocInfo->hasByTypes([InheritanceTypeTagValueNode::class, EntityTagValueNode::class]);
     }
 
-    public function removeMappedByOrInversedByFromProperty(Property $property): void
+    public function removeMappedByOrInversedByFromProperty(PhpDocInfo $phpDocInfo): void
     {
-        /** @var PhpDocInfo $phpDocInfo */
-        $phpDocInfo = $property->getAttribute(AttributeKey::PHP_DOC_INFO);
         $relationTagValueNode = $phpDocInfo->getByType(DoctrineRelationTagValueNodeInterface::class);
-        $shouldUpdate = false;
         if ($relationTagValueNode instanceof MappedByNodeInterface && $relationTagValueNode->getMappedBy()) {
-            $shouldUpdate = true;
             $relationTagValueNode->removeMappedBy();
         }
-        if ($relationTagValueNode instanceof InversedByNodeInterface && $relationTagValueNode->getInversedBy()) {
-            $shouldUpdate = true;
-            $relationTagValueNode->removeInversedBy();
-        }
-        if (! $shouldUpdate) {
+        if (! $relationTagValueNode instanceof InversedByNodeInterface) {
             return;
         }
+        if (! $relationTagValueNode->getInversedBy()) {
+            return;
+        }
+        $phpDocInfo->markAsChanged();
+        $relationTagValueNode->removeInversedBy();
     }
 
     public function isMethodCallOnDoctrineEntity(Node $node, string $methodName): bool

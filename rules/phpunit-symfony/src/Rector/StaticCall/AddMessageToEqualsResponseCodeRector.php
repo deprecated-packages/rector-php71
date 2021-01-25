@@ -83,7 +83,7 @@ CODE_SAMPLE
             return null;
         }
         $parentVariable = $this->getParentOfGetStatusCode($node->args[1]->value);
-        if ($parentVariable === null) {
+        if (! $parentVariable instanceof Expr) {
             return null;
         }
         $getContentMethodCall = new MethodCall($parentVariable, 'getContent');

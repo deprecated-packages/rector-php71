@@ -9,16 +9,18 @@ use PhpParser\Node\FunctionLike;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Function_;
+use PhpParser\Node\Stmt\Interface_;
+use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeWithClassName;
 use Rector\Core\ValueObject\PhpVersionFeature;
+use Rector\NodeTypeResolver\Node\AttributeKey;
+use Rector\NodeTypeResolver\NodeTypeResolver;
 use Rector\PHPStanStaticTypeMapper\PHPStanStaticTypeMapper;
-use Rector\StaticTypeMapper\ValueObject\Type\ShortenedObjectType;
 use Rector\TypeDeclaration\ChildPopulator\ChildParamPopulator;
 use Rector\TypeDeclaration\TypeInferer\ParamTypeInferer;
 use Rector\TypeDeclaration\ValueObject\NewType;
-use ReflectionClass;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
@@ -37,10 +39,22 @@ final class ParamTypeDeclarationRector extends AbstractTypeDeclarationRector
      */
     private $childParamPopulator;
 
-    public function __construct(ChildParamPopulator $childParamPopulator, ParamTypeInferer $paramTypeInferer)
+    /**
+     * @var NodeTypeResolver
+     */
+    private $nodeTypeResolver;
+
+    /**
+     * @var ReflectionProvider
+     */
+    private $reflectionProvider;
+
+    public function __construct(ChildParamPopulator $childParamPopulator, ParamTypeInferer $paramTypeInferer, NodeTypeResolver $nodeTypeResolver, ReflectionProvider $reflectionProvider)
     {
         $this->paramTypeInferer = $paramTypeInferer;
         $this->childParamPopulator = $childParamPopulator;
+        $this->nodeTypeResolver = $nodeTypeResolver;
+        $this->reflectionProvider = $reflectionProvider;
     }
 
     public function getRuleDefinition(): RuleDefinition
@@ -146,6 +160,10 @@ CODE_SAMPLE
         if ($paramTypeNode === null) {
             return;
         }
+        $parentNode = $functionLike->getAttribute(AttributeKey::PARENT_NODE);
+        if ($parentNode instanceof Interface_ && $parentNode->extends !== []) {
+            return;
+        }
         $param->type = $paramTypeNode;
         $this->childParamPopulator->populateChildClassMethod($functionLike, $position, $inferedType);
     }
@@ -171,16 +189,8 @@ CODE_SAMPLE
         if (! $type instanceof TypeWithClassName) {
             return false;
         }
-        $fullyQualifiedName = $this->getFullyQualifiedName($type);
-        $reflectionClass = new ReflectionClass($fullyQualifiedName);
-        return $reflectionClass->isTrait();
-    }
-
-    private function getFullyQualifiedName(TypeWithClassName $typeWithClassName): string
-    {
-        if ($typeWithClassName instanceof ShortenedObjectType) {
-            return $typeWithClassName->getFullyQualifiedName();
-        }
-        return $typeWithClassName->getClassName();
+        $fullyQualifiedName = $this->nodeTypeResolver->getFullyQualifiedClassName($type);
+        $classReflection = $this->reflectionProvider->getClass($fullyQualifiedName);
+        return $classReflection->isTrait();
     }
 }

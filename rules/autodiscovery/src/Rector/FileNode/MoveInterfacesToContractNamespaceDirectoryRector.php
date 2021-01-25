@@ -8,6 +8,7 @@ use PhpParser\Node;
 use PhpParser\Node\Stmt\Interface_;
 use Rector\Core\PhpParser\Node\CustomNode\FileNode;
 use Rector\Core\Rector\AbstractRector;
+use Rector\FileSystemRector\ValueObject\MovedFileWithNodes;
 use Rector\NetteToSymfony\Analyzer\NetteControlFactoryInterfaceAnalyzer;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
@@ -69,16 +70,15 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        /** @var Interface_|null $interface */
         $interface = $this->betterNodeFinder->findFirstInstanceOf([$node], Interface_::class);
-        if ($interface === null) {
+        if (! $interface instanceof Interface_) {
             return null;
         }
         if ($this->netteControlFactoryInterfaceAnalyzer->isComponentFactoryInterface($interface)) {
             return null;
         }
         $movedFileWithNodes = $this->movedFileWithNodesFactory->createWithDesiredGroup($node->getFileInfo(), $node->stmts, 'Contract');
-        if ($movedFileWithNodes === null) {
+        if (! $movedFileWithNodes instanceof MovedFileWithNodes) {
             return null;
         }
         $this->addMovedFile($movedFileWithNodes);

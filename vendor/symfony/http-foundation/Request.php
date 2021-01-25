@@ -1978,6 +1978,9 @@ class Request
         return null;
     }
 
+    /**
+     * @return $this
+     */
     private static function createRequestFromFactory(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
     {
         if (self::$requestFactory) {

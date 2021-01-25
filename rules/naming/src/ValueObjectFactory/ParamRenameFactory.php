@@ -41,7 +41,7 @@ final class ParamRenameFactory
             return null;
         }
         /** @var ClassMethod|Function_|Closure|ArrowFunction|null $functionLike */
-        $functionLike = $this->betterNodeFinder->findFirstParentInstanceOf($param, FunctionLike::class);
+        $functionLike = $this->betterNodeFinder->findParentType($param, FunctionLike::class);
         if ($functionLike === null) {
             throw new ShouldNotHappenException("There shouldn't be a param outside of FunctionLike");
         }

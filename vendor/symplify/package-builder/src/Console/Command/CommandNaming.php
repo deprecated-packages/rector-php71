@@ -37,7 +37,7 @@ final class CommandNaming
     public static function classToName(string $class): string
     {
         /** @var string $shortClassName */
-        $shortClassName = self::getShortClassName($class);
+        $shortClassName = self::resolveShortName($class);
         $rawCommandName = Strings::substring($shortClassName, 0, -strlen('Command'));
         // ECSCommand => ecs
         for ($i = 0; $i < strlen($rawCommandName); ++$i) {
@@ -53,10 +53,10 @@ final class CommandNaming
         });
     }
 
-    private static function getShortClassName(string $class): string
+    private static function resolveShortName(string $class): string
     {
         $classParts = explode('\\', $class);
-        return (string) array_pop($classParts);
+        return array_pop($classParts);
     }
 
     private static function isFollowedByUpperCaseLetterOrNothing(string $string, int $position): bool

@@ -9,9 +9,9 @@ use PhpParser\Node\Stmt\ClassConst;
 use PHPStan\Type\ArrayType;
 use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\MixedType;
-use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo;
+use Rector\BetterPhpDocParser\PhpDocManipulator\PhpDocTypeChanger;
 use Rector\Core\Rector\AbstractRector;
-use Rector\NodeTypeResolver\Node\AttributeKey;
+use Rector\NodeTypeResolver\PHPStan\TypeComparator;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
@@ -24,6 +24,22 @@ final class VarConstantCommentRector extends AbstractRector
      * @var int
      */
     private const ARRAY_LIMIT_TYPES = 3;
+
+    /**
+     * @var TypeComparator
+     */
+    private $typeComparator;
+
+    /**
+     * @var PhpDocTypeChanger
+     */
+    private $phpDocTypeChanger;
+
+    public function __construct(TypeComparator $typeComparator, PhpDocTypeChanger $phpDocTypeChanger)
+    {
+        $this->typeComparator = $typeComparator;
+        $this->phpDocTypeChanger = $phpDocTypeChanger;
+    }
 
     public function getRuleDefinition(): RuleDefinition
     {
@@ -68,7 +84,7 @@ CODE_SAMPLE
         if ($constType instanceof MixedType) {
             return null;
         }
-        $phpDocInfo = $this->getOrCreatePhpDocInfo($node);
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($node);
         // skip big arrays and mixed[] constants
         if ($constType instanceof ConstantArrayType) {
             if (count($constType->getValueTypes()) > self::ARRAY_LIMIT_TYPES) {
@@ -80,17 +96,10 @@ CODE_SAMPLE
                 return null;
             }
         }
-        $phpDocInfo->changeVarType($constType);
-        return $node;
-    }
-
-    private function getOrCreatePhpDocInfo(ClassConst $classConst): PhpDocInfo
-    {
-        /** @var PhpDocInfo|null $phpDocInfo */
-        $phpDocInfo = $classConst->getAttribute(AttributeKey::PHP_DOC_INFO);
-        if ($phpDocInfo === null) {
-            $phpDocInfo = $this->phpDocInfoFactory->createEmpty($classConst);
+        if ($this->typeComparator->isSubtype($constType, $phpDocInfo->getVarType())) {
+            return null;
         }
-        return $phpDocInfo;
+        $this->phpDocTypeChanger->changeVarType($phpDocInfo, $constType);
+        return $node;
     }
 }

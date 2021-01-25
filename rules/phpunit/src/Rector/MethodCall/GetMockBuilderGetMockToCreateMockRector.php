@@ -63,9 +63,8 @@ CODE_SAMPLE
         if (! $node->var instanceof MethodCall) {
             return null;
         }
-        /** @var MethodCall|null $getMockBuilderMethodCall */
         $getMockBuilderMethodCall = $this->isName($node->var->name, 'disableOriginalConstructor') ? $node->var->var : $node->var;
-        if ($getMockBuilderMethodCall === null) {
+        if (! $getMockBuilderMethodCall instanceof MethodCall) {
             return null;
         }
         if (! $this->isName($getMockBuilderMethodCall->name, 'getMockBuilder')) {

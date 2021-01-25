@@ -39,12 +39,15 @@ final class PHPUnitDataProviderDocNodeFactory
             return $attributeAwareDataProviderTagValueNode;
         } catch (ParserException $parserException) {
             $tokenIterator->rollback();
-            $description = $this->privatesCaller->callPrivateMethod($this->phpDocParser, 'parseOptionalDescription', $tokenIterator);
+            $description = $this->privatesCaller->callPrivateMethod($this->phpDocParser, 'parseOptionalDescription', [$tokenIterator]);
 
             return new InvalidTagValueNode($description, $parserException);
         }
     }
 
+    /**
+     * @deprecated Refactor to remove dependency on phpdoc parser
+     */
     public function setPhpDocParser(PhpDocParser $phpDocParser): void
     {
         $this->phpDocParser = $phpDocParser;
@@ -55,7 +58,7 @@ final class PHPUnitDataProviderDocNodeFactory
      */
     private function parseDataProviderTagValue(TokenIterator $tokenIterator): DataProviderTagValueNode
     {
-        $method = $this->privatesCaller->callPrivateMethod($this->phpDocParser, 'parseOptionalDescription', $tokenIterator);
+        $method = $this->privatesCaller->callPrivateMethod($this->phpDocParser, 'parseOptionalDescription', [$tokenIterator]);
         return new DataProviderTagValueNode($method);
     }
 }

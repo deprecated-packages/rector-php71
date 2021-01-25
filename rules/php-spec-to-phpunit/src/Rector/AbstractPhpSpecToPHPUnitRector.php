@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Rector\PhpSpecToPHPUnit\Rector;
 
 use PhpParser\Node;
+use PhpParser\Node\Stmt\ClassLike;
 use Rector\Core\Rector\AbstractRector;
 use Rector\NodeTypeResolver\Node\AttributeKey;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
@@ -61,7 +62,7 @@ CODE_SAMPLE
     public function isInPhpSpecBehavior(Node $node): bool
     {
         $classLike = $node->getAttribute(AttributeKey::CLASS_NODE);
-        if ($classLike === null) {
+        if (! $classLike instanceof ClassLike) {
             return false;
         }
         return $this->isObjectType($classLike, 'PhpSpec\ObjectBehavior');

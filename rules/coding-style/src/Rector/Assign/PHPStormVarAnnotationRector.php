@@ -69,15 +69,13 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        /** @var Expression|null $expression */
         $expression = $node->getAttribute(AttributeKey::CURRENT_STATEMENT);
         // unable to analyze
-        if ($expression === null) {
+        if (! $expression instanceof Expression) {
             return null;
         }
-        /** @var Node|null $nextNode */
         $nextNode = $expression->getAttribute(AttributeKey::NEXT_NODE);
-        if ($nextNode === null) {
+        if (! $nextNode instanceof Node) {
             return null;
         }
         $docContent = $this->getDocContent($nextNode);

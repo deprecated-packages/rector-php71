@@ -18,7 +18,7 @@ trait ConfiguratorTrait
      *
      * @param string|array $configurator A PHP callable reference
      *
-     * @return mixed
+     * @return $this
      */
     public final function configurator($configurator)
     {

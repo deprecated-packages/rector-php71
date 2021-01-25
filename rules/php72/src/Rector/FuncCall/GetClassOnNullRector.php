@@ -7,12 +7,9 @@ namespace Rector\Php72\Rector\FuncCall;
 use PhpParser\Node;
 use PhpParser\Node\Expr\BinaryOp\Identical;
 use PhpParser\Node\Expr\BinaryOp\NotIdentical;
-use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Ternary;
-use PhpParser\Node\Identifier;
-use PhpParser\Node\Name;
-use PhpParser\Node\Stmt\Trait_;
+use PhpParser\Node\Stmt\Class_;
 use PHPStan\Analyser\Scope;
 use PHPStan\Type\NullType;
 use Rector\Core\Rector\AbstractRector;
@@ -70,45 +67,54 @@ CODE_SAMPLE
         if (! $this->isName($node, 'get_class')) {
             return null;
         }
+        $firstArgValue = $node->args[0]->value;
         // only relevant inside the class
-        /** @var Scope|null $nodeScope */
-        $nodeScope = $node->getAttribute(AttributeKey::SCOPE);
-        if ($nodeScope instanceof Scope && ! $nodeScope->isInClass()) {
+        $scope = $node->getAttribute(AttributeKey::SCOPE);
+        if (! $scope instanceof Scope) {
+            return null;
+        }
+        if (! $scope->isInClass()) {
             return null;
         }
         // possibly already changed
         if ($this->shouldSkip($node)) {
             return null;
         }
-        if (! isset($node->args[0])) {
+        if (! $this->isNullableType($firstArgValue) && ! $this->isStaticType($firstArgValue, NullType::class)) {
             return null;
         }
-        $valueNode = $node->args[0]->value;
-        if (! $this->isNullableType($valueNode) && ! $this->isStaticType($valueNode, NullType::class)) {
-            return null;
-        }
-        $notIdentical = new NotIdentical($valueNode, $this->createNull());
-        $funcCall = new FuncCall($node->name, $node->args);
-        $selfClassConstFetch = new ClassConstFetch(new Name('self'), new Identifier('class'));
-        $ternary = new Ternary($notIdentical, $funcCall, $selfClassConstFetch);
-        $funcCall->setAttribute(AttributeKey::PARENT_NODE, $ternary);
-        return $ternary;
+        $notIdentical = new NotIdentical($firstArgValue, $this->createNull());
+        $funcCall = $this->createGetClassFuncCall($node);
+        $selfClassConstFetch = $this->createClassConstReference('self');
+        return new Ternary($notIdentical, $funcCall, $selfClassConstFetch);
     }
 
     private function shouldSkip(FuncCall $funcCall): bool
     {
+        $isJustAdded = (bool) $funcCall->getAttribute(AttributeKey::JUST_ADDED);
+        if ($isJustAdded) {
+            return true;
+        }
         $classLike = $funcCall->getAttribute(AttributeKey::CLASS_NODE);
-        if ($classLike instanceof Trait_) {
+        if (! $classLike instanceof Class_) {
             return true;
         }
-        $parentNode = $funcCall->getAttribute(AttributeKey::PARENT_NODE);
-        if (! $parentNode instanceof Ternary) {
-            return false;
+        $parent = $funcCall->getAttribute(AttributeKey::PARENT_NODE);
+        if ($parent instanceof Ternary) {
+            if ($this->isIdenticalToNotNull($funcCall, $parent)) {
+                return true;
+            }
+
+            return $this->isNotIdenticalToNull($funcCall, $parent);
         }
-        if ($this->isIdenticalToNotNull($funcCall, $parentNode)) {
-            return true;
-        }
-        return $this->isNotIdenticalToNull($funcCall, $parentNode);
+        return false;
+    }
+
+    private function createGetClassFuncCall(FuncCall $oldFuncCall): FuncCall
+    {
+        $funcCall = new FuncCall($oldFuncCall->name, $oldFuncCall->args);
+        $funcCall->setAttribute(AttributeKey::JUST_ADDED, true);
+        return $funcCall;
     }
 
     /**

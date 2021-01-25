@@ -42,9 +42,8 @@ final class JMSInjectPhpDocNodeFactory extends AbstractPhpDocNodeFactory impleme
         if (! $node instanceof Property) {
             return null;
         }
-        /** @var Inject|null $inject */
         $inject = $this->nodeAnnotationReader->readPropertyAnnotation($node, $annotationClass);
-        if ($inject === null) {
+        if (! $inject instanceof Inject) {
             return null;
         }
         $serviceName = $inject->value === null ? $this->nodeNameResolver->getName($node) : $inject->value;

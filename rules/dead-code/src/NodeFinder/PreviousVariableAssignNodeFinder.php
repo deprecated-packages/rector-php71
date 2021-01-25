@@ -7,6 +7,7 @@ namespace Rector\DeadCode\NodeFinder;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Assign;
 use Rector\Core\PhpParser\Node\BetterNodeFinder;
+use Rector\Core\PhpParser\Printer\BetterStandardPrinter;
 use Rector\NodeNameResolver\NodeNameResolver;
 
 final class PreviousVariableAssignNodeFinder
@@ -21,10 +22,16 @@ final class PreviousVariableAssignNodeFinder
      */
     private $nodeNameResolver;
 
-    public function __construct(BetterNodeFinder $betterNodeFinder, NodeNameResolver $nodeNameResolver)
+    /**
+     * @var BetterStandardPrinter
+     */
+    private $betterStandardPrinter;
+
+    public function __construct(BetterNodeFinder $betterNodeFinder, NodeNameResolver $nodeNameResolver, BetterStandardPrinter $betterStandardPrinter)
     {
         $this->betterNodeFinder = $betterNodeFinder;
         $this->nodeNameResolver = $nodeNameResolver;
+        $this->betterStandardPrinter = $betterStandardPrinter;
     }
 
     public function find(Assign $assign): ?Node
@@ -35,8 +42,8 @@ final class PreviousVariableAssignNodeFinder
             if (! $node instanceof Assign) {
                 return false;
             }
-            // skil self
-            if ($node === $currentAssign) {
+            // skip self
+            if ($this->betterStandardPrinter->areSameNode($node, $currentAssign)) {
                 return false;
             }
             return $this->nodeNameResolver->isName($node->var, $variableName);

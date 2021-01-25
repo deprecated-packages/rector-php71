@@ -172,9 +172,8 @@ CODE_SAMPLE
 
     private function resolveCreateComponentMethodCallReturnType(MethodCall $methodCall): Type
     {
-        /** @var Scope|null $scope */
         $scope = $methodCall->getAttribute(AttributeKey::SCOPE);
-        if ($scope === null) {
+        if (! $scope instanceof Scope) {
             return new MixedType();
         }
         if (count($methodCall->args) !== 1) {
@@ -189,10 +188,12 @@ CODE_SAMPLE
 
     private function resolveArrayDimFetchControlType(ArrayDimFetch $arrayDimFetch): Type
     {
-        /** @var Scope|null $scope */
         $scope = $arrayDimFetch->getAttribute(AttributeKey::SCOPE);
-        if ($scope === null) {
+        if (! $scope instanceof Scope) {
             throw new ShouldNotHappenException();
+        }
+        if (! $arrayDimFetch->dim instanceof String_) {
+            return new MixedType();
         }
         return $this->resolveTypeFromShortControlNameAndVariable($arrayDimFetch->dim, $scope, $arrayDimFetch->var);
     }
@@ -200,7 +201,8 @@ CODE_SAMPLE
     private function resolveTypeFromShortControlNameAndVariable(String_ $shortControlString, Scope $scope, Expr $expr): Type
     {
         $componentName = $this->getValue($shortControlString);
-        $methodName = sprintf('createComponent%s', ucfirst($componentName));
+        $componentName = ucfirst($componentName);
+        $methodName = sprintf('createComponent%s', $componentName);
         $calledOnType = $scope->getType($expr);
         if (! $calledOnType instanceof TypeWithClassName) {
             return new MixedType();

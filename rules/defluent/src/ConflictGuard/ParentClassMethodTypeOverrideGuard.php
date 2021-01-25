@@ -41,7 +41,7 @@ final class ParentClassMethodTypeOverrideGuard
         // make sure return type is not protected by parent contract
         $parentClassMethodReflection = $this->getParentClassMethod($classMethod);
         // nothign to check
-        if ($parentClassMethodReflection === null) {
+        if (! $parentClassMethodReflection instanceof MethodReflection) {
             return true;
         }
         $parentClassMethod = $this->nodeRepository->findClassMethodByMethodReflection($parentClassMethodReflection);

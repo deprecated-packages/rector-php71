@@ -19,11 +19,6 @@ use Symplify\SimplePhpDocParser\PhpDocNodeTraverser;
 final class DocBlockNameImporter
 {
     /**
-     * @var bool
-     */
-    private $hasPhpDocChanged = false;
-
-    /**
      * @var PhpDocNodeTraverser
      */
     private $phpDocNodeTraverser;
@@ -57,11 +52,10 @@ final class DocBlockNameImporter
         $this->useNodesToAddCollector = $useNodesToAddCollector;
     }
 
-    public function importNames(PhpDocInfo $phpDocInfo, Node $phpParserNode): bool
+    public function importNames(PhpDocInfo $phpDocInfo, Node $phpParserNode): void
     {
         $attributeAwarePhpDocNode = $phpDocInfo->getPhpDocNode();
-        $this->hasPhpDocChanged = false;
-        $this->phpDocNodeTraverser->traverseWithCallable($attributeAwarePhpDocNode, '', function (PhpDocParserNode $docNode) use ($phpParserNode): PhpDocParserNode {
+        $this->phpDocNodeTraverser->traverseWithCallable($attributeAwarePhpDocNode, '', function (PhpDocParserNode $docNode) use ($phpDocInfo, $phpParserNode): PhpDocParserNode {
             if (! $docNode instanceof IdentifierTypeNode) {
                 return $docNode;
             }
@@ -74,12 +68,11 @@ final class DocBlockNameImporter
             if (! $importShortClasses && substr_count($staticType->getClassName(), '\\') === 0) {
                 return $docNode;
             }
-            return $this->processFqnNameImport($phpParserNode, $docNode, $staticType);
+            return $this->processFqnNameImport($phpDocInfo, $phpParserNode, $docNode, $staticType);
         });
-        return $this->hasPhpDocChanged;
     }
 
-    private function processFqnNameImport(Node $node, IdentifierTypeNode $identifierTypeNode, FullyQualifiedObjectType $fullyQualifiedObjectType): PhpDocParserNode
+    private function processFqnNameImport(PhpDocInfo $phpDocInfo, Node $node, IdentifierTypeNode $identifierTypeNode, FullyQualifiedObjectType $fullyQualifiedObjectType): PhpDocParserNode
     {
         if ($this->classNameImportSkipper->shouldSkipNameForFullyQualifiedObjectType($node, $fullyQualifiedObjectType)) {
             return $identifierTypeNode;
@@ -88,14 +81,14 @@ final class DocBlockNameImporter
         if ($this->useNodesToAddCollector->isShortImported($node, $fullyQualifiedObjectType)) {
             if ($this->useNodesToAddCollector->isImportShortable($node, $fullyQualifiedObjectType)) {
                 $identifierTypeNode->name = $fullyQualifiedObjectType->getShortName();
-                $this->hasPhpDocChanged = true;
+                $phpDocInfo->markAsChanged();
             }
 
             return $identifierTypeNode;
         }
         $shortenedIdentifierTypeNode = new IdentifierTypeNode($fullyQualifiedObjectType->getShortName());
-        $this->hasPhpDocChanged = true;
         $this->useNodesToAddCollector->addUseImport($node, $fullyQualifiedObjectType);
+        $phpDocInfo->markAsChanged();
         return $shortenedIdentifierTypeNode;
     }
 }

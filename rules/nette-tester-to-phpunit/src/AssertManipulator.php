@@ -16,7 +16,7 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Stmt\ClassMethod;
 use PHPStan\Type\BooleanType;
-use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo;
+use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfoFactory;
 use Rector\Core\PhpParser\Node\Value\ValueResolver;
 use Rector\NodeNameResolver\NodeNameResolver;
 use Rector\NodeTypeResolver\Node\AttributeKey;
@@ -110,7 +110,12 @@ final class AssertManipulator
      */
     private $nodesToAddCollector;
 
-    public function __construct(NodeNameResolver $nodeNameResolver, NodeTypeResolver $nodeTypeResolver, NodesToAddCollector $nodesToAddCollector, NodesToRemoveCollector $nodesToRemoveCollector, StringTypeAnalyzer $stringTypeAnalyzer, ValueResolver $valueResolver)
+    /**
+     * @var PhpDocInfoFactory
+     */
+    private $phpDocInfoFactory;
+
+    public function __construct(NodeNameResolver $nodeNameResolver, NodeTypeResolver $nodeTypeResolver, NodesToAddCollector $nodesToAddCollector, NodesToRemoveCollector $nodesToRemoveCollector, StringTypeAnalyzer $stringTypeAnalyzer, ValueResolver $valueResolver, PhpDocInfoFactory $phpDocInfoFactory)
     {
         $this->nodeNameResolver = $nodeNameResolver;
         $this->nodeTypeResolver = $nodeTypeResolver;
@@ -118,6 +123,7 @@ final class AssertManipulator
         $this->stringTypeAnalyzer = $stringTypeAnalyzer;
         $this->nodesToRemoveCollector = $nodesToRemoveCollector;
         $this->nodesToAddCollector = $nodesToAddCollector;
+        $this->phpDocInfoFactory = $phpDocInfoFactory;
     }
 
     /**
@@ -231,13 +237,11 @@ final class AssertManipulator
         $closure = $staticCall->args[0]->value;
         $this->nodesToAddCollector->addNodesAfterNode($closure->stmts, $staticCall);
         $this->nodesToRemoveCollector->addNodeToRemove($staticCall);
-        /** @var ClassMethod|null $classMethod */
         $classMethod = $staticCall->getAttribute(AttributeKey::METHOD_NODE);
-        if ($classMethod === null) {
+        if (! $classMethod instanceof ClassMethod) {
             return;
         }
-        /** @var PhpDocInfo $phpDocInfo */
-        $phpDocInfo = $classMethod->getAttribute(AttributeKey::PHP_DOC_INFO);
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($classMethod);
         $phpDocInfo->addBareTag('@doesNotPerformAssertions');
     }
 

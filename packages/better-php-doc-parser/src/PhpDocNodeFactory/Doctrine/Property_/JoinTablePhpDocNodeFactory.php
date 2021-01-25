@@ -50,9 +50,8 @@ final class JoinTablePhpDocNodeFactory extends AbstractPhpDocNodeFactory impleme
         if (! $node instanceof Property) {
             throw new ShouldNotHappenException();
         }
-        /** @var JoinTable|null $joinTable */
         $joinTable = $this->nodeAnnotationReader->readPropertyAnnotation($node, $annotationClass);
-        if ($joinTable === null) {
+        if (! $joinTable instanceof JoinTable) {
             return null;
         }
         $annotationContent = $this->resolveContentFromTokenIterator($tokenIterator);

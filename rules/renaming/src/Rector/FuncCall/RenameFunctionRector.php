@@ -22,7 +22,7 @@ final class RenameFunctionRector extends AbstractRector implements ConfigurableR
     /**
      * @var string
      */
-    public const OLD_FUNCTION_TO_NEW_FUNCTION = '$oldFunctionToNewFunction';
+    public const OLD_FUNCTION_TO_NEW_FUNCTION = 'old_function_to_new_function';
 
     /**
      * @var array<string, string>
@@ -58,7 +58,7 @@ final class RenameFunctionRector extends AbstractRector implements ConfigurableR
                 continue;
             }
 
-            $node->name = Strings::contains($newFunction, '\\') ? new FullyQualified($newFunction) : new Name($newFunction);
+            $node->name = $this->createName($newFunction);
         }
         return $node;
     }
@@ -69,5 +69,13 @@ final class RenameFunctionRector extends AbstractRector implements ConfigurableR
     public function configure(array $configuration): void
     {
         $this->oldFunctionToNewFunction = $configuration[self::OLD_FUNCTION_TO_NEW_FUNCTION] ?? [];
+    }
+
+    private function createName(string $newFunction): Name
+    {
+        if (Strings::contains($newFunction, '\\')) {
+            return new FullyQualified($newFunction);
+        }
+        return new Name($newFunction);
     }
 }

@@ -12,17 +12,19 @@ use PhpParser\Node\FunctionLike;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Function_;
-use Rector\Core\PhpParser\NodeTraverser\CallableNodeTraverser;
+use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo;
+use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfoFactory;
 use Rector\Naming\PhpDoc\VarTagValueNodeRenamer;
 use Rector\NodeNameResolver\NodeNameResolver;
 use Rector\NodeTypeResolver\Node\AttributeKey;
+use Symplify\Astral\NodeTraverser\SimpleCallableNodeTraverser;
 
 final class VariableRenamer
 {
     /**
-     * @var CallableNodeTraverser
+     * @var SimpleCallableNodeTraverser
      */
-    private $callableNodeTraverser;
+    private $simpleCallableNodeTraverser;
 
     /**
      * @var NodeNameResolver
@@ -34,11 +36,17 @@ final class VariableRenamer
      */
     private $varTagValueNodeRenamer;
 
-    public function __construct(CallableNodeTraverser $callableNodeTraverser, NodeNameResolver $nodeNameResolver, VarTagValueNodeRenamer $varTagValueNodeRenamer)
+    /**
+     * @var PhpDocInfoFactory
+     */
+    private $phpDocInfoFactory;
+
+    public function __construct(SimpleCallableNodeTraverser $simpleCallableNodeTraverser, NodeNameResolver $nodeNameResolver, VarTagValueNodeRenamer $varTagValueNodeRenamer, PhpDocInfoFactory $phpDocInfoFactory)
     {
-        $this->callableNodeTraverser = $callableNodeTraverser;
+        $this->simpleCallableNodeTraverser = $simpleCallableNodeTraverser;
         $this->nodeNameResolver = $nodeNameResolver;
         $this->varTagValueNodeRenamer = $varTagValueNodeRenamer;
+        $this->phpDocInfoFactory = $phpDocInfoFactory;
     }
 
     /**
@@ -50,7 +58,7 @@ final class VariableRenamer
         if ($assign === null) {
             $isRenamingActive = true;
         }
-        $this->callableNodeTraverser->traverseNodesWithCallable((array) $functionLike->stmts, function (Node $node) use ($oldName, $expectedName, $assign, &$isRenamingActive): ?Variable {
+        $this->simpleCallableNodeTraverser->traverseNodesWithCallable((array) $functionLike->stmts, function (Node $node) use ($oldName, $expectedName, $assign, &$isRenamingActive): ?Variable {
             if ($assign !== null && $node === $assign) {
                 $isRenamingActive = true;
                 return null;
@@ -77,9 +85,8 @@ final class VariableRenamer
 
     private function isParamInParentFunction(Variable $variable): bool
     {
-        /** @var Closure|null $closure */
         $closure = $variable->getAttribute(AttributeKey::CLOSURE_NODE);
-        if ($closure === null) {
+        if (! $closure instanceof Closure) {
             return false;
         }
         $variableName = $this->nodeNameResolver->getName($variable);
@@ -100,7 +107,20 @@ final class VariableRenamer
             return null;
         }
         $variable->name = $expectedName;
-        $this->varTagValueNodeRenamer->renameAssignVarTagVariableName($variable, $oldName, $expectedName);
+        $variablePhpDocInfo = $this->resolvePhpDocInfo($variable);
+        $this->varTagValueNodeRenamer->renameAssignVarTagVariableName($variablePhpDocInfo, $oldName, $expectedName);
         return $variable;
+    }
+
+    /**
+     * Expression doc block has higher priority
+     */
+    private function resolvePhpDocInfo(Variable $variable): PhpDocInfo
+    {
+        $expression = $variable->getAttribute(AttributeKey::CURRENT_STATEMENT);
+        if ($expression instanceof Node) {
+            return $this->phpDocInfoFactory->createFromNodeOrEmpty($expression);
+        }
+        return $this->phpDocInfoFactory->createFromNodeOrEmpty($variable);
     }
 }

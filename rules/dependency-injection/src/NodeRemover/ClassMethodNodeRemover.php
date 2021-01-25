@@ -11,10 +11,10 @@ use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Expression;
-use Rector\Core\PhpParser\NodeTraverser\CallableNodeTraverser;
 use Rector\Core\ValueObject\MethodName;
 use Rector\NodeNameResolver\NodeNameResolver;
 use Rector\PostRector\Collector\NodesToRemoveCollector;
+use Symplify\Astral\NodeTraverser\SimpleCallableNodeTraverser;
 
 final class ClassMethodNodeRemover
 {
@@ -29,15 +29,15 @@ final class ClassMethodNodeRemover
     private $nodeNameResolver;
 
     /**
-     * @var CallableNodeTraverser
+     * @var SimpleCallableNodeTraverser
      */
-    private $callableNodeTraverser;
+    private $simpleCallableNodeTraverser;
 
-    public function __construct(CallableNodeTraverser $callableNodeTraverser, NodeNameResolver $nodeNameResolver, NodesToRemoveCollector $nodesToRemoveCollector)
+    public function __construct(SimpleCallableNodeTraverser $simpleCallableNodeTraverser, NodeNameResolver $nodeNameResolver, NodesToRemoveCollector $nodesToRemoveCollector)
     {
         $this->nodesToRemoveCollector = $nodesToRemoveCollector;
         $this->nodeNameResolver = $nodeNameResolver;
-        $this->callableNodeTraverser = $callableNodeTraverser;
+        $this->simpleCallableNodeTraverser = $simpleCallableNodeTraverser;
     }
 
     public function removeClassMethodIfUseless(ClassMethod $classMethod): void
@@ -55,7 +55,7 @@ final class ClassMethodNodeRemover
     {
         /** @var string $paramName */
         $paramName = $this->nodeNameResolver->getName($param->var);
-        $this->callableNodeTraverser->traverseNodesWithCallable((array) $classMethod->stmts, function (Node $node) use ($paramName) {
+        $this->simpleCallableNodeTraverser->traverseNodesWithCallable((array) $classMethod->stmts, function (Node $node) use ($paramName) {
             if (! $this->isParentConstructStaticCall($node)) {
                 return null;
             }

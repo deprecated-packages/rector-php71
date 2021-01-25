@@ -18,7 +18,6 @@ use Rector\Core\Util\StaticRectorStrings;
 use Rector\NetteToSymfony\Route\RouteInfoFactory;
 use Rector\NetteToSymfony\Routing\ExplicitRouteAnnotationDecorator;
 use Rector\NetteToSymfony\ValueObject\RouteInfo;
-use Rector\NodeTypeResolver\Node\AttributeKey;
 use Rector\TypeDeclaration\TypeInferer\ReturnTypeInferer;
 use ReflectionMethod;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
@@ -153,7 +152,7 @@ CODE_SAMPLE
         /** @var RouteInfo $routeInfo */
         foreach ($routeInfos as $routeInfo) {
             $classMethod = $this->resolveControllerClassMethod($routeInfo);
-            if ($classMethod === null) {
+            if (! $classMethod instanceof \PhpParser\Node\Stmt\ClassMethod) {
                 continue;
             }
 
@@ -203,7 +202,7 @@ CODE_SAMPLE
         // collect annotations and target controllers
         foreach ($assignNodes as $assignNode) {
             $routeNameToControllerMethod = $this->routeInfoFactory->createFromNode($assignNode->expr);
-            if ($routeNameToControllerMethod === null) {
+            if (! $routeNameToControllerMethod instanceof \Rector\NetteToSymfony\ValueObject\RouteInfo) {
                 continue;
             }
 
@@ -215,7 +214,7 @@ CODE_SAMPLE
     private function resolveControllerClassMethod(RouteInfo $routeInfo): ?ClassMethod
     {
         $classNode = $this->nodeRepository->findClass($routeInfo->getClass());
-        if ($classNode === null) {
+        if (! $classNode instanceof Class_) {
             return null;
         }
         return $classNode->getMethod($routeInfo->getMethod());
@@ -284,10 +283,7 @@ CODE_SAMPLE
             return true;
         }
         // already has Route tag
-        $phpDocInfo = $classMethod->getAttribute(AttributeKey::PHP_DOC_INFO);
-        if ($phpDocInfo === null) {
-            return false;
-        }
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($classMethod);
         return $phpDocInfo->hasByType(SymfonyRouteTagValueNode::class);
     }
 

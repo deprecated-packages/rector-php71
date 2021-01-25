@@ -54,7 +54,7 @@ class RegisterListenersPass implements CompilerPassInterface
     }
 
     /**
-     * @return mixed
+     * @return $this
      */
     public function setNoPreloadEvents(array $noPreloadEvents, string $tagName = 'container.no_preload')
     {

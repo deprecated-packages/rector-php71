@@ -16,7 +16,7 @@ trait ClassTrait
     /**
      * Sets the service class.
      *
-     * @return mixed
+     * @return $this
      */
     public final function class(?string $class)
     {

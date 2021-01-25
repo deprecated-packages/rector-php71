@@ -6,6 +6,7 @@ namespace Rector\NetteKdyby\Rector\ClassMethod;
 
 use Nette\Utils\Strings;
 use PhpParser\Node;
+use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\ArrayItem;
 use PhpParser\Node\Stmt\ClassMethod;
 use Rector\NetteKdyby\DataProvider\EventAndListenerTreeProvider;
@@ -122,7 +123,7 @@ CODE_SAMPLE
                 return null;
             }
             $arrayKey = $node->key;
-            if ($arrayKey === null) {
+            if (! $arrayKey instanceof Expr) {
                 return null;
             }
             $eventPropertyReferenceName = $this->getValue($arrayKey);
@@ -131,7 +132,7 @@ CODE_SAMPLE
                 return null;
             }
             $eventClassName = $this->eventClassNaming->createEventClassNameFromClassPropertyReference($eventPropertyReferenceName);
-            $node->key = $this->createClassConstantReference($eventClassName);
+            $node->key = $this->createClassConstReference($eventClassName);
         });
     }
 }

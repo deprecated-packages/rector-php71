@@ -73,7 +73,7 @@ final class RenameNamespaceRector extends AbstractRector implements Configurable
             return null;
         }
         $renamedNamespaceValueObject = $this->namespaceMatcher->matchRenamedNamespace($name, $this->oldToNewNamespaces);
-        if ($renamedNamespaceValueObject === null) {
+        if (! $renamedNamespaceValueObject instanceof RenamedNamespace) {
             return null;
         }
         if ($this->isClassFullyQualifiedName($node)) {
@@ -110,7 +110,7 @@ final class RenameNamespaceRector extends AbstractRector implements Configurable
     private function isClassFullyQualifiedName(Node $node): bool
     {
         $parentNode = $node->getAttribute(AttributeKey::PARENT_NODE);
-        if ($parentNode === null) {
+        if (! $parentNode instanceof Node) {
             return false;
         }
         if (! $parentNode instanceof New_) {
@@ -125,7 +125,7 @@ final class RenameNamespaceRector extends AbstractRector implements Configurable
     private function isPartialNamespace(Name $name): bool
     {
         $resolvedName = $name->getAttribute(AttributeKey::RESOLVED_NAME);
-        if ($resolvedName === null) {
+        if (! $resolvedName instanceof Name) {
             return false;
         }
         if ($resolvedName instanceof FullyQualified) {

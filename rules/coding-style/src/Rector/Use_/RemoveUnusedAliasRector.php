@@ -105,7 +105,7 @@ CODE_SAMPLE
             return null;
         }
         $searchNode = $this->resolveSearchNode($node);
-        if ($searchNode === null) {
+        if (! $searchNode instanceof Node) {
             return null;
         }
         $this->resolvedNodeNames = $this->useManipulator->resolveUsedNameNodes($searchNode);

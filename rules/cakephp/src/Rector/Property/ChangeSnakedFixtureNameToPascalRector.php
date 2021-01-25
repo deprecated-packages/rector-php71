@@ -8,6 +8,7 @@ use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\ArrayItem;
 use PhpParser\Node\Scalar\String_;
+use PhpParser\Node\Stmt\ClassLike;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\PropertyProperty;
 use Rector\Core\Rector\AbstractRector;
@@ -62,7 +63,7 @@ CODE_SAMPLE
     public function refactor(Node $node): ?Node
     {
         $classLike = $node->getAttribute(AttributeKey::CLASS_NODE);
-        if ($classLike === null) {
+        if (! $classLike instanceof ClassLike) {
             return null;
         }
         if (! $this->isName($node, 'fixtures')) {
@@ -96,10 +97,11 @@ CODE_SAMPLE
     private function renameFixtureName(String_ $string): void
     {
         [$prefix, $table] = explode('.', $string->value);
-        $table = array_map(function (string $token): string {
+        $tableParts = explode('/', $table);
+        $pascalCaseTableParts = array_map(function (string $token): string {
             return StaticRectorStrings::underscoreToPascalCase($token);
-        }, explode('/', $table));
-        $table = implode('/', $table);
+        }, $tableParts);
+        $table = implode('/', $pascalCaseTableParts);
         $string->value = sprintf('%s.%s', $prefix, $table);
     }
 }

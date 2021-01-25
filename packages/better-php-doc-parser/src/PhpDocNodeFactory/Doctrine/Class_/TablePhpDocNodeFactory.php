@@ -52,9 +52,8 @@ final class TablePhpDocNodeFactory extends AbstractPhpDocNodeFactory implements 
         if (! $node instanceof Class_) {
             throw new ShouldNotHappenException();
         }
-        /** @var Table|null $table */
         $table = $this->nodeAnnotationReader->readClassAnnotation($node, $annotationClass);
-        if ($table === null) {
+        if (! $table instanceof Table) {
             return null;
         }
         $annotationContent = $this->resolveContentFromTokenIterator($tokenIterator);

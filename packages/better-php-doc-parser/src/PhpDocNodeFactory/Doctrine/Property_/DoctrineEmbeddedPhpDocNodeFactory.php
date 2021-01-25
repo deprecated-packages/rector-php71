@@ -26,9 +26,8 @@ final class DoctrineEmbeddedPhpDocNodeFactory extends AbstractPhpDocNodeFactory 
 
     public function createFromNodeAndTokens(Node $node, TokenIterator $tokenIterator, string $annotationClass): ?PhpDocTagValueNode
     {
-        /** @var Embedded|null $annotation */
         $annotation = $this->nodeAnnotationReader->readAnnotation($node, $annotationClass);
-        if ($annotation === null) {
+        if (! $annotation instanceof Embedded) {
             return null;
         }
         $content = $this->resolveContentFromTokenIterator($tokenIterator);

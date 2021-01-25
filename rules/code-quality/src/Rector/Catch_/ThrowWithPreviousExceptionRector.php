@@ -81,7 +81,7 @@ CODE_SAMPLE
     public function refactor(Node $node): ?Node
     {
         $caughtThrowableVariable = $node->var;
-        if ($caughtThrowableVariable === null) {
+        if (! $caughtThrowableVariable instanceof Variable) {
             return null;
         }
         $this->traverseNodesWithCallable($node->stmts, function (Node $node) use ($caughtThrowableVariable): ?int {

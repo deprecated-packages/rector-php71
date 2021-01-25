@@ -83,10 +83,7 @@ CODE_SAMPLE
         if ($node instanceof Property) {
             return null;
         }
-        $phpDocInfo = $node->getAttribute(AttributeKey::PHP_DOC_INFO);
-        if ($phpDocInfo === null) {
-            return null;
-        }
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($node);
         $docVariableName = $this->getVarDocVariableName($phpDocInfo);
         if ($docVariableName === null) {
             return null;
@@ -105,7 +102,7 @@ CODE_SAMPLE
     private function getVarDocVariableName(PhpDocInfo $phpDocInfo): ?string
     {
         $attributeAwareVarTagValueNode = $phpDocInfo->getVarTagValueNode();
-        if ($attributeAwareVarTagValueNode === null) {
+        if (! $attributeAwareVarTagValueNode instanceof VarTagValueNode) {
             return null;
         }
         $variableName = $attributeAwareVarTagValueNode->variableName;
@@ -141,7 +138,7 @@ CODE_SAMPLE
         $stmt->setAttribute(AttributeKey::COMMENTS, null);
         $type = $phpDocInfo->getVarType();
         $assertFuncCall = $this->createFuncCallBasedOnType($type, $variable);
-        if ($assertFuncCall === null) {
+        if (! $assertFuncCall instanceof FuncCall) {
             return null;
         }
         $phpDocInfo->removeByType(VarTagValueNode::class);
@@ -152,12 +149,12 @@ CODE_SAMPLE
     private function refactorAlreadyCreatedNode(Stmt $stmt, PhpDocInfo $phpDocInfo, Variable $variable): ?Node
     {
         $varTagValue = $phpDocInfo->getVarTagValueNode();
-        if ($varTagValue === null) {
+        if (! $varTagValue instanceof VarTagValueNode) {
             throw new ShouldNotHappenException();
         }
         $phpStanType = $this->staticTypeMapper->mapPHPStanPhpDocTypeNodeToPHPStanType($varTagValue->type, $variable);
         $assertFuncCall = $this->createFuncCallBasedOnType($phpStanType, $variable);
-        if ($assertFuncCall === null) {
+        if (! $assertFuncCall instanceof FuncCall) {
             return null;
         }
         $this->addNodeAfterNode($assertFuncCall, $stmt);

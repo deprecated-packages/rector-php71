@@ -60,6 +60,7 @@ use Rector\CodeQuality\Rector\Name\FixClassCaseSensitivityNameRector;
 use Rector\CodeQuality\Rector\New_\NewStaticToNewSelfRector;
 use Rector\CodeQuality\Rector\NotEqual\CommonNotEqualRector;
 use Rector\CodeQuality\Rector\Return_\SimplifyUselessVariableRector;
+use Rector\CodeQuality\Rector\Switch_\SingularSwitchToIfRector;
 use Rector\CodeQuality\Rector\Ternary\ArrayKeyExistsTernaryThenValueToCoalescingRector;
 use Rector\CodeQuality\Rector\Ternary\SimplifyDuplicatedTernaryRector;
 use Rector\CodeQuality\Rector\Ternary\SimplifyTautologyTernaryRector;
@@ -154,8 +155,7 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
             'mbstrrpos' => 'mb_strrpos',
             'mbsubstr' => 'mb_substr',
         ],
-    ],
-    ]);
+    ]]);
     $services->set(SetTypeToCastRector::class);
     $services->set(LogicalToBooleanRector::class);
     $services->set(VarToPublicPropertyRector::class);
@@ -165,4 +165,5 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
     $services->set(DateTimeToDateTimeInterfaceRector::class);
     $services->set(UnwrapSprintfOneArgumentRector::class);
     $services->set(SwitchNegatedTernaryRector::class);
+    $services->set(SingularSwitchToIfRector::class);
 };

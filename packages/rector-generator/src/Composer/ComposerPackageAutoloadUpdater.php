@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Rector\RectorGenerator\Composer;
 
-use Rector\RectorGenerator\FileSystem\JsonFileSystem;
 use Rector\RectorGenerator\ValueObject\Package;
 use Rector\RectorGenerator\ValueObject\RectorRecipe;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symplify\SmartFileSystem\Json\JsonFileSystem;
 
 final class ComposerPackageAutoloadUpdater
 {
@@ -45,7 +45,7 @@ final class ComposerPackageAutoloadUpdater
     public function processComposerAutoload(RectorRecipe $rectorRecipe): void
     {
         $composerJsonFilePath = getcwd() . '/composer.json';
-        $composerJson = $this->jsonFileSystem->loadFileToJson($composerJsonFilePath);
+        $composerJson = $this->jsonFileSystem->loadFilePathToJson($composerJsonFilePath);
         $package = $this->resolvePackage($rectorRecipe);
         if ($this->isPackageAlreadyLoaded($composerJson, $package)) {
             return;
@@ -59,7 +59,7 @@ final class ComposerPackageAutoloadUpdater
         $srcAutoload = $rectorRecipe->isRectorRepository() ? self::AUTOLOAD : self::AUTOLOAD_DEV;
         $composerJson[$srcAutoload][self::PSR_4][$package->getSrcNamespace()] = $package->getSrcDirectory();
         $composerJson[self::AUTOLOAD_DEV][self::PSR_4][$package->getTestsNamespace()] = $package->getTestsDirectory();
-        $this->jsonFileSystem->saveJsonToFile($composerJsonFilePath, $composerJson);
+        $this->jsonFileSystem->writeJsonToFilePath($composerJson, $composerJsonFilePath);
         $this->rebuildAutoload();
     }
 

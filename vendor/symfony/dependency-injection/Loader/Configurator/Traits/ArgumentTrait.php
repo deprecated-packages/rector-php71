@@ -16,7 +16,7 @@ trait ArgumentTrait
     /**
      * Sets the arguments to pass to the service constructor/factory method.
      *
-     * @return mixed
+     * @return $this
      */
     public final function args(array $arguments)
     {
@@ -30,7 +30,7 @@ trait ArgumentTrait
      * @param string|int $key
      * @param mixed      $value
      *
-     * @return mixed
+     * @return $this
      */
     public final function arg($key, $value)
     {

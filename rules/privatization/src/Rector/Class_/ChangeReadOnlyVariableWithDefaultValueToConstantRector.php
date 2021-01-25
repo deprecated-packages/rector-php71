@@ -111,7 +111,7 @@ CODE_SAMPLE
             }
 
             $classMethod = $node->getMethod($methodName);
-            if ($classMethod === null) {
+            if (! $classMethod instanceof ClassMethod) {
                 throw new ShouldNotHappenException();
             }
 

@@ -23,7 +23,7 @@ final class JoinTableTagValueNode extends AbstractDoctrineTagValueNode implement
     private const INVERSE_JOIN_COLUMNS = 'inverseJoinColumns';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $name;
 
@@ -56,7 +56,7 @@ final class JoinTableTagValueNode extends AbstractDoctrineTagValueNode implement
      * @param JoinColumnTagValueNode[] $joinColumns
      * @param JoinColumnTagValueNode[] $inverseJoinColumns
      */
-    public function __construct(string $name, ?string $schema = null, array $joinColumns = [], array $inverseJoinColumns = [], ?string $originalContent = null, ?AroundSpaces $joinColumnsAroundSpaces = null, ?AroundSpaces $inverseJoinColumnsAroundSpaces = null)
+    public function __construct(?string $name, ?string $schema = null, array $joinColumns = [], array $inverseJoinColumns = [], ?string $originalContent = null, ?AroundSpaces $joinColumnsAroundSpaces = null, ?AroundSpaces $inverseJoinColumnsAroundSpaces = null)
     {
         $this->name = $name;
         $this->schema = $schema;
@@ -87,7 +87,9 @@ final class JoinTableTagValueNode extends AbstractDoctrineTagValueNode implement
     {
         $items = [];
 
-        $items['name'] = $this->name;
+        if ($this->name !== null) {
+            $items['name'] = $this->name;
+        }
 
         if ($this->schema !== null) {
             $items['schema'] = $this->schema;
@@ -126,7 +128,9 @@ final class JoinTableTagValueNode extends AbstractDoctrineTagValueNode implement
     {
         $items = [];
 
-        $items['name'] = sprintf('"%s"', $this->name);
+        if ($this->name !== null) {
+            $items['name'] = sprintf('"%s"', $this->name);
+        }
 
         if ($this->schema !== null) {
             $items['schema'] = sprintf('"%s"', $this->schema);
@@ -143,14 +147,14 @@ final class JoinTableTagValueNode extends AbstractDoctrineTagValueNode implement
     {
         $items = [];
         if ($this->joinColumns !== []) {
-            if ($this->joinColumnsAroundSpaces === null) {
+            if (! $this->joinColumnsAroundSpaces instanceof AroundSpaces) {
                 throw new ShouldNotHappenException();
             }
 
             $items[$joinColumnsKey] = $this->printNestedTag($this->joinColumns, false, $this->joinColumnsAroundSpaces->getOpeningSpace(), $this->joinColumnsAroundSpaces->getClosingSpace());
         }
         if ($this->inverseJoinColumns !== []) {
-            if ($this->inverseJoinColumnsAroundSpaces === null) {
+            if (! $this->inverseJoinColumnsAroundSpaces instanceof AroundSpaces) {
                 throw new ShouldNotHappenException();
             }
 

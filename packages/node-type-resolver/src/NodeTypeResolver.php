@@ -39,6 +39,7 @@ use Rector\NodeTypeResolver\TypeAnalyzer\ArrayTypeAnalyzer;
 use Rector\PHPStanStaticTypeMapper\Utils\TypeUnwrapper;
 use Rector\StaticTypeMapper\TypeFactory\TypeFactoryStaticHelper;
 use Rector\StaticTypeMapper\ValueObject\Type\FullyQualifiedObjectType;
+use Rector\StaticTypeMapper\ValueObject\Type\ShortenedObjectType;
 use Rector\TypeDeclaration\PHPStan\Type\ObjectTypeSpecifier;
 
 final class NodeTypeResolver
@@ -94,6 +95,19 @@ final class NodeTypeResolver
     public function autowireNodeTypeResolver(ArrayTypeAnalyzer $arrayTypeAnalyzer): void
     {
         $this->arrayTypeAnalyzer = $arrayTypeAnalyzer;
+    }
+
+    /**
+     * @param string[]|ObjectType[] $requiredTypes
+     */
+    public function isObjectTypes(Node $node, array $requiredTypes): bool
+    {
+        foreach ($requiredTypes as $requiredType) {
+            if ($this->isObjectType($node, $requiredType)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -158,12 +172,11 @@ final class NodeTypeResolver
         if (StaticInstanceOf::isOneOf($node, [Param::class, Scalar::class])) {
             return $this->resolve($node);
         }
-        /** @var Scope|null $nodeScope */
         $nodeScope = $node->getAttribute(AttributeKey::SCOPE);
         if (! $node instanceof Expr) {
             return new MixedType();
         }
-        if ($nodeScope === null) {
+        if (! $nodeScope instanceof Scope) {
             return new MixedType();
         }
         if ($node instanceof New_ && $this->classNodeAnalyzer->isAnonymousClass($node->class)) {
@@ -245,10 +258,18 @@ final class NodeTypeResolver
             return true;
         }
         $defaultNodeValue = $property->props[0]->default;
-        if ($defaultNodeValue === null) {
+        if (! $defaultNodeValue instanceof \PhpParser\Node\Expr) {
             return false;
         }
         return $this->isStaticType($defaultNodeValue, BooleanType::class);
+    }
+
+    public function getFullyQualifiedClassName(TypeWithClassName $typeWithClassName): string
+    {
+        if ($typeWithClassName instanceof ShortenedObjectType) {
+            return $typeWithClassName->getFullyQualifiedName();
+        }
+        return $typeWithClassName->getClassName();
     }
 
     private function addNodeTypeResolver(NodeTypeResolverInterface $nodeTypeResolver): void
@@ -308,9 +329,8 @@ final class NodeTypeResolver
         if ($type !== null) {
             return $type;
         }
-        /** @var Scope|null $nodeScope */
         $nodeScope = $node->getAttribute(AttributeKey::SCOPE);
-        if ($nodeScope === null) {
+        if (! $nodeScope instanceof Scope) {
             return new MixedType();
         }
         if (! $node instanceof Expr) {

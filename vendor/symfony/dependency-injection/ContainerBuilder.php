@@ -588,9 +588,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * constructor.
      *
      * @throws BadMethodCallException When this ContainerBuilder is compiled
-     * @param mixed $container
      */
-    public function merge($container)
+    public function merge(self $container)
     {
         if ($this->isCompiled()) {
             throw new BadMethodCallException('Cannot merge on a compiled container.');

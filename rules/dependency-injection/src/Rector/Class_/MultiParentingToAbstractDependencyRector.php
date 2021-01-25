@@ -14,6 +14,7 @@ use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfoFactory;
 use Rector\Core\Contract\Rector\ConfigurableRectorInterface;
 use Rector\Core\PhpParser\Node\Manipulator\ClassInsertManipulator;
 use Rector\Core\Rector\AbstractRector;
+use Rector\Core\ValueObject\FrameworkName;
 use Rector\Core\ValueObject\MethodName;
 use Rector\DependencyInjection\NodeFactory\InjectMethodFactory;
 use Rector\DependencyInjection\NodeRemover\ClassMethodNodeRemover;
@@ -28,18 +29,6 @@ use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
  */
 final class MultiParentingToAbstractDependencyRector extends AbstractRector implements ConfigurableRectorInterface
 {
-    /**
-     * @api
-     * @var string
-     */
-    public const FRAMEWORK_SYMFONY = 'symfony';
-
-    /**
-     * @api
-     * @var string
-     */
-    public const FRAMEWORK_NETTE = 'nette';
-
     /**
      * @api
      * @var string
@@ -128,7 +117,7 @@ class SecondChild extends AbstractParentClass
 }
 CODE_SAMPLE
 , [
-                self::FRAMEWORK => self::FRAMEWORK_NETTE,
+                self::FRAMEWORK => FrameworkName::NETTE,
             ]),
         ]);
     }
@@ -159,7 +148,7 @@ CODE_SAMPLE
             return null;
         }
         $classMethod = $node->getMethod(MethodName::CONSTRUCT);
-        if ($classMethod === null) {
+        if (! $classMethod instanceof ClassMethod) {
             return null;
         }
         $abstractClassConstructorParamTypes = $this->resolveConstructorParamClassTypes($node);
@@ -167,7 +156,7 @@ CODE_SAMPLE
         $this->objectTypesToInject = [];
         foreach ($childrenClasses as $childrenClass) {
             $constructorClassMethod = $childrenClass->getMethod(MethodName::CONSTRUCT);
-            if ($constructorClassMethod === null) {
+            if (! $constructorClassMethod instanceof ClassMethod) {
                 continue;
             }
 
@@ -193,7 +182,7 @@ CODE_SAMPLE
     private function resolveConstructorParamClassTypes(Class_ $class): array
     {
         $constructorClassMethod = $class->getMethod(MethodName::CONSTRUCT);
-        if ($constructorClassMethod === null) {
+        if (! $constructorClassMethod instanceof ClassMethod) {
             return [];
         }
         $objectTypes = [];

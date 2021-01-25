@@ -90,7 +90,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     /**
      * @param string|string[] $needle
      *
-     * @return mixed
+     * @return static
      */
     public function after($needle, bool $includeNeedle = false, int $offset = 0)
     {
@@ -117,7 +117,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     /**
      * @param string|string[] $needle
      *
-     * @return mixed
+     * @return static
      */
     public function afterLast($needle, bool $includeNeedle = false, int $offset = 0)
     {
@@ -142,14 +142,14 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return static
      */
     public abstract function append(string ...$suffix);
 
     /**
      * @param string|string[] $needle
      *
-     * @return mixed
+     * @return static
      */
     public function before($needle, bool $includeNeedle = false, int $offset = 0)
     {
@@ -176,7 +176,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     /**
      * @param string|string[] $needle
      *
-     * @return mixed
+     * @return static
      */
     public function beforeLast($needle, bool $includeNeedle = false, int $offset = 0)
     {
@@ -210,7 +210,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return static
      */
     abstract public function camel();
 
@@ -220,7 +220,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     public abstract function chunk(int $length = 1): array;
 
     /**
-     * @return mixed
+     * @return static
      */
     public function collapseWhitespace()
     {
@@ -255,7 +255,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return static
      */
     public function ensureEnd(string $suffix)
     {
@@ -268,7 +268,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return static
      */
     public function ensureStart(string $prefix)
     {
@@ -302,12 +302,12 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return static
      */
     abstract public function folded();
 
     /**
-     * @return mixed
+     * @return static
      */
     public function ignoreCase()
     {
@@ -361,7 +361,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return static
      */
     public abstract function join(array $strings, string $lastGlue = null);
 
@@ -373,7 +373,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     abstract public function length(): int;
 
     /**
-     * @return mixed
+     * @return static
      */
     abstract public function lower();
 
@@ -387,27 +387,27 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     public abstract function match(string $regexp, int $flags = 0, int $offset = 0): array;
 
     /**
-     * @return mixed
+     * @return static
      */
     public abstract function padBoth(int $length, string $padStr = ' ');
 
     /**
-     * @return mixed
+     * @return static
      */
     public abstract function padEnd(int $length, string $padStr = ' ');
 
     /**
-     * @return mixed
+     * @return static
      */
     public abstract function padStart(int $length, string $padStr = ' ');
 
     /**
-     * @return mixed
+     * @return static
      */
     public abstract function prepend(string ...$prefix);
 
     /**
-     * @return mixed
+     * @return static
      */
     public function repeat(int $multiplier)
     {
@@ -420,34 +420,34 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return static
      */
     public abstract function replace(string $from, string $to);
 
     /**
      * @param string|callable $to
      *
-     * @return mixed
+     * @return static
      */
     public abstract function replaceMatches(string $fromRegexp, $to);
 
     /**
-     * @return mixed
+     * @return static
      */
     abstract public function reverse();
 
     /**
-     * @return mixed
+     * @return static
      */
     public abstract function slice(int $start = 0, int $length = null);
 
     /**
-     * @return mixed
+     * @return static
      */
     abstract public function snake();
 
     /**
-     * @return mixed
+     * @return static
      */
     public abstract function splice(string $replacement, int $start = 0, int $length = null);
 
@@ -512,7 +512,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return static
      */
     public abstract function title(bool $allWords = false);
 
@@ -560,22 +560,22 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return static
      */
     public abstract function trim(string $chars = " \t\n\r\0\x0B\x0C\u{A0}\u{FEFF}");
 
     /**
-     * @return mixed
+     * @return static
      */
     public abstract function trimEnd(string $chars = " \t\n\r\0\x0B\x0C\u{A0}\u{FEFF}");
 
     /**
-     * @return mixed
+     * @return static
      */
     public abstract function trimStart(string $chars = " \t\n\r\0\x0B\x0C\u{A0}\u{FEFF}");
 
     /**
-     * @return mixed
+     * @return static
      */
     public function truncate(int $length, string $ellipsis = '', bool $cut = true)
     {
@@ -599,7 +599,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return static
      */
     abstract public function upper();
 
@@ -609,7 +609,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     public abstract function width(bool $ignoreAnsiDecoration = true): int;
 
     /**
-     * @return mixed
+     * @return static
      */
     public function wordwrap(int $width = 75, string $break = "\n", bool $cut = false)
     {

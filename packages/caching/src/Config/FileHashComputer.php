@@ -63,6 +63,7 @@ final class FileHashComputer
      */
     private function arrayToHash(array $array): string
     {
-        return md5(serialize($array));
+        $serializedArray = serialize($array);
+        return md5($serializedArray);
     }
 }

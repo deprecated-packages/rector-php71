@@ -123,9 +123,10 @@ final class ConsoleApplication extends Application
 
     private function getNewWorkingDir(InputInterface $input): string
     {
-        $workingDir = $input->getParameterOption(['--working-dir', '-d']);
+        $workingDir = $input->getParameterOption('--working-dir');
         if ($workingDir !== false && ! is_dir($workingDir)) {
-            throw new InvalidConfigurationException('Invalid working directory specified, ' . $workingDir . ' does not exist.');
+            $errorMessage = sprintf('Invalid working directory specified, "%s" does not exist.', $workingDir);
+            throw new InvalidConfigurationException($errorMessage);
         }
         return (string) $workingDir;
     }
@@ -157,7 +158,7 @@ final class ConsoleApplication extends Application
         $inputDefinition->addOption(new InputOption(Option::OPTION_DEBUG, null, InputOption::VALUE_NONE, 'Enable debug verbosity (-vvv)'));
         $inputDefinition->addOption(new InputOption(Option::XDEBUG, null, InputOption::VALUE_NONE, 'Allow running xdebug'));
         $inputDefinition->addOption(new InputOption(Option::OPTION_CLEAR_CACHE, null, InputOption::VALUE_NONE, 'Clear cache'));
-        $inputDefinition->addOption(new InputOption('--working-dir', '-d', InputOption::VALUE_REQUIRED, 'If specified, use the given directory as working directory.'));
+        $inputDefinition->addOption(new InputOption('working-dir', null, InputOption::VALUE_REQUIRED, 'If specified, use the given directory as working directory.'));
     }
 
     private function getDefaultConfigPath(): string

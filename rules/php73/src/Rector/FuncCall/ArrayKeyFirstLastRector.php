@@ -79,11 +79,10 @@ CODE_SAMPLE
             return null;
         }
         $nextExpression = $this->getNextExpression($node);
-        if ($nextExpression === null) {
+        if (! $nextExpression instanceof Node) {
             return null;
         }
         $resetOrEndFuncCall = $node;
-        /** @var FuncCall|null $keyFuncCall */
         $keyFuncCall = $this->betterNodeFinder->findFirst($nextExpression, function (Node $node) use ($resetOrEndFuncCall): bool {
             if (! $node instanceof FuncCall) {
                 return false;
@@ -93,7 +92,7 @@ CODE_SAMPLE
             }
             return $this->areNodesEqual($resetOrEndFuncCall->args[0], $node->args[0]);
         });
-        if ($keyFuncCall === null) {
+        if (! $keyFuncCall instanceof FuncCall) {
             return null;
         }
         $newName = self::PREVIOUS_TO_NEW_FUNCTIONS[$this->getName($node)];

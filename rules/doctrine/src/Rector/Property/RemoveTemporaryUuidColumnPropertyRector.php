@@ -74,7 +74,8 @@ CODE_SAMPLE
         if (! $this->isName($node, 'uuid')) {
             return null;
         }
-        if (! $this->hasPhpDocTagValueNode($node, ColumnTagValueNode::class)) {
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($node);
+        if (! $phpDocInfo->hasByType(ColumnTagValueNode::class)) {
             return null;
         }
         $this->removeNode($node);

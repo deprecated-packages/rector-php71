@@ -18,7 +18,7 @@ trait TagTrait
     /**
      * Adds a tag for this definition.
      *
-     * @return mixed
+     * @return $this
      */
     public final function tag(string $name, array $attributes = [])
     {

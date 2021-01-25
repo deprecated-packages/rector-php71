@@ -89,7 +89,8 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        if (! $this->hasPhpDocTagValueNode($node, EntityTagValueNode::class)) {
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($node);
+        if (! $phpDocInfo->hasByType(EntityTagValueNode::class)) {
             return null;
         }
         $toManyPropertyNames = $this->resolveToManyPropertyNames($node);
@@ -112,14 +113,12 @@ CODE_SAMPLE
                 continue;
             }
 
-            if (! $this->hasPhpDocTagValueNode($property, ToManyTagNodeInterface::class)) {
+            $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($property);
+            if (! $phpDocInfo->hasByType(ToManyTagNodeInterface::class)) {
                 continue;
             }
 
-            /** @var string $propertyName */
-            $propertyName = $this->getName($property);
-
-            $collectionPropertyNames[] = $propertyName;
+            $collectionPropertyNames[] = $this->getName($property);
         }
         return $collectionPropertyNames;
     }

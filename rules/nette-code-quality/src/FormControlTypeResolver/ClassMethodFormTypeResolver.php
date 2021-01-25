@@ -49,9 +49,8 @@ final class ClassMethodFormTypeResolver implements FormControlTypeResolverInterf
         if ($this->nodeNameResolver->isName($node, MethodName::CONSTRUCT)) {
             return [];
         }
-        /** @var Return_|null $lastReturn */
         $lastReturn = $this->betterNodeFinder->findLastInstanceOf((array) $node->stmts, Return_::class);
-        if ($lastReturn === null) {
+        if (! $lastReturn instanceof Return_) {
             return [];
         }
         if (! $lastReturn->expr instanceof Variable) {

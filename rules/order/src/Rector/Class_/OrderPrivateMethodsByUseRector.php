@@ -135,7 +135,7 @@ CODE_SAMPLE
                 return null;
             }
             $classMethod = $classLike->getMethod($methodName);
-            if ($classMethod === null) {
+            if (! $classMethod instanceof ClassMethod) {
                 return null;
             }
             if ($classMethod->isPrivate()) {

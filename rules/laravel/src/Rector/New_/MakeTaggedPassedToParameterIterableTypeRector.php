@@ -7,7 +7,9 @@ namespace Rector\Laravel\Rector\New_;
 use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\New_;
+use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\ClassMethod;
 use Rector\Core\Rector\AbstractRector;
 use Rector\Core\ValueObject\MethodName;
 use Rector\NodeTypeResolver\Node\AttributeKey;
@@ -90,7 +92,7 @@ CODE_SAMPLE
             return null;
         }
         $class = $this->nodeRepository->findClass($className);
-        if ($class === null) {
+        if (! $class instanceof Class_) {
             return null;
         }
         foreach ($node->args as $arg) {
@@ -104,11 +106,11 @@ CODE_SAMPLE
         $argValueType = $this->getStaticType($arg->value);
         $constructClassMethod = $class->getMethod(MethodName::CONSTRUCT);
         $argumentPosition = (int) $arg->getAttribute(AttributeKey::ARGUMENT_POSITION);
-        if ($constructClassMethod === null) {
+        if (! $constructClassMethod instanceof ClassMethod) {
             return;
         }
         $param = $constructClassMethod->params[$argumentPosition] ?? null;
-        if ($param === null) {
+        if (! $param instanceof Param) {
             return;
         }
         $argTypeNode = $this->staticTypeMapper->mapPHPStanTypeToPhpParserNode($argValueType);

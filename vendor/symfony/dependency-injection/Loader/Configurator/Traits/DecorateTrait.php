@@ -21,7 +21,7 @@ trait DecorateTrait
      *
      * @param string|null $id The decorated service id, use null to remove decoration
      *
-     * @return mixed
+     * @return $this
      *
      * @throws InvalidArgumentException in case the decorated service id and the new decorated service id are equals
      */

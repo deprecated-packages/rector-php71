@@ -9,6 +9,7 @@ use Rector\Caching\Application\CachedFileInfoFilterAndReporter;
 use Rector\Caching\Detector\ChangedFilesDetector;
 use Rector\ChangesReporting\Application\ErrorAndDiffCollector;
 use Rector\ChangesReporting\Output\ConsoleOutputFormatter;
+use Rector\Composer\Processor\ComposerProcessor;
 use Rector\Core\Application\RectorApplication;
 use Rector\Core\Autoloading\AdditionalAutoloader;
 use Rector\Core\Configuration\Configuration;
@@ -90,7 +91,12 @@ final class ProcessCommand extends AbstractCommand
      */
     private $cachedFileInfoFilterAndReporter;
 
-    public function __construct(AdditionalAutoloader $additionalAutoloader, ChangedFilesDetector $changedFilesDetector, Configuration $configuration, ErrorAndDiffCollector $errorAndDiffCollector, FilesFinder $phpFilesFinder, NonPhpFileProcessor $nonPhpFileProcessor, OutputFormatterCollector $outputFormatterCollector, RectorApplication $rectorApplication, RectorGuard $rectorGuard, RectorNodeTraverser $rectorNodeTraverser, StubLoader $stubLoader, SymfonyStyle $symfonyStyle, CachedFileInfoFilterAndReporter $cachedFileInfoFilterAndReporter)
+    /**
+     * @var ComposerProcessor
+     */
+    private $composerProcessor;
+
+    public function __construct(AdditionalAutoloader $additionalAutoloader, ChangedFilesDetector $changedFilesDetector, Configuration $configuration, ErrorAndDiffCollector $errorAndDiffCollector, FilesFinder $phpFilesFinder, NonPhpFileProcessor $nonPhpFileProcessor, OutputFormatterCollector $outputFormatterCollector, RectorApplication $rectorApplication, RectorGuard $rectorGuard, RectorNodeTraverser $rectorNodeTraverser, StubLoader $stubLoader, SymfonyStyle $symfonyStyle, CachedFileInfoFilterAndReporter $cachedFileInfoFilterAndReporter, ComposerProcessor $composerProcessor)
     {
         $this->filesFinder = $phpFilesFinder;
         $this->additionalAutoloader = $additionalAutoloader;
@@ -105,6 +111,7 @@ final class ProcessCommand extends AbstractCommand
         $this->changedFilesDetector = $changedFilesDetector;
         $this->symfonyStyle = $symfonyStyle;
         $this->cachedFileInfoFilterAndReporter = $cachedFileInfoFilterAndReporter;
+        $this->composerProcessor = $composerProcessor;
         parent::__construct();
     }
 
@@ -153,6 +160,8 @@ final class ProcessCommand extends AbstractCommand
         // must run after PHP rectors, because they might change class names, and these class names must be changed in configs
         $nonPhpFileInfos = $this->filesFinder->findInDirectoriesAndFiles($paths, StaticNonPhpFileSuffixes::SUFFIXES);
         $this->nonPhpFileProcessor->runOnFileInfos($nonPhpFileInfos);
+        $composerJsonFilePath = getcwd() . '/composer.json';
+        $this->composerProcessor->process($composerJsonFilePath);
         $this->reportZeroCacheRectorsCondition();
         // report diffs and errors
         $outputFormat = (string) $input->getOption(Option::OPTION_OUTPUT_FORMAT);

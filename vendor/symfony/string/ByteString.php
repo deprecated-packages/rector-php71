@@ -41,7 +41,9 @@ class ByteString extends AbstractString
      *
      * Copyright (c) 2004-2020, Facebook, Inc. (https://www.facebook.com/)
      */
-
+    /**
+     * @return $this
+     */
     public static function fromRandom(int $length = 16, string $alphabet = null)
     {
         if ($length <= 0) {

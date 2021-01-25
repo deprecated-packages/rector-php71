@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit97f64b6838685db999b07d2dfbeb5ab7
+class ComposerStaticInit43c5eed993f96f212fa2be2157444e4e
 {
     public static $files = array (
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
@@ -40,9 +40,11 @@ class ComposerStaticInit97f64b6838685db999b07d2dfbeb5ab7
             'Symplify\\PackageBuilder\\' => 24,
             'Symplify\\MarkdownDiff\\' => 22,
             'Symplify\\EasyTesting\\' => 21,
+            'Symplify\\ConsolePackageBuilder\\' => 31,
             'Symplify\\ConsoleColorDiff\\' => 26,
             'Symplify\\ComposerJsonManipulator\\' => 33,
             'Symplify\\AutowireArrayParameter\\' => 32,
+            'Symplify\\Astral\\' => 16,
             'Symfony\\Polyfill\\Php80\\' => 23,
             'Symfony\\Polyfill\\Php74\\' => 23,
             'Symfony\\Polyfill\\Php73\\' => 23,
@@ -59,6 +61,7 @@ class ComposerStaticInit97f64b6838685db999b07d2dfbeb5ab7
             'Symfony\\Component\\VarExporter\\' => 30,
             'Symfony\\Component\\VarDumper\\' => 28,
             'Symfony\\Component\\String\\' => 25,
+            'Symfony\\Component\\Process\\' => 26,
             'Symfony\\Component\\HttpKernel\\' => 29,
             'Symfony\\Component\\HttpFoundation\\' => 33,
             'Symfony\\Component\\Finder\\' => 25,
@@ -110,7 +113,6 @@ class ComposerStaticInit97f64b6838685db999b07d2dfbeb5ab7
             'Rector\\Php54\\' => 13,
             'Rector\\Php53\\' => 13,
             'Rector\\Php52\\' => 13,
-            'Rector\\Phalcon\\' => 15,
             'Rector\\Performance\\' => 19,
             'Rector\\PSR4\\' => 12,
             'Rector\\PHPUnit\\' => 15,
@@ -136,7 +138,6 @@ class ComposerStaticInit97f64b6838685db999b07d2dfbeb5ab7
             'Rector\\MagicDisclosure\\' => 23,
             'Rector\\Legacy\\' => 14,
             'Rector\\Laravel\\' => 15,
-            'Rector\\JMS\\' => 11,
             'Rector\\Generic\\' => 15,
             'Rector\\FileSystemRector\\' => 24,
             'Rector\\FamilyTree\\' => 18,
@@ -157,7 +158,9 @@ class ComposerStaticInit97f64b6838685db999b07d2dfbeb5ab7
             'Rector\\DeadCode\\' => 16,
             'Rector\\Core\\' => 12,
             'Rector\\ConsoleDiffer\\' => 21,
+            'Rector\\Composer\\' => 16,
             'Rector\\Compiler\\' => 16,
+            'Rector\\Comments\\' => 16,
             'Rector\\CodingStyle\\' => 19,
             'Rector\\CodeQuality\\' => 19,
             'Rector\\CodeQualityStrict\\' => 25,
@@ -248,6 +251,10 @@ class ComposerStaticInit97f64b6838685db999b07d2dfbeb5ab7
         array (
             0 => __DIR__ . '/..' . '/symplify/easy-testing/src',
         ),
+        'Symplify\\ConsolePackageBuilder\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symplify/console-package-builder/src',
+        ),
         'Symplify\\ConsoleColorDiff\\' => 
         array (
             0 => __DIR__ . '/..' . '/symplify/console-color-diff/src',
@@ -259,6 +266,10 @@ class ComposerStaticInit97f64b6838685db999b07d2dfbeb5ab7
         'Symplify\\AutowireArrayParameter\\' => 
         array (
             0 => __DIR__ . '/..' . '/symplify/autowire-array-parameter/src',
+        ),
+        'Symplify\\Astral\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symplify/astral/src',
         ),
         'Symfony\\Polyfill\\Php80\\' => 
         array (
@@ -323,6 +334,10 @@ class ComposerStaticInit97f64b6838685db999b07d2dfbeb5ab7
         'Symfony\\Component\\String\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/string',
+        ),
+        'Symfony\\Component\\Process\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/process',
         ),
         'Symfony\\Component\\HttpKernel\\' => 
         array (
@@ -516,10 +531,6 @@ class ComposerStaticInit97f64b6838685db999b07d2dfbeb5ab7
         array (
             0 => __DIR__ . '/../..' . '/rules/php52/src',
         ),
-        'Rector\\Phalcon\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/rules/phalcon/src',
-        ),
         'Rector\\Performance\\' => 
         array (
             0 => __DIR__ . '/../..' . '/rules/performance/src',
@@ -620,10 +631,6 @@ class ComposerStaticInit97f64b6838685db999b07d2dfbeb5ab7
         array (
             0 => __DIR__ . '/../..' . '/rules/laravel/src',
         ),
-        'Rector\\JMS\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/rules/jms/src',
-        ),
         'Rector\\Generic\\' => 
         array (
             0 => __DIR__ . '/../..' . '/rules/generic/src',
@@ -704,9 +711,17 @@ class ComposerStaticInit97f64b6838685db999b07d2dfbeb5ab7
         array (
             0 => __DIR__ . '/../..' . '/packages/console-differ/src',
         ),
+        'Rector\\Composer\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/rules/composer/src',
+        ),
         'Rector\\Compiler\\' => 
         array (
             0 => __DIR__ . '/../..' . '/utils/compiler/src',
+        ),
+        'Rector\\Comments\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/packages/comments/src',
         ),
         'Rector\\CodingStyle\\' => 
         array (
@@ -818,31 +833,31 @@ class ComposerStaticInit97f64b6838685db999b07d2dfbeb5ab7
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'JsonException' => __DIR__ . '/..' . '/symfony/polyfill-php73/Resources/stubs/JsonException.php',
-        'Nette\\ArgumentOutOfRangeException' => __DIR__ . '/..' . '/nette/utils/src/Utils/exceptions.php',
-        'Nette\\DeprecatedException' => __DIR__ . '/..' . '/nette/utils/src/Utils/exceptions.php',
-        'Nette\\DirectoryNotFoundException' => __DIR__ . '/..' . '/nette/utils/src/Utils/exceptions.php',
-        'Nette\\FileNotFoundException' => __DIR__ . '/..' . '/nette/utils/src/Utils/exceptions.php',
-        'Nette\\HtmlStringable' => __DIR__ . '/..' . '/nette/utils/src/Utils/HtmlStringable.php',
-        'Nette\\IOException' => __DIR__ . '/..' . '/nette/utils/src/Utils/exceptions.php',
-        'Nette\\InvalidArgumentException' => __DIR__ . '/..' . '/nette/utils/src/Utils/exceptions.php',
-        'Nette\\InvalidStateException' => __DIR__ . '/..' . '/nette/utils/src/Utils/exceptions.php',
+        'Nette\\ArgumentOutOfRangeException' => __DIR__ . '/..' . '/nette/utils/src/exceptions.php',
+        'Nette\\DeprecatedException' => __DIR__ . '/..' . '/nette/utils/src/exceptions.php',
+        'Nette\\DirectoryNotFoundException' => __DIR__ . '/..' . '/nette/utils/src/exceptions.php',
+        'Nette\\FileNotFoundException' => __DIR__ . '/..' . '/nette/utils/src/exceptions.php',
+        'Nette\\HtmlStringable' => __DIR__ . '/..' . '/nette/utils/src/HtmlStringable.php',
+        'Nette\\IOException' => __DIR__ . '/..' . '/nette/utils/src/exceptions.php',
+        'Nette\\InvalidArgumentException' => __DIR__ . '/..' . '/nette/utils/src/exceptions.php',
+        'Nette\\InvalidStateException' => __DIR__ . '/..' . '/nette/utils/src/exceptions.php',
         'Nette\\Iterators\\CachingIterator' => __DIR__ . '/..' . '/nette/utils/src/Iterators/CachingIterator.php',
         'Nette\\Iterators\\Mapper' => __DIR__ . '/..' . '/nette/utils/src/Iterators/Mapper.php',
         'Nette\\Loaders\\RobotLoader' => __DIR__ . '/..' . '/nette/robot-loader/src/RobotLoader/RobotLoader.php',
         'Nette\\Localization\\ITranslator' => __DIR__ . '/..' . '/nette/utils/src/compatibility.php',
-        'Nette\\Localization\\Translator' => __DIR__ . '/..' . '/nette/utils/src/Utils/Translator.php',
-        'Nette\\MemberAccessException' => __DIR__ . '/..' . '/nette/utils/src/Utils/exceptions.php',
+        'Nette\\Localization\\Translator' => __DIR__ . '/..' . '/nette/utils/src/Translator.php',
+        'Nette\\MemberAccessException' => __DIR__ . '/..' . '/nette/utils/src/exceptions.php',
         'Nette\\Neon\\Decoder' => __DIR__ . '/..' . '/nette/neon/src/Neon/Decoder.php',
         'Nette\\Neon\\Encoder' => __DIR__ . '/..' . '/nette/neon/src/Neon/Encoder.php',
         'Nette\\Neon\\Entity' => __DIR__ . '/..' . '/nette/neon/src/Neon/Entity.php',
         'Nette\\Neon\\Exception' => __DIR__ . '/..' . '/nette/neon/src/Neon/Exception.php',
         'Nette\\Neon\\Neon' => __DIR__ . '/..' . '/nette/neon/src/Neon/Neon.php',
-        'Nette\\NotImplementedException' => __DIR__ . '/..' . '/nette/utils/src/Utils/exceptions.php',
-        'Nette\\NotSupportedException' => __DIR__ . '/..' . '/nette/utils/src/Utils/exceptions.php',
-        'Nette\\OutOfRangeException' => __DIR__ . '/..' . '/nette/utils/src/Utils/exceptions.php',
-        'Nette\\SmartObject' => __DIR__ . '/..' . '/nette/utils/src/Utils/SmartObject.php',
-        'Nette\\StaticClass' => __DIR__ . '/..' . '/nette/utils/src/Utils/StaticClass.php',
-        'Nette\\UnexpectedValueException' => __DIR__ . '/..' . '/nette/utils/src/Utils/exceptions.php',
+        'Nette\\NotImplementedException' => __DIR__ . '/..' . '/nette/utils/src/exceptions.php',
+        'Nette\\NotSupportedException' => __DIR__ . '/..' . '/nette/utils/src/exceptions.php',
+        'Nette\\OutOfRangeException' => __DIR__ . '/..' . '/nette/utils/src/exceptions.php',
+        'Nette\\SmartObject' => __DIR__ . '/..' . '/nette/utils/src/SmartObject.php',
+        'Nette\\StaticClass' => __DIR__ . '/..' . '/nette/utils/src/StaticClass.php',
+        'Nette\\UnexpectedValueException' => __DIR__ . '/..' . '/nette/utils/src/exceptions.php',
         'Nette\\Utils\\ArrayHash' => __DIR__ . '/..' . '/nette/utils/src/Utils/ArrayHash.php',
         'Nette\\Utils\\ArrayList' => __DIR__ . '/..' . '/nette/utils/src/Utils/ArrayList.php',
         'Nette\\Utils\\Arrays' => __DIR__ . '/..' . '/nette/utils/src/Utils/Arrays.php',
@@ -893,9 +908,9 @@ class ComposerStaticInit97f64b6838685db999b07d2dfbeb5ab7
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit97f64b6838685db999b07d2dfbeb5ab7::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit97f64b6838685db999b07d2dfbeb5ab7::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit97f64b6838685db999b07d2dfbeb5ab7::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit43c5eed993f96f212fa2be2157444e4e::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit43c5eed993f96f212fa2be2157444e4e::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit43c5eed993f96f212fa2be2157444e4e::$classMap;
 
         }, null, ClassLoader::class);
     }

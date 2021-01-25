@@ -7,15 +7,15 @@ namespace Rector\TypeDeclaration\AlreadyAssignDetector;
 use PhpParser\Node;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\Assign;
-use Rector\Core\PhpParser\NodeTraverser\CallableNodeTraverser;
 use Rector\TypeDeclaration\Matcher\PropertyAssignMatcher;
+use Symplify\Astral\NodeTraverser\SimpleCallableNodeTraverser;
 
 abstract class AbstractAssignDetector
 {
     /**
-     * @var CallableNodeTraverser
+     * @var SimpleCallableNodeTraverser
      */
-    protected $callableNodeTraverser;
+    protected $simpleCallableNodeTraverser;
 
     /**
      * @var PropertyAssignMatcher
@@ -25,10 +25,10 @@ abstract class AbstractAssignDetector
     /**
      * @required
      */
-    public function autowireAbstractAssignDetector(PropertyAssignMatcher $propertyAssignMatcher, CallableNodeTraverser $callableNodeTraverser): void
+    public function autowireAbstractAssignDetector(PropertyAssignMatcher $propertyAssignMatcher, SimpleCallableNodeTraverser $simpleCallableNodeTraverser): void
     {
         $this->propertyAssignMatcher = $propertyAssignMatcher;
-        $this->callableNodeTraverser = $callableNodeTraverser;
+        $this->simpleCallableNodeTraverser = $simpleCallableNodeTraverser;
     }
 
     protected function matchAssignExprToPropertyName(Node $node, string $propertyName): ?Expr

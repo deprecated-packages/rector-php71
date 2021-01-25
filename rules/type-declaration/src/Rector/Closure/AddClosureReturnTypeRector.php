@@ -77,9 +77,8 @@ CODE_SAMPLE
         if ($node->returnType !== null) {
             return null;
         }
-        /** @var Scope|null $scope */
         $scope = $node->getAttribute(AttributeKey::SCOPE);
-        if ($scope === null) {
+        if (! $scope instanceof Scope) {
             return null;
         }
         $inferedReturnType = $this->returnTypeInferer->inferFunctionLike($node);

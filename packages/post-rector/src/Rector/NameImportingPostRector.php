@@ -6,10 +6,10 @@ namespace Rector\PostRector\Rector;
 
 use PhpParser\Node;
 use PhpParser\Node\Name;
-use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo;
+use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfoFactory;
+use Rector\CodingStyle\ClassNameImport\ClassNameImportSkipper;
 use Rector\CodingStyle\Node\NameImporter;
 use Rector\Core\Configuration\Option;
-use Rector\NodeTypeResolver\Node\AttributeKey;
 use Rector\NodeTypeResolver\PhpDoc\NodeAnalyzer\DocBlockNameImporter;
 use Symplify\PackageBuilder\Parameter\ParameterProvider;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
@@ -32,11 +32,23 @@ final class NameImportingPostRector extends AbstractPostRector
      */
     private $docBlockNameImporter;
 
-    public function __construct(ParameterProvider $parameterProvider, NameImporter $nameImporter, DocBlockNameImporter $docBlockNameImporter)
+    /**
+     * @var ClassNameImportSkipper
+     */
+    private $classNameImportSkipper;
+
+    /**
+     * @var PhpDocInfoFactory
+     */
+    private $phpDocInfoFactory;
+
+    public function __construct(ParameterProvider $parameterProvider, NameImporter $nameImporter, DocBlockNameImporter $docBlockNameImporter, ClassNameImportSkipper $classNameImportSkipper, PhpDocInfoFactory $phpDocInfoFactory)
     {
         $this->parameterProvider = $parameterProvider;
         $this->nameImporter = $nameImporter;
         $this->docBlockNameImporter = $docBlockNameImporter;
+        $this->classNameImportSkipper = $classNameImportSkipper;
+        $this->phpDocInfoFactory = $phpDocInfoFactory;
     }
 
     public function enterNode(Node $node): ?Node
@@ -46,21 +58,14 @@ final class NameImportingPostRector extends AbstractPostRector
             return null;
         }
         if ($node instanceof Name) {
-            return $this->nameImporter->importName($node);
+            return $this->processNodeName($node);
         }
         $importDocBlocks = (bool) $this->parameterProvider->provideParameter(Option::IMPORT_DOC_BLOCKS);
         if (! $importDocBlocks) {
             return null;
         }
-        /** @var PhpDocInfo|null $phpDocInfo */
-        $phpDocInfo = $node->getAttribute(AttributeKey::PHP_DOC_INFO);
-        if ($phpDocInfo === null) {
-            return null;
-        }
-        $hasChanged = $this->docBlockNameImporter->importNames($phpDocInfo, $node);
-        if (! $hasChanged) {
-            return null;
-        }
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($node);
+        $this->docBlockNameImporter->importNames($phpDocInfo, $node);
         return $node;
     }
 
@@ -82,5 +87,19 @@ $someClass = new SomeClass();
 CODE_SAMPLE
 ),
         ]);
+    }
+
+    private function processNodeName(Name $name): ?Node
+    {
+        $importName = $this->getName($name);
+        if (! is_callable($importName)) {
+            return $this->nameImporter->importName($name);
+        }
+        if (substr_count($name->toCodeString(), '\\') > 1
+            && $this->classNameImportSkipper->isFoundInUse($name)
+            && ! function_exists($name->getLast())) {
+            return null;
+        }
+        return $this->nameImporter->importName($name);
     }
 }

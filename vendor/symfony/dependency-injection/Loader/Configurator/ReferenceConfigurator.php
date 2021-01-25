@@ -30,7 +30,7 @@ class ReferenceConfigurator extends AbstractConfigurator
     }
 
     /**
-     * @return mixed
+     * @return $this
      */
     final public function ignoreOnInvalid()
     {
@@ -40,7 +40,7 @@ class ReferenceConfigurator extends AbstractConfigurator
     }
 
     /**
-     * @return mixed
+     * @return $this
      */
     final public function nullOnInvalid()
     {
@@ -50,7 +50,7 @@ class ReferenceConfigurator extends AbstractConfigurator
     }
 
     /**
-     * @return mixed
+     * @return $this
      */
     final public function ignoreOnUninitialized()
     {

@@ -16,7 +16,7 @@ trait ShareTrait
     /**
      * Sets if the service must be shared or not.
      *
-     * @return mixed
+     * @return $this
      */
     public final function share(bool $shared = true)
     {

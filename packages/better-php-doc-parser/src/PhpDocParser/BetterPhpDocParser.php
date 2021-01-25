@@ -77,11 +77,6 @@ final class BetterPhpDocParser extends PhpDocParser
     private $classAnnotationMatcher;
 
     /**
-     * @var Lexer
-     */
-    private $lexer;
-
-    /**
      * @var AnnotationContentResolver
      */
     private $annotationContentResolver;
@@ -94,7 +89,7 @@ final class BetterPhpDocParser extends PhpDocParser
     /**
      * @param PhpDocNodeFactoryInterface[] $phpDocNodeFactories
      */
-    public function __construct(TypeParser $typeParser, ConstExprParser $constExprParser, AttributeAwareNodeFactory $attributeAwareNodeFactory, MultilineSpaceFormatPreserver $multilineSpaceFormatPreserver, CurrentNodeProvider $currentNodeProvider, ClassAnnotationMatcher $classAnnotationMatcher, Lexer $lexer, AnnotationContentResolver $annotationContentResolver, PHPUnitDataProviderDocNodeFactory $phpUnitDataProviderDocNodeFactory, array $phpDocNodeFactories = [])
+    public function __construct(TypeParser $typeParser, ConstExprParser $constExprParser, AttributeAwareNodeFactory $attributeAwareNodeFactory, MultilineSpaceFormatPreserver $multilineSpaceFormatPreserver, CurrentNodeProvider $currentNodeProvider, ClassAnnotationMatcher $classAnnotationMatcher, AnnotationContentResolver $annotationContentResolver, PHPUnitDataProviderDocNodeFactory $phpUnitDataProviderDocNodeFactory, array $phpDocNodeFactories = [])
     {
         parent::__construct($typeParser, $constExprParser);
         $this->privatesCaller = new PrivatesCaller();
@@ -103,17 +98,9 @@ final class BetterPhpDocParser extends PhpDocParser
         $this->multilineSpaceFormatPreserver = $multilineSpaceFormatPreserver;
         $this->currentNodeProvider = $currentNodeProvider;
         $this->classAnnotationMatcher = $classAnnotationMatcher;
-        $this->lexer = $lexer;
         $this->annotationContentResolver = $annotationContentResolver;
         $this->phpUnitDataProviderDocNodeFactory = $phpUnitDataProviderDocNodeFactory;
         $this->setPhpDocNodeFactories($phpDocNodeFactories);
-    }
-
-    public function parseString(string $docBlock): PhpDocNode
-    {
-        $tokens = $this->lexer->tokenize($docBlock);
-        $tokenIterator = new TokenIterator($tokens);
-        return parent::parse($tokenIterator);
     }
 
     /**
@@ -151,7 +138,7 @@ final class BetterPhpDocParser extends PhpDocParser
         // needed for reference support in params, see https://github.com/rectorphp/rector/issues/1734
         $tagValueNode = null;
         $currentPhpNode = $this->currentNodeProvider->getNode();
-        if ($currentPhpNode === null) {
+        if (! $currentPhpNode instanceof \PhpParser\Node) {
             throw new ShouldNotHappenException();
         }
         $lowercasedTag = strtolower($tag);
@@ -196,7 +183,7 @@ final class BetterPhpDocParser extends PhpDocParser
         $originalTokenIterator = clone $tokenIterator;
         $docContent = $this->annotationContentResolver->resolveFromTokenIterator($originalTokenIterator);
         $tokenStart = $this->getTokenIteratorIndex($tokenIterator);
-        $phpDocNode = $this->privatesCaller->callPrivateMethod($this, 'parseChild', $tokenIterator);
+        $phpDocNode = $this->privatesCaller->callPrivateMethod($this, 'parseChild', [$tokenIterator]);
         $tokenEnd = $this->resolveTokenEnd($tokenIterator);
         $startAndEnd = new StartAndEnd($tokenStart, $tokenEnd);
         $attributeAwareNode = $this->attributeAwareNodeFactory->createFromNode($phpDocNode, $docContent);
@@ -244,7 +231,7 @@ final class BetterPhpDocParser extends PhpDocParser
     private function matchTagToPhpDocNodeFactory(string $tag): ?PhpDocNodeFactoryInterface
     {
         $currentPhpNode = $this->currentNodeProvider->getNode();
-        if ($currentPhpNode === null) {
+        if (! $currentPhpNode instanceof \PhpParser\Node) {
             throw new ShouldNotHappenException();
         }
         $fullyQualifiedAnnotationClass = $this->classAnnotationMatcher->resolveTagFullyQualifiedName($tag, $currentPhpNode);

@@ -42,9 +42,12 @@ final class ComposerPackageSorter
     private function createNameWithPriority(string $requirementName): string
     {
         if ($this->isPlatformPackage($requirementName)) {
-            return (string) Strings::replace($requirementName, self::REQUIREMENT_TYPE_REGEX, function (array $match): string {
+            return Strings::replace($requirementName, self::REQUIREMENT_TYPE_REGEX, function (array $match): string {
                 $name = $match['name'];
-                if ($name === 'php' || $name === 'hhvm') {
+                if ($name === 'php') {
+                    return '0-' . $name;
+                }
+                if ($name === 'hhvm') {
                     return '0-' . $name;
                 }
                 if ($name === 'ext') {

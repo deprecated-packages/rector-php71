@@ -117,7 +117,8 @@ CODE_SAMPLE
     private function isGedmoBlameableClass(Class_ $class): bool
     {
         foreach ($class->getProperties() as $property) {
-            if ($this->hasPhpDocTagValueNode($property, BlameableTagValueNode::class)) {
+            $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($property);
+            if ($phpDocInfo->hasByType(BlameableTagValueNode::class)) {
                 return true;
             }
         }
@@ -128,7 +129,8 @@ CODE_SAMPLE
     {
         $removedPropertyNames = [];
         foreach ($class->getProperties() as $property) {
-            if (! $this->hasPhpDocTagValueNode($property, BlameableTagValueNode::class)) {
+            $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($property);
+            if (! $phpDocInfo->hasByType(BlameableTagValueNode::class)) {
                 continue;
             }
 
@@ -148,7 +150,6 @@ CODE_SAMPLE
     {
         foreach ($class->getMethods() as $classMethod) {
             foreach ($removedPropertyNames as $removedPropertyName) {
-
                 // remove methods
                 $setMethodName = 'set' . ucfirst($removedPropertyName);
                 $getMethodName = 'get' . ucfirst($removedPropertyName);

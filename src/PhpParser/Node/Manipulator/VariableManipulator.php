@@ -14,18 +14,18 @@ use PhpParser\Node\Scalar;
 use PhpParser\Node\Scalar\Encapsed;
 use PhpParser\Node\Stmt\ClassMethod;
 use Rector\Core\PhpParser\Node\BetterNodeFinder;
-use Rector\Core\PhpParser\NodeTraverser\CallableNodeTraverser;
 use Rector\Core\PhpParser\Printer\BetterStandardPrinter;
 use Rector\NodeNameResolver\NodeNameResolver;
 use Rector\NodeTypeResolver\Node\AttributeKey;
 use Rector\ReadWrite\Guard\VariableToConstantGuard;
+use Symplify\Astral\NodeTraverser\SimpleCallableNodeTraverser;
 
 final class VariableManipulator
 {
     /**
-     * @var CallableNodeTraverser
+     * @var SimpleCallableNodeTraverser
      */
-    private $callableNodeTraverser;
+    private $simpleCallableNodeTraverser;
 
     /**
      * @var AssignManipulator
@@ -57,9 +57,9 @@ final class VariableManipulator
      */
     private $variableToConstantGuard;
 
-    public function __construct(ArrayManipulator $arrayManipulator, AssignManipulator $assignManipulator, BetterNodeFinder $betterNodeFinder, BetterStandardPrinter $betterStandardPrinter, CallableNodeTraverser $callableNodeTraverser, NodeNameResolver $nodeNameResolver, VariableToConstantGuard $variableToConstantGuard)
+    public function __construct(ArrayManipulator $arrayManipulator, AssignManipulator $assignManipulator, BetterNodeFinder $betterNodeFinder, BetterStandardPrinter $betterStandardPrinter, SimpleCallableNodeTraverser $simpleCallableNodeTraverser, NodeNameResolver $nodeNameResolver, VariableToConstantGuard $variableToConstantGuard)
     {
-        $this->callableNodeTraverser = $callableNodeTraverser;
+        $this->simpleCallableNodeTraverser = $simpleCallableNodeTraverser;
         $this->assignManipulator = $assignManipulator;
         $this->betterStandardPrinter = $betterStandardPrinter;
         $this->betterNodeFinder = $betterNodeFinder;
@@ -74,7 +74,7 @@ final class VariableManipulator
     public function collectScalarOrArrayAssignsOfVariable(ClassMethod $classMethod): array
     {
         $assignsOfArrayToVariable = [];
-        $this->callableNodeTraverser->traverseNodesWithCallable((array) $classMethod->getStmts(), function (Node $node) use (&$assignsOfArrayToVariable) {
+        $this->simpleCallableNodeTraverser->traverseNodesWithCallable((array) $classMethod->getStmts(), function (Node $node) use (&$assignsOfArrayToVariable) {
             if (! $node instanceof Assign) {
                 return null;
             }

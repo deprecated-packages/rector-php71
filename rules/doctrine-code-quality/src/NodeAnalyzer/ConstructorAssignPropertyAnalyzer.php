@@ -7,6 +7,7 @@ namespace Rector\DoctrineCodeQuality\NodeAnalyzer;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Property;
 use Rector\Core\PhpParser\Node\BetterNodeFinder;
 use Rector\Core\ValueObject\MethodName;
@@ -38,7 +39,7 @@ final class ConstructorAssignPropertyAnalyzer
             return null;
         }
         $constructClassMethod = $classLike->getMethod(MethodName::CONSTRUCT);
-        if ($constructClassMethod === null) {
+        if (! $constructClassMethod instanceof ClassMethod) {
             return null;
         }
         $propertyName = $this->nodeNameResolver->getName($property);

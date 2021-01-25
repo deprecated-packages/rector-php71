@@ -60,7 +60,7 @@ final class CacheItem implements ItemInterface
     /**
      * {@inheritdoc}
      *
-     * @return mixed
+     * @return $this
      */
     public function set($value)
     {
@@ -71,7 +71,7 @@ final class CacheItem implements ItemInterface
     /**
      * {@inheritdoc}
      *
-     * @return mixed
+     * @return $this
      */
     public function expiresAt($expiration)
     {
@@ -88,7 +88,7 @@ final class CacheItem implements ItemInterface
     /**
      * {@inheritdoc}
      *
-     * @return mixed
+     * @return $this
      */
     public function expiresAfter($time)
     {

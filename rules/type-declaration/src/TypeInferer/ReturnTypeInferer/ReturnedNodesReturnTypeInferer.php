@@ -86,7 +86,7 @@ final class ReturnedNodesReturnTypeInferer extends AbstractTypeInferer implement
     private function collectReturns(FunctionLike $functionLike): array
     {
         $returns = [];
-        $this->callableNodeTraverser->traverseNodesWithCallable((array) $functionLike->getStmts(), function (Node $node) use (&$returns): ?int {
+        $this->simpleCallableNodeTraverser->traverseNodesWithCallable((array) $functionLike->getStmts(), function (Node $node) use (&$returns): ?int {
             if ($node instanceof Switch_) {
                 $this->processSwitch($node);
             }

@@ -25,7 +25,7 @@ final class EarlyExpirationMessage
     private $callback;
 
     /**
-     * @return mixed|null
+     * @return $this|null
      */
     public static function create(ReverseContainer $reverseContainer, callable $callback, CacheItem $item, AdapterInterface $pool)
     {

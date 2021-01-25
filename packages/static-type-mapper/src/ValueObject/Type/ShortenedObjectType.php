@@ -24,6 +24,9 @@ final class ShortenedObjectType extends ObjectType
         return $this->getClassName();
     }
 
+    /**
+     * @return class-string
+     */
     public function getFullyQualifiedName(): string
     {
         return $this->fullyQualifiedName;

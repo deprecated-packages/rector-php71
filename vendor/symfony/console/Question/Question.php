@@ -73,7 +73,7 @@ class Question
     /**
      * Sets whether the user response should accept newline characters.
      *
-     * @return mixed
+     * @return $this
      */
     public function setMultiline(bool $multiline)
     {
@@ -183,7 +183,7 @@ class Question
      *
      * The callback is passed the user input as argument and should return an iterable of corresponding suggestions.
      *
-     * @return mixed
+     * @return $this
      */
     public function setAutocompleterCallback(callable $callback = null)
     {
@@ -284,7 +284,7 @@ class Question
     }
 
     /**
-     * @return mixed
+     * @return $this
      */
     public function setTrimmable(bool $trimmable)
     {

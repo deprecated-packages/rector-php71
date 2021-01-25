@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 use Rector\Generic\Rector\StaticCall\SwapClassMethodArgumentsRector;
 use Rector\Generic\ValueObject\SwapClassMethodArguments;
-use Rector\Phalcon\Rector\Assign\FlashWithCssClassesToExtraCallRector;
-use Rector\Phalcon\Rector\Assign\NewApplicationToToFactoryWithDefaultContainerRector;
-use Rector\Phalcon\Rector\MethodCall\AddRequestToHandleMethodCallRector;
 use Rector\Renaming\Rector\ConstFetch\RenameConstantRector;
 use Rector\Renaming\Rector\MethodCall\RenameMethodRector;
 use Rector\Renaming\Rector\Name\RenameClassRector;
@@ -130,7 +127,4 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
             'FILTER_ALPHANUM' => 'FILTER_ALNUM',
         ],
     ]]);
-    $services->set(FlashWithCssClassesToExtraCallRector::class);
-    $services->set(NewApplicationToToFactoryWithDefaultContainerRector::class);
-    $services->set(AddRequestToHandleMethodCallRector::class);
 };

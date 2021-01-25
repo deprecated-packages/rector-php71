@@ -37,7 +37,7 @@ class DefaultsConfigurator extends AbstractServiceConfigurator
     /**
      * Adds a tag for this definition.
      *
-     * @return mixed
+     * @return $this
      *
      * @throws InvalidArgumentException when an invalid tag name or attribute is provided
      */

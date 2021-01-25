@@ -16,7 +16,7 @@ trait FileTrait
     /**
      * Sets a file to require before creating the service.
      *
-     * @return mixed
+     * @return $this
      */
     public final function file(string $file)
     {

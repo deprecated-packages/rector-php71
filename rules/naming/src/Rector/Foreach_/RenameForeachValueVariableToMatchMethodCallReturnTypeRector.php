@@ -100,9 +100,8 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        /** @var VariableAndCallForeach|null $variableAndCallAssign */
         $variableAndCallAssign = $this->varValueAndCallForeachMatcher->match($node);
-        if ($variableAndCallAssign === null) {
+        if (! $variableAndCallAssign instanceof VariableAndCallForeach) {
             return null;
         }
         $expectedName = $this->expectedNameResolver->resolveForForeach($variableAndCallAssign->getCall());

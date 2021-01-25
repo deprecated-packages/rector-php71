@@ -48,7 +48,7 @@ final class YieldNodesReturnTypeInferer extends AbstractTypeInferer implements R
         $types = [];
         foreach ($yieldNodes as $yieldNode) {
             $value = $this->resolveYieldValue($yieldNode);
-            if ($value === null) {
+            if (! $value instanceof Expr) {
                 continue;
             }
 
@@ -75,7 +75,7 @@ final class YieldNodesReturnTypeInferer extends AbstractTypeInferer implements R
     private function findCurrentScopeYieldNodes(FunctionLike $functionLike): array
     {
         $yieldNodes = [];
-        $this->callableNodeTraverser->traverseNodesWithCallable((array) $functionLike->getStmts(), function (Node $node) use (&$yieldNodes): ?int {
+        $this->simpleCallableNodeTraverser->traverseNodesWithCallable((array) $functionLike->getStmts(), function (Node $node) use (&$yieldNodes): ?int {
             // skip nested scope
             if ($node instanceof FunctionLike) {
                 return NodeTraverser::DONT_TRAVERSE_CHILDREN;

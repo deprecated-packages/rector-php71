@@ -6,12 +6,15 @@ namespace Rector\Nette\Rector\ClassMethod;
 
 use PhpParser\Node;
 use PhpParser\Node\Expr\MethodCall;
+use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Expression;
 use Rector\Core\Rector\AbstractRector;
+use Rector\Core\ValueObject\MethodName;
 use Rector\Nette\NodeFactory\ActionRenderFactory;
 use Rector\Nette\TemplatePropertyAssignCollector;
 use Rector\Nette\ValueObject\MagicTemplatePropertyCalls;
+use Rector\NodeTypeResolver\Node\AttributeKey;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
@@ -80,10 +83,7 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        if (! $this->isObjectType($node, 'Nette\Application\UI\Control')) {
-            return null;
-        }
-        if (! $node->isPublic()) {
+        if ($this->shouldSkip($node)) {
             return null;
         }
         $magicTemplatePropertyCalls = $this->templatePropertyAssignCollector->collectTemplateFileNameVariablesAndNodesToRemove($node);
@@ -91,6 +91,21 @@ CODE_SAMPLE
         $node->stmts = array_merge((array) $node->stmts, [new Expression($renderMethodCall)]);
         $this->removeNodes($magicTemplatePropertyCalls->getNodesToRemove());
         return $node;
+    }
+
+    private function shouldSkip(ClassMethod $classMethod): bool
+    {
+        $classLike = $classMethod->getAttribute(AttributeKey::CLASS_NODE);
+        if (! $classLike instanceof Class_) {
+            return true;
+        }
+        if (! $this->isObjectType($classLike, 'Nette\Application\UI\Control')) {
+            return true;
+        }
+        if ($this->isName($classMethod, MethodName::CONSTRUCT)) {
+            return true;
+        }
+        return ! $classMethod->isPublic();
     }
 
     private function createRenderMethodCall(ClassMethod $classMethod, MagicTemplatePropertyCalls $magicTemplatePropertyCalls): MethodCall

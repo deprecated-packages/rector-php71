@@ -10,12 +10,13 @@ use PHPStan\Type\ArrayType;
 use PHPStan\Type\BooleanType;
 use PHPStan\Type\FloatType;
 use PHPStan\Type\IntegerType;
+use PHPStan\Type\MixedType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\StringType;
 use PHPStan\Type\Type;
+use Rector\NodeTypeResolver\NodeTypeResolver;
 use Rector\StaticTypeMapper\StaticTypeMapper;
 use Rector\StaticTypeMapper\ValueObject\Type\AliasedObjectType;
-use Rector\StaticTypeMapper\ValueObject\Type\ShortenedObjectType;
 use Rector\TypeDeclaration\TypeNormalizer;
 
 final class TypeComparator
@@ -35,11 +36,17 @@ final class TypeComparator
      */
     private $staticTypeMapper;
 
-    public function __construct(TypeHasher $typeHasher, TypeNormalizer $typeNormalizer, StaticTypeMapper $staticTypeMapper)
+    /**
+     * @var NodeTypeResolver
+     */
+    private $nodeTypeResolver;
+
+    public function __construct(TypeHasher $typeHasher, TypeNormalizer $typeNormalizer, StaticTypeMapper $staticTypeMapper, NodeTypeResolver $nodeTypeResolver)
     {
         $this->typeHasher = $typeHasher;
         $this->typeNormalizer = $typeNormalizer;
         $this->staticTypeMapper = $staticTypeMapper;
+        $this->nodeTypeResolver = $nodeTypeResolver;
     }
 
     public function areTypesEqual(Type $firstType, Type $secondType): bool
@@ -64,6 +71,15 @@ final class TypeComparator
         $phpParserNodeType = $this->staticTypeMapper->mapPhpParserNodePHPStanType($phpParserNode);
         $phpStanDocType = $this->staticTypeMapper->mapPHPStanPhpDocTypeNodeToPHPStanType($phpStanDocTypeNode, $node);
         return $this->areTypesEqual($phpParserNodeType, $phpStanDocType);
+    }
+
+    public function isSubtype(Type $checkedType, Type $mainType): bool
+    {
+        if ($mainType instanceof MixedType) {
+            return false;
+        }
+        return $mainType->isSuperTypeOf($checkedType)
+            ->yes();
     }
 
     private function areBothSameScalarType(Type $firstType, Type $secondType): bool
@@ -112,8 +128,8 @@ final class TypeComparator
         $firstArrayItemType = $firstType->getItemType();
         $secondArrayItemType = $secondType->getItemType();
         if ($firstArrayItemType instanceof ObjectType && $secondArrayItemType instanceof ObjectType) {
-            $firstFqnClassName = $this->getFqnClassName($firstArrayItemType);
-            $secondFqnClassName = $this->getFqnClassName($secondArrayItemType);
+            $firstFqnClassName = $this->nodeTypeResolver->getFullyQualifiedClassName($firstArrayItemType);
+            $secondFqnClassName = $this->nodeTypeResolver->getFullyQualifiedClassName($secondArrayItemType);
 
             if (is_a($firstFqnClassName, $secondFqnClassName, true)) {
                 return true;
@@ -124,13 +140,5 @@ final class TypeComparator
             }
         }
         return false;
-    }
-
-    private function getFqnClassName(ObjectType $objectType): string
-    {
-        if ($objectType instanceof ShortenedObjectType) {
-            return $objectType->getFullyQualifiedName();
-        }
-        return $objectType->getClassName();
     }
 }

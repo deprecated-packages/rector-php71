@@ -8,13 +8,14 @@ use Nette\Utils\Strings;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Property;
 use PHPStan\Type\ObjectType;
 use Rector\Core\PhpParser\Node\Manipulator\ClassDependencyManipulator;
 use Rector\Core\Rector\AbstractRector;
 use Rector\Core\ValueObject\MethodName;
 use Rector\Doctrine\NodeFactory\EntityUuidNodeFactory;
-use Rector\NodeTypeResolver\Node\AttributeKey;
+use Rector\Doctrine\PhpDocParser\DoctrineDocBlockResolver;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
@@ -35,10 +36,16 @@ final class AlwaysInitializeUuidInEntityRector extends AbstractRector
      */
     private $classDependencyManipulator;
 
-    public function __construct(ClassDependencyManipulator $classDependencyManipulator, EntityUuidNodeFactory $entityUuidNodeFactory)
+    /**
+     * @var DoctrineDocBlockResolver
+     */
+    private $doctrineDocBlockResolver;
+
+    public function __construct(ClassDependencyManipulator $classDependencyManipulator, EntityUuidNodeFactory $entityUuidNodeFactory, DoctrineDocBlockResolver $doctrineDocBlockResolver)
     {
         $this->entityUuidNodeFactory = $entityUuidNodeFactory;
         $this->classDependencyManipulator = $classDependencyManipulator;
+        $this->doctrineDocBlockResolver = $doctrineDocBlockResolver;
     }
 
     public function getRuleDefinition(): RuleDefinition
@@ -96,11 +103,11 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        if (! $this->isDoctrineEntityClass($node)) {
+        if (! $this->doctrineDocBlockResolver->isDoctrineEntityClass($node)) {
             return null;
         }
         $uuidProperty = $this->resolveUuidPropertyFromClass($node);
-        if ($uuidProperty === null) {
+        if (! $uuidProperty instanceof Property) {
             return null;
         }
         $uuidPropertyName = $this->getName($uuidProperty);
@@ -116,10 +123,7 @@ CODE_SAMPLE
     private function resolveUuidPropertyFromClass(Class_ $class): ?Property
     {
         foreach ($class->getProperties() as $property) {
-            $propertyPhpDoc = $property->getAttribute(AttributeKey::PHP_DOC_INFO);
-            if ($propertyPhpDoc === null) {
-                continue;
-            }
+            $propertyPhpDoc = $this->phpDocInfoFactory->createFromNodeOrEmpty($property);
 
             $varType = $propertyPhpDoc->getVarType();
             if (! $varType instanceof ObjectType) {
@@ -138,7 +142,7 @@ CODE_SAMPLE
     private function hasUuidInitAlreadyAdded(Class_ $class, string $uuidPropertyName): bool
     {
         $constructClassMethod = $class->getMethod(MethodName::CONSTRUCT);
-        if ($constructClassMethod === null) {
+        if (! $constructClassMethod instanceof ClassMethod) {
             return false;
         }
         return (bool) $this->betterNodeFinder->findFirst($class->stmts, function (Node $node) use ($uuidPropertyName): bool {

@@ -99,9 +99,8 @@ class EnvPlaceholderParameterBag extends ParameterBag
 
     /**
      * Merges the env placeholders of another EnvPlaceholderParameterBag.
-     * @param mixed $bag
      */
-    public function mergeEnvPlaceholders($bag)
+    public function mergeEnvPlaceholders(self $bag)
     {
         if ($newPlaceholders = $bag->getEnvPlaceholders()) {
             $this->envPlaceholders += $newPlaceholders;

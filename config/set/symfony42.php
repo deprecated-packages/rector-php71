@@ -6,6 +6,7 @@ use PHPStan\Type\IterableType;
 use PHPStan\Type\MixedType;
 
 use Rector\Core\ValueObject\Visibility;
+use Rector\Generic\NodeAnalyzer\ArgumentAddingScope;
 use Rector\Generic\Rector\ClassMethod\ArgumentAdderRector;
 use Rector\Generic\Rector\ClassMethod\ArgumentDefaultValueReplacerRector;
 use Rector\Generic\Rector\ClassMethod\ArgumentRemoverRector;
@@ -56,15 +57,15 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
         ArgumentAdderRector::ADDED_ARGUMENTS => ValueObjectInliner::inline([
             // https://github.com/symfony/symfony/commit/fa2063efe43109aea093d6fbfc12d675dba82146
             // https://github.com/symfony/symfony/commit/e3aa90f852f69040be19da3d8729cdf02d238ec7
-            new ArgumentAdder('Symfony\Component\BrowserKit\Client', 'submit', 2, 'serverParameters', [], null, ArgumentAdderRector::SCOPE_METHOD_CALL),
-            new ArgumentAdder('Symfony\Component\DomCrawler\Crawler', 'children', 0, null, null, null, ArgumentAdderRector::SCOPE_METHOD_CALL),
-            new ArgumentAdder('Symfony\Component\Finder\Finder', 'sortByName', 0, null, false, null, ArgumentAdderRector::SCOPE_METHOD_CALL),
-            new ArgumentAdder('Symfony\Bridge\Monolog\Processor\DebugProcessor', 'getLogs', 0, null, null, null, ArgumentAdderRector::SCOPE_METHOD_CALL),
-            new ArgumentAdder('Symfony\Bridge\Monolog\Processor\DebugProcessor', 'countErrors', 0, 'default_value', null, null, ArgumentAdderRector::SCOPE_METHOD_CALL),
-            new ArgumentAdder('Symfony\Bridge\Monolog\Logger', 'getLogs', 0, 'default_value', null, null, ArgumentAdderRector::SCOPE_METHOD_CALL),
-            new ArgumentAdder('Symfony\Bridge\Monolog\Logger', 'countErrors', 0, 'default_value', null, null, ArgumentAdderRector::SCOPE_METHOD_CALL),
-            new ArgumentAdder('Symfony\Component\Serializer\Normalizer', 'handleCircularReference', 1, null, null, null, ArgumentAdderRector::SCOPE_METHOD_CALL),
-            new ArgumentAdder('Symfony\Component\Serializer\Normalizer', 'handleCircularReference', 2, null, null, null, ArgumentAdderRector::SCOPE_METHOD_CALL),
+            new ArgumentAdder('Symfony\Component\BrowserKit\Client', 'submit', 2, 'serverParameters', [], null, ArgumentAddingScope::SCOPE_METHOD_CALL),
+            new ArgumentAdder('Symfony\Component\DomCrawler\Crawler', 'children', 0, null, null, null, ArgumentAddingScope::SCOPE_METHOD_CALL),
+            new ArgumentAdder('Symfony\Component\Finder\Finder', 'sortByName', 0, null, false, null, ArgumentAddingScope::SCOPE_METHOD_CALL),
+            new ArgumentAdder('Symfony\Bridge\Monolog\Processor\DebugProcessor', 'getLogs', 0, null, null, null, ArgumentAddingScope::SCOPE_METHOD_CALL),
+            new ArgumentAdder('Symfony\Bridge\Monolog\Processor\DebugProcessor', 'countErrors', 0, 'default_value', null, null, ArgumentAddingScope::SCOPE_METHOD_CALL),
+            new ArgumentAdder('Symfony\Bridge\Monolog\Logger', 'getLogs', 0, 'default_value', null, null, ArgumentAddingScope::SCOPE_METHOD_CALL),
+            new ArgumentAdder('Symfony\Bridge\Monolog\Logger', 'countErrors', 0, 'default_value', null, null, ArgumentAddingScope::SCOPE_METHOD_CALL),
+            new ArgumentAdder('Symfony\Component\Serializer\Normalizer', 'handleCircularReference', 1, null, null, null, ArgumentAddingScope::SCOPE_METHOD_CALL),
+            new ArgumentAdder('Symfony\Component\Serializer\Normalizer', 'handleCircularReference', 2, null, null, null, ArgumentAddingScope::SCOPE_METHOD_CALL),
         ]),
     ]]);
     $services->set(RenameMethodRector::class)->call('configure', [[

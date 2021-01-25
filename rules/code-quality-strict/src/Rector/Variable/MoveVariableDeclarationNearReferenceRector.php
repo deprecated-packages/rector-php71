@@ -80,6 +80,9 @@ CODE_SAMPLE
         if (! ($parent instanceof Assign && $parent->var === $node)) {
             return null;
         }
+        if ($parent->expr instanceof ArrayDimFetch) {
+            return null;
+        }
         $expression = $parent->getAttribute(AttributeKey::PARENT_NODE);
         if (! $expression instanceof Expression) {
             return null;
@@ -90,10 +93,7 @@ CODE_SAMPLE
         if ($this->hasPropertyInExpr($expression, $parent->expr)) {
             return null;
         }
-        if ($this->hasReAssign($expression, $parent->var)) {
-            return null;
-        }
-        if ($this->hasReAssign($expression, $parent->expr)) {
+        if ($this->shouldSkipReAssign($expression, $parent)) {
             return null;
         }
         $variable = $this->getUsageInNextStmts($expression, $node);
@@ -126,36 +126,12 @@ CODE_SAMPLE
         });
     }
 
-    private function hasReAssign(Expression $expression, Expr $expr): bool
+    private function shouldSkipReAssign(Expression $expression, Assign $assign): bool
     {
-        $next = $expression->getAttribute(AttributeKey::NEXT_NODE);
-        $exprValues = $this->betterNodeFinder->find($expr, function (Node $node): bool {
-            return $node instanceof Variable;
-        });
-        if ($exprValues === []) {
-            return false;
+        if ($this->hasReAssign($expression, $assign->var)) {
+            return true;
         }
-        while ($next) {
-            foreach ($exprValues as $value) {
-                $isReAssign = (bool) $this->betterNodeFinder->findFirst($next, function (Node $node): bool {
-                    $parent = $node->getAttribute(AttributeKey::PARENT_NODE);
-                    $node = $this->mayBeArrayDimFetch($node);
-                    if (! $parent instanceof Assign) {
-                        return false;
-                    }
-                    return (string) $this->getName($node) === (string) $this->getName($parent->var);
-                });
-
-                if (! $isReAssign) {
-                    continue;
-                }
-
-                return true;
-            }
-
-            $next = $next->getAttribute(AttributeKey::NEXT_NODE);
-        }
-        return false;
+        return $this->hasReAssign($expression, $assign->expr);
     }
 
     private function getUsageInNextStmts(Expression $expression, Variable $variable): ?Variable
@@ -184,7 +160,7 @@ CODE_SAMPLE
 
     private function isInsideLoopStmts(Node $node): bool
     {
-        $loopNode = $this->betterNodeFinder->findFirstParentInstanceOf($node, [For_::class, While_::class, Foreach_::class, Do_::class]);
+        $loopNode = $this->betterNodeFinder->findParentTypes($node, [For_::class, While_::class, Foreach_::class, Do_::class]);
         return (bool) $loopNode;
     }
 
@@ -216,13 +192,36 @@ CODE_SAMPLE
         return (bool) $this->scopeAwareNodeFinder->findParentType($expression, [If_::class, Else_::class, ElseIf_::class]);
     }
 
-    private function mayBeArrayDimFetch(Node $node): Node
+    private function hasReAssign(Expression $expression, Expr $expr): bool
     {
-        $parent = $node->getAttribute(AttributeKey::PARENT_NODE);
-        if ($parent instanceof ArrayDimFetch) {
-            $node = $parent->var;
+        $next = $expression->getAttribute(AttributeKey::NEXT_NODE);
+        $exprValues = $this->betterNodeFinder->find($expr, function (Node $node): bool {
+            return $node instanceof Variable;
+        });
+        if ($exprValues === []) {
+            return false;
         }
-        return $node;
+        while ($next) {
+            foreach ($exprValues as $value) {
+                $isReAssign = (bool) $this->betterNodeFinder->findFirst($next, function (Node $node): bool {
+                    $parent = $node->getAttribute(AttributeKey::PARENT_NODE);
+                    $node = $this->mayBeArrayDimFetch($node);
+                    if (! $parent instanceof Assign) {
+                        return false;
+                    }
+                    return (string) $this->getName($node) === (string) $this->getName($parent->var);
+                });
+
+                if (! $isReAssign) {
+                    continue;
+                }
+
+                return true;
+            }
+
+            $next = $next->getAttribute(AttributeKey::NEXT_NODE);
+        }
+        return false;
     }
 
     private function hasStaticCall(Node $node): bool
@@ -291,6 +290,15 @@ CODE_SAMPLE
             $node = $node->getAttribute(AttributeKey::NEXT_NODE);
         }
         return null;
+    }
+
+    private function mayBeArrayDimFetch(Node $node): Node
+    {
+        $parent = $node->getAttribute(AttributeKey::PARENT_NODE);
+        if ($parent instanceof ArrayDimFetch) {
+            $node = $parent->var;
+        }
+        return $node;
     }
 
     private function countWithElseIf(Node $node, Variable $variable, int $countFound): int

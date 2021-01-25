@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Rector\TypeDeclaration\AlreadyAssignDetector;
 
 use PhpParser\Node;
+use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Stmt\ClassLike;
 use PhpParser\NodeTraverser;
@@ -16,9 +17,9 @@ final class ConstructorAssignDetector extends AbstractAssignDetector
     public function isPropertyAssigned(ClassLike $classLike, string $propertyName): bool
     {
         $isAssignedInConstructor = false;
-        $this->callableNodeTraverser->traverseNodesWithCallable($classLike->stmts, function (Node $node) use ($propertyName, &$isAssignedInConstructor): ?int {
+        $this->simpleCallableNodeTraverser->traverseNodesWithCallable($classLike->stmts, function (Node $node) use ($propertyName, &$isAssignedInConstructor): ?int {
             $expr = $this->matchAssignExprToPropertyName($node, $propertyName);
-            if ($expr === null) {
+            if (! $expr instanceof Expr) {
                 return null;
             }
             // is in constructor?

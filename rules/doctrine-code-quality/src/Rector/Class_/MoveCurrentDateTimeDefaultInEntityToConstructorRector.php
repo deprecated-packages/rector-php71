@@ -8,8 +8,8 @@ use PhpParser\Node;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Property;
+use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\Doctrine\Property_\ColumnTagValueNode;
 use Rector\Core\Rector\AbstractRector;
-use Rector\DoctrineCodeQuality\NodeAnalyzer\ColumnDatetimePropertyAnalyzer;
 use Rector\DoctrineCodeQuality\NodeAnalyzer\ConstructorAssignPropertyAnalyzer;
 use Rector\DoctrineCodeQuality\NodeFactory\ValueAssignFactory;
 use Rector\DoctrineCodeQuality\NodeManipulator\ColumnDatetimePropertyManipulator;
@@ -26,11 +26,6 @@ use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
  */
 final class MoveCurrentDateTimeDefaultInEntityToConstructorRector extends AbstractRector
 {
-    /**
-     * @var ColumnDatetimePropertyAnalyzer
-     */
-    private $columnDatetimePropertyAnalyzer;
-
     /**
      * @var ConstructorManipulator
      */
@@ -51,9 +46,8 @@ final class MoveCurrentDateTimeDefaultInEntityToConstructorRector extends Abstra
      */
     private $constructorAssignPropertyAnalyzer;
 
-    public function __construct(ColumnDatetimePropertyAnalyzer $columnDatetimePropertyAnalyzer, ConstructorManipulator $constructorManipulator, ValueAssignFactory $valueAssignFactory, ColumnDatetimePropertyManipulator $columnDatetimePropertyManipulator, ConstructorAssignPropertyAnalyzer $constructorAssignPropertyAnalyzer)
+    public function __construct(ConstructorManipulator $constructorManipulator, ValueAssignFactory $valueAssignFactory, ColumnDatetimePropertyManipulator $columnDatetimePropertyManipulator, ConstructorAssignPropertyAnalyzer $constructorAssignPropertyAnalyzer)
     {
-        $this->columnDatetimePropertyAnalyzer = $columnDatetimePropertyAnalyzer;
         $this->constructorManipulator = $constructorManipulator;
         $this->valueAssignFactory = $valueAssignFactory;
         $this->columnDatetimePropertyManipulator = $columnDatetimePropertyManipulator;
@@ -126,8 +120,13 @@ CODE_SAMPLE
 
     private function refactorProperty(Property $property, Class_ $class): ?Property
     {
-        $columnTagValueNode = $this->columnDatetimePropertyAnalyzer->matchDateTimeColumnTagValueNodeInProperty($property);
-        if ($columnTagValueNode === null) {
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($property);
+        $columnTagValueNode = $phpDocInfo->getByType(ColumnTagValueNode::class);
+        if (! $columnTagValueNode instanceof ColumnTagValueNode) {
+            return null;
+        }
+        /** @var ColumnTagValueNode $columnTagValueNode */
+        if ($columnTagValueNode->getType() !== 'datetime') {
             return null;
         }
         $constructorAssign = $this->constructorAssignPropertyAnalyzer->resolveConstructorAssign($property);
@@ -137,6 +136,7 @@ CODE_SAMPLE
         }
         // 1. remove default options from database level
         $this->columnDatetimePropertyManipulator->removeDefaultOption($columnTagValueNode);
+        $phpDocInfo->markAsChanged();
         // 2. remove default value
         $this->refactorClass($class, $property);
         // 3. remove default from property
@@ -150,9 +150,8 @@ CODE_SAMPLE
         /** @var string $propertyName */
         $propertyName = $this->getName($property);
         $onlyProperty = $property->props[0];
-        /** @var Expr|null $defaultExpr */
         $defaultExpr = $onlyProperty->default;
-        if ($defaultExpr === null) {
+        if (! $defaultExpr instanceof Expr) {
             return;
         }
         $expression = $this->valueAssignFactory->createDefaultDateTimeWithValueAssign($propertyName, $defaultExpr);

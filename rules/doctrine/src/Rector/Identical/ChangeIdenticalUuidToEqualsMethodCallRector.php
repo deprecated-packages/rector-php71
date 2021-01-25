@@ -75,7 +75,7 @@ CODE_SAMPLE
     public function refactor(Node $node): ?Node
     {
         $twoNodeMatch = $this->matchEntityCallAndComparedVariable($node);
-        if ($twoNodeMatch === null) {
+        if (! $twoNodeMatch instanceof TwoNodeMatch) {
             return null;
         }
         $entityMethodCall = $twoNodeMatch->getFirstExpr();

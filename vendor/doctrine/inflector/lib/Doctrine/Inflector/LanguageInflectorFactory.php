@@ -13,7 +13,7 @@ interface LanguageInflectorFactory
      *
      * @param bool $reset If true, will unset default inflections for all new rules
      *
-     * @return mixed
+     * @return $this
      */
     public function withSingularRules(?Ruleset $singularRules, bool $reset = false);
 
@@ -22,7 +22,7 @@ interface LanguageInflectorFactory
      *
      * @param bool $reset If true, will unset default inflections for all new rules
      *
-     * @return mixed
+     * @return $this
      */
     public function withPluralRules(?Ruleset $pluralRules, bool $reset = false);
 

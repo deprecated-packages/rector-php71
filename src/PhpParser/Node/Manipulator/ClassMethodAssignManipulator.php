@@ -21,15 +21,16 @@ use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Foreach_;
 use PHPStan\Reflection\ObjectTypeMethodReflection;
 use PHPStan\Reflection\ParameterReflection;
+use PHPStan\Reflection\ParametersAcceptor;
 use PHPStan\Type\Type;
 use Rector\Core\PhpParser\Node\BetterNodeFinder;
 use Rector\Core\PhpParser\Node\NodeFactory;
-use Rector\Core\PhpParser\NodeTraverser\CallableNodeTraverser;
 use Rector\Core\PhpParser\Printer\BetterStandardPrinter;
 use Rector\Core\PHPStan\Reflection\CallReflectionResolver;
 use Rector\Core\Util\StaticInstanceOf;
 use Rector\NodeNameResolver\NodeNameResolver;
 use Rector\NodeTypeResolver\Node\AttributeKey;
+use Symplify\Astral\NodeTraverser\SimpleCallableNodeTraverser;
 
 final class ClassMethodAssignManipulator
 {
@@ -39,9 +40,9 @@ final class ClassMethodAssignManipulator
     private $variableManipulator;
 
     /**
-     * @var CallableNodeTraverser
+     * @var SimpleCallableNodeTraverser
      */
-    private $callableNodeTraverser;
+    private $simpleCallableNodeTraverser;
 
     /**
      * @var NodeNameResolver
@@ -68,10 +69,10 @@ final class ClassMethodAssignManipulator
      */
     private $callReflectionResolver;
 
-    public function __construct(BetterNodeFinder $betterNodeFinder, BetterStandardPrinter $betterStandardPrinter, CallableNodeTraverser $callableNodeTraverser, NodeFactory $nodeFactory, NodeNameResolver $nodeNameResolver, VariableManipulator $variableManipulator, CallReflectionResolver $callReflectionResolver)
+    public function __construct(BetterNodeFinder $betterNodeFinder, BetterStandardPrinter $betterStandardPrinter, SimpleCallableNodeTraverser $simpleCallableNodeTraverser, NodeFactory $nodeFactory, NodeNameResolver $nodeNameResolver, VariableManipulator $variableManipulator, CallReflectionResolver $callReflectionResolver)
     {
         $this->variableManipulator = $variableManipulator;
-        $this->callableNodeTraverser = $callableNodeTraverser;
+        $this->simpleCallableNodeTraverser = $simpleCallableNodeTraverser;
         $this->nodeNameResolver = $nodeNameResolver;
         $this->nodeFactory = $nodeFactory;
         $this->betterNodeFinder = $betterNodeFinder;
@@ -109,7 +110,7 @@ final class ClassMethodAssignManipulator
     private function filterOutArrayDestructedVariables(array $variableAssigns, ClassMethod $classMethod): array
     {
         $arrayDestructionCreatedVariables = [];
-        $this->callableNodeTraverser->traverseNodesWithCallable($classMethod, function (Node $node) use (&$arrayDestructionCreatedVariables) {
+        $this->simpleCallableNodeTraverser->traverseNodesWithCallable($classMethod, function (Node $node) use (&$arrayDestructionCreatedVariables) {
             if (! $node instanceof Assign) {
                 return null;
             }
@@ -202,7 +203,7 @@ final class ClassMethodAssignManipulator
     private function collectReferenceVariableNames(ClassMethod $classMethod): array
     {
         $referencedVariables = [];
-        $this->callableNodeTraverser->traverseNodesWithCallable($classMethod, function (Node $node) use (&$referencedVariables) {
+        $this->simpleCallableNodeTraverser->traverseNodesWithCallable($classMethod, function (Node $node) use (&$referencedVariables) {
             if (! $node instanceof Variable) {
                 return null;
             }
@@ -279,7 +280,7 @@ final class ClassMethodAssignManipulator
         }
         $variableName = $this->nodeNameResolver->getName($variable);
         $parametersAcceptor = $this->callReflectionResolver->resolveParametersAcceptor($methodReflection, $node);
-        if ($parametersAcceptor === null) {
+        if (! $parametersAcceptor instanceof ParametersAcceptor) {
             return false;
         }
         /** @var ParameterReflection $parameterReflection */
@@ -323,7 +324,7 @@ final class ClassMethodAssignManipulator
     {
         $methodReflection = $this->callReflectionResolver->resolveConstructor($new);
         $parametersAcceptor = $this->callReflectionResolver->resolveParametersAcceptor($methodReflection, $new);
-        if ($parametersAcceptor === null) {
+        if (! $parametersAcceptor instanceof ParametersAcceptor) {
             return false;
         }
         /** @var ParameterReflection $parameterReflection */

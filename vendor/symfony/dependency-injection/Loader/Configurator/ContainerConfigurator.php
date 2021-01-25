@@ -73,7 +73,7 @@ class ContainerConfigurator extends AbstractConfigurator
     }
 
     /**
-     * @return mixed
+     * @return static
      */
     public final function withPath(string $path)
     {

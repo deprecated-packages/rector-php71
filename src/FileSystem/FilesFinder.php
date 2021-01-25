@@ -109,7 +109,7 @@ final class FilesFinder
         $suffixesPattern = $this->normalizeSuffixesToPattern($suffixes);
         $finder = Finder::create()
             ->followLinks()
-            ->files()->in($absoluteDirectories)->name($suffixesPattern)
+            ->files()->size('> 0')->in($absoluteDirectories)->name($suffixesPattern)
             ->sortByName();
         $this->addFilterWithExcludedPaths($finder);
         return $this->finderSanitizer->sanitize($finder);
@@ -123,7 +123,17 @@ final class FilesFinder
         $plainDiff = shell_exec('git diff --name-only') ?: '';
         $relativePaths = explode(PHP_EOL, trim($plainDiff));
 
-        return array_values(array_filter(array_map('realpath', $relativePaths)));
+        $realPaths = [];
+        foreach ($relativePaths as $relativePath) {
+            $realPath = realpath($relativePath);
+            if ($realPath === false) {
+                continue;
+            }
+
+            $realPaths[] = $realPath;
+        }
+
+        return $realPaths;
     }
 
     /**

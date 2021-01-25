@@ -8,6 +8,7 @@ use PhpParser\Node;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Identifier;
 use Rector\Core\Rector\AbstractPHPUnitRector;
+use Rector\PHPUnit\NodeManipulator\ArgumentMover;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
@@ -16,6 +17,16 @@ use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
  */
 final class AssertSameTrueFalseToAssertTrueFalseRector extends AbstractPHPUnitRector
 {
+    /**
+     * @var ArgumentMover
+     */
+    private $argumentMover;
+
+    public function __construct(ArgumentMover $argumentMover)
+    {
+        $this->argumentMover = $argumentMover;
+    }
+
     public function getRuleDefinition(): RuleDefinition
     {
         return new RuleDefinition('Change $this->assertSame(true, ...) to assertTrue()', [
@@ -65,25 +76,18 @@ CODE_SAMPLE
             return null;
         }
         if ($this->isTrue($node->args[0]->value)) {
-            $this->removeFirstArgument($node);
+            $this->argumentMover->removeFirst($node);
 
             $node->name = new Identifier('assertTrue');
 
             return $node;
         }
         if ($this->isFalse($node->args[0]->value)) {
-            $this->removeFirstArgument($node);
+            $this->argumentMover->removeFirst($node);
 
             $node->name = new Identifier('assertFalse');
             return $node;
         }
         return null;
-    }
-
-    private function removeFirstArgument(MethodCall $methodCall): void
-    {
-        $args = $methodCall->args;
-        array_shift($args);
-        $methodCall->args = $args;
     }
 }

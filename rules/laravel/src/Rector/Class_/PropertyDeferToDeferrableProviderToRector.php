@@ -63,7 +63,7 @@ CODE_SAMPLE
             return null;
         }
         $deferProperty = $this->matchDeferWithFalseProperty($node);
-        if ($deferProperty === null) {
+        if (! $deferProperty instanceof Property) {
             return null;
         }
         $this->removeNode($deferProperty);

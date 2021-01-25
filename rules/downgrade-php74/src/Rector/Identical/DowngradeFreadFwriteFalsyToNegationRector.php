@@ -53,7 +53,7 @@ CODE_SAMPLE
     public function refactor(Node $node): ?Node
     {
         $compareValue = $this->getCompareValue($node);
-        if ($compareValue === null) {
+        if (! $compareValue instanceof Expr) {
             return null;
         }
         if (! $this->isFalse($compareValue)) {

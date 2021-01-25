@@ -64,7 +64,7 @@ class ServiceLocator implements ServiceProviderInterface
     /**
      * @internal
      *
-     * @return mixed
+     * @return static
      */
     public function withContext(string $externalId, Container $container)
     {

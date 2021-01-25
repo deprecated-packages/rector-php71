@@ -107,9 +107,9 @@ class ErrorHandler
 
     /**
      * Registers the error handler.
-     * @param mixed $handler
+     * @return $this
      */
-    public static function register($handler = null, bool $replace = true)
+    public static function register(self $handler = null, bool $replace = true)
     {
         if (null === self::$reservedMemory) {
             self::$reservedMemory = str_repeat('x', 10240);

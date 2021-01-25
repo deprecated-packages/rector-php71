@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Rector\CodeQuality\Rector\Foreach_;
 
 use PhpParser\Node;
+use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Stmt\Foreach_;
 use Rector\CodeQuality\NodeAnalyzer\ForeachNodeAnalyzer;
@@ -81,14 +82,14 @@ CODE_SAMPLE
     public function refactor(Node $node): ?Node
     {
         $assignVariable = $this->foreachNodeAnalyzer->matchAssignItemsOnlyForeachArrayVariable($node);
-        if ($assignVariable === null) {
+        if (! $assignVariable instanceof Expr) {
             return null;
         }
         if ($this->shouldSkipAsPartOfNestedForeach($node)) {
             return null;
         }
         $previousDeclaration = $this->nodeUsageFinder->findPreviousForeachNodeUsage($node, $assignVariable);
-        if ($previousDeclaration === null) {
+        if (! $previousDeclaration instanceof Node) {
             return null;
         }
         $previousDeclarationParentNode = $previousDeclaration->getAttribute(AttributeKey::PARENT_NODE);
@@ -105,7 +106,7 @@ CODE_SAMPLE
 
     private function shouldSkipAsPartOfNestedForeach(Foreach_ $foreach): bool
     {
-        $foreachParent = $this->betterNodeFinder->findFirstParentInstanceOf($foreach, Foreach_::class);
+        $foreachParent = $this->betterNodeFinder->findParentType($foreach, Foreach_::class);
         return $foreachParent !== null;
     }
 }

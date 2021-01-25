@@ -6,12 +6,12 @@ namespace Rector\MockeryToProphecy\Rector\ClassMethod;
 
 use PhpParser\Node;
 use PhpParser\Node\Arg;
-use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Stmt\ClassMethod;
 use Rector\Core\Rector\AbstractPHPUnitRector;
+use Rector\MockeryToProphecy\Collector\MockVariableCollector;
 use Rector\NodeTypeResolver\Node\AttributeKey;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
@@ -25,6 +25,16 @@ final class MockeryCreateMockToProphizeRector extends AbstractPHPUnitRector
      * @var array<string, class-string>
      */
     private $mockVariableTypesByNames = [];
+
+    /**
+     * @var MockVariableCollector
+     */
+    private $mockVariableCollector;
+
+    public function __construct(MockVariableCollector $mockVariableCollector)
+    {
+        $this->mockVariableCollector = $mockVariableCollector;
+    }
 
     /**
      * @return string[]
@@ -51,12 +61,12 @@ final class MockeryCreateMockToProphizeRector extends AbstractPHPUnitRector
     {
         return new RuleDefinition('Changes mockery mock creation to Prophesize', [
             new CodeSample(<<<'CODE_SAMPLE'
-$mock = \Mockery::mock(\'MyClass\');
+$mock = \Mockery::mock('MyClass');
 $service = new Service();
 $service->injectDependency($mock);
 CODE_SAMPLE
 , <<<'CODE_SAMPLE'
- $mock = $this->prophesize(\'MyClass\');
+ $mock = $this->prophesize('MyClass');
 
 $service = new Service();
 $service->injectDependency($mock->reveal());
@@ -75,7 +85,8 @@ CODE_SAMPLE
                 return null;
             }
             /** @var StaticCall $node */
-            $this->collectMockVariableName($node);
+            $collectedVariableTypesByNames = $this->mockVariableCollector->collectMockVariableName($node);
+            $this->mockVariableTypesByNames = array_merge($this->mockVariableTypesByNames, $collectedVariableTypesByNames);
             $parentNode = $node->getAttribute(AttributeKey::PARENT_NODE);
             if ($parentNode instanceof Arg) {
                 $prophesizeMethodCall = $this->createProphesizeMethodCall($node);
@@ -104,24 +115,6 @@ CODE_SAMPLE
             }
             return $this->createMethodCall($node->value, 'reveal');
         });
-    }
-
-    private function collectMockVariableName(StaticCall $staticCall): void
-    {
-        $parentNode = $staticCall->getAttribute(AttributeKey::PARENT_NODE);
-        if (! $parentNode instanceof Assign) {
-            return;
-        }
-        if (! $parentNode->var instanceof Variable) {
-            return;
-        }
-        /** @var Variable $variable */
-        $variable = $parentNode->var;
-        /** @var string $variableName */
-        $variableName = $this->getName($variable);
-        $type = $staticCall->args[0]->value;
-        $mockedType = $this->getValue($type);
-        $this->mockVariableTypesByNames[$variableName] = $mockedType;
     }
 
     private function createProphesizeMethodCall(StaticCall $staticCall): MethodCall

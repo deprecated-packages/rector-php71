@@ -80,7 +80,7 @@ CODE_SAMPLE
 
     private function unsetUnusedArrayElements(FuncCall $funcCall, Scope $scope): void
     {
-        foreach ($funcCall->args as $positoin => $arg) {
+        foreach ($funcCall->args as $position => $arg) {
             if (! $arg->value instanceof Array_) {
                 continue;
             }
@@ -100,7 +100,7 @@ CODE_SAMPLE
 
             if ($arg->value->items === []) {
                 // Drops empty array from `compact()` arguments.
-                unset($funcCall->args[$positoin]);
+                unset($funcCall->args[$position]);
             }
         }
     }

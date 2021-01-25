@@ -17,7 +17,7 @@ trait AbstractTrait
      * Whether this definition is abstract, that means it merely serves as a
      * template for other definitions.
      *
-     * @return mixed
+     * @return $this
      */
     public final function abstract(bool $abstract = true)
     {

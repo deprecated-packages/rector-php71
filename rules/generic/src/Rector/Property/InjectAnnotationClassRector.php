@@ -14,7 +14,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagValueNode;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
-use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo;
+use Rector\BetterPhpDocParser\PhpDocManipulator\PhpDocTypeChanger;
 use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\JMS\JMSInjectTagValueNode;
 use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\PHPDI\PHPDIInjectTagValueNode;
 use Rector\ChangesReporting\Application\ErrorAndDiffCollector;
@@ -22,6 +22,7 @@ use Rector\Core\Contract\Rector\ConfigurableRectorInterface;
 use Rector\Core\Exception\NotImplementedException;
 use Rector\Core\Exception\ShouldNotHappenException;
 use Rector\Core\Rector\AbstractRector;
+use Rector\Core\ValueObject\PhpVersionFeature;
 use Rector\NodeTypeResolver\Node\AttributeKey;
 use Rector\Symfony\ServiceMapProvider;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\ConfiguredCodeSample;
@@ -38,7 +39,7 @@ final class InjectAnnotationClassRector extends AbstractRector implements Config
     /**
      * @var string
      */
-    public const ANNOTATION_CLASSES = '$annotationClasses';
+    public const ANNOTATION_CLASSES = 'annotation_classes';
 
     /**
      * @var array<string, string>
@@ -69,10 +70,16 @@ final class InjectAnnotationClassRector extends AbstractRector implements Config
      */
     private $serviceMapProvider;
 
-    public function __construct(ServiceMapProvider $serviceMapProvider, ErrorAndDiffCollector $errorAndDiffCollector)
+    /**
+     * @var PhpDocTypeChanger
+     */
+    private $phpDocTypeChanger;
+
+    public function __construct(ServiceMapProvider $serviceMapProvider, ErrorAndDiffCollector $errorAndDiffCollector, PhpDocTypeChanger $phpDocTypeChanger)
     {
         $this->errorAndDiffCollector = $errorAndDiffCollector;
         $this->serviceMapProvider = $serviceMapProvider;
+        $this->phpDocTypeChanger = $phpDocTypeChanger;
     }
 
     public function getRuleDefinition(): RuleDefinition
@@ -124,10 +131,7 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        $phpDocInfo = $node->getAttribute(AttributeKey::PHP_DOC_INFO);
-        if (! $phpDocInfo instanceof PhpDocInfo) {
-            return null;
-        }
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($node);
         foreach ($this->annotationClasses as $annotationClass) {
             $this->ensureAnnotationClassIsSupported($annotationClass);
 
@@ -159,7 +163,9 @@ CODE_SAMPLE
         if (isset(self::ANNOTATION_TO_TAG_CLASS[$annotationClass])) {
             return;
         }
-        throw new NotImplementedException(sprintf('Annotation class "%s" is not implemented yet. Use one of "%s" or add custom tag for it to Rector.', $annotationClass, implode('", "', array_keys(self::ANNOTATION_TO_TAG_CLASS))));
+        $availableAnnotations = array_keys(self::ANNOTATION_TO_TAG_CLASS);
+        $errorMessage = sprintf('Annotation class "%s" is not implemented yet. Use one of "%s" or add custom tag for it to Rector.', $annotationClass, implode('", "', $availableAnnotations));
+        throw new NotImplementedException($errorMessage);
     }
 
     private function isParameterInject(PhpDocTagValueNode $phpDocTagValueNode): bool
@@ -180,9 +186,7 @@ CODE_SAMPLE
             return $this->resolveJMSDIInjectType($property, $phpDocTagValueNode);
         }
         if ($phpDocTagValueNode instanceof PHPDIInjectTagValueNode) {
-            /** @var PhpDocInfo $phpDocInfo */
-            $phpDocInfo = $property->getAttribute(AttributeKey::PHP_DOC_INFO);
-
+            $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($property);
             return $phpDocInfo->getVarType();
         }
         throw new ShouldNotHappenException();
@@ -194,15 +198,18 @@ CODE_SAMPLE
             return null;
         }
         $propertyName = $this->getName($property);
-        /** @var PhpDocInfo $phpDocInfo */
-        $phpDocInfo = $property->getAttribute(AttributeKey::PHP_DOC_INFO);
-        $phpDocInfo->changeVarType($type);
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($property);
+        $this->phpDocTypeChanger->changeVarType($phpDocInfo, $type);
         $phpDocInfo->removeByType($tagClass);
         $classLike = $property->getAttribute(AttributeKey::CLASS_NODE);
         if (! $classLike instanceof Class_) {
             throw new ShouldNotHappenException();
         }
-        $this->addConstructorDependencyToClass($classLike, $type, $propertyName);
+        $this->addConstructorDependencyToClass($classLike, $type, $propertyName, $property->flags);
+        if ($this->phpVersionProvider->isAtLeastPhpVersion(PhpVersionFeature::PROPERTY_PROMOTION)) {
+            $this->removeNode($property);
+            return null;
+        }
         return $property;
     }
 
@@ -225,8 +232,7 @@ CODE_SAMPLE
             }
         }
         // 3. service is in @var annotation
-        /** @var PhpDocInfo $phpDocInfo */
-        $phpDocInfo = $property->getAttribute(AttributeKey::PHP_DOC_INFO);
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($property);
         $varType = $phpDocInfo->getVarType();
         if (! $varType instanceof MixedType) {
             return $varType;

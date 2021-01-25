@@ -76,7 +76,7 @@ CODE_SAMPLE
     public function refactor(Node $node): ?Node
     {
         $unprefixedMethodToGetSet = $this->matchTypeAndMethodName($node);
-        if ($unprefixedMethodToGetSet === null) {
+        if (! $unprefixedMethodToGetSet instanceof ModalToGetSet) {
             return null;
         }
         $newName = $this->resolveNewMethodNameByCondition($node, $unprefixedMethodToGetSet);

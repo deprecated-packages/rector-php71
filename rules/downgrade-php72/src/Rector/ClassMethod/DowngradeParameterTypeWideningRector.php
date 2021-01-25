@@ -14,12 +14,10 @@ use PhpParser\Node\Stmt\Function_;
 use PhpParser\Node\Stmt\Interface_;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\ClassReflection;
-use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo;
-use Rector\ChangesReporting\Collector\RectorChangeCollector;
+use Rector\BetterPhpDocParser\PhpDocManipulator\PhpDocTypeChanger;
 use Rector\Core\Rector\AbstractRector;
 use Rector\NodeTypeResolver\Node\AttributeKey;
 use ReflectionMethod;
-use ReflectionParameter;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
@@ -31,13 +29,13 @@ use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 final class DowngradeParameterTypeWideningRector extends AbstractRector
 {
     /**
-     * @var RectorChangeCollector
+     * @var PhpDocTypeChanger
      */
-    private $rectorChangeCollector;
+    private $phpDocTypeChanger;
 
-    public function __construct(RectorChangeCollector $rectorChangeCollector)
+    public function __construct(PhpDocTypeChanger $phpDocTypeChanger)
     {
-        $this->rectorChangeCollector = $rectorChangeCollector;
+        $this->phpDocTypeChanger = $phpDocTypeChanger;
     }
 
     public function getRuleDefinition(): RuleDefinition
@@ -117,14 +115,13 @@ CODE_SAMPLE
         if ($param->type !== null) {
             return;
         }
-        /** @var Scope|null $scope */
         $scope = $functionLike->getAttribute(AttributeKey::SCOPE);
-        if ($scope === null) {
+        if (! $scope instanceof Scope) {
             // possibly trait
             return;
         }
         $classReflection = $scope->getClassReflection();
-        if ($classReflection === null) {
+        if (! $classReflection instanceof ClassReflection) {
             return;
         }
         /** @var string $methodName */
@@ -151,7 +148,7 @@ CODE_SAMPLE
              * The interface is also retrieve though, so that method
              * will eventually be refactored.
              */
-            if ($classMethod === null) {
+            if (! $classMethod instanceof ClassMethod) {
                 continue;
             }
             $this->removeParamTypeFromMethod($ancestorClassOrInterface, $position, $classMethod);
@@ -166,12 +163,19 @@ CODE_SAMPLE
     private function getClassesWithDifferentSignature(ClassReflection $classReflection, string $methodName, string $paramName): array
     {
         // 1. All ancestor classes with different signature
-        $refactorableAncestorClassNames = array_filter($classReflection->getParentClassesNames(), function (string $ancestorClassName) use ($methodName, $paramName): bool {
+        $ancestorClassNames = array_filter($classReflection->getParentClassesNames(), function (string $ancestorClassName) use ($methodName, $paramName): bool {
             return $this->hasMethodWithTypedParam($ancestorClassName, $methodName, $paramName);
         });
-        return array_filter(array_map(function (string $ancestorClassName): ?Class_ {
-            return $this->nodeRepository->findClass($ancestorClassName);
-        }, $refactorableAncestorClassNames));
+        $classes = [];
+        foreach ($ancestorClassNames as $ancestorClassName) {
+            $class = $this->nodeRepository->findClass($ancestorClassName);
+            if (! $class instanceof Class_) {
+                continue;
+            }
+
+            $classes[] = $class;
+        }
+        return $classes;
     }
 
     /**
@@ -186,16 +190,23 @@ CODE_SAMPLE
         $refactorableInterfaceClassNames = array_filter($interfaceClassNames, function (string $interfaceClassName) use ($methodName, $paramName): bool {
             return $this->hasMethodWithTypedParam($interfaceClassName, $methodName, $paramName);
         });
-        return array_filter(array_map(function (string $interfaceClassName): ?Interface_ {
-            return $this->nodeRepository->findInterface($interfaceClassName);
-        }, $refactorableInterfaceClassNames));
+        $interfaces = [];
+        foreach ($refactorableInterfaceClassNames as $refactorableInterfaceClassName) {
+            $interface = $this->nodeRepository->findInterface($refactorableInterfaceClassName);
+            if (! $interface instanceof Interface_) {
+                continue;
+            }
+
+            $interfaces[] = $interface;
+        }
+        return $interfaces;
     }
 
     private function removeParamTypeFromMethod(ClassLike $classLike, int $position, ClassMethod $classMethod): void
     {
         $classMethodName = $this->getName($classMethod);
         $currentClassMethod = $classLike->getMethod($classMethodName);
-        if ($currentClassMethod === null) {
+        if (! $currentClassMethod instanceof ClassMethod) {
             return;
         }
         if (! isset($currentClassMethod->params[$position])) {
@@ -210,7 +221,6 @@ CODE_SAMPLE
         $this->addPHPDocParamTypeToMethod($classMethod, $param);
         // Remove the type
         $param->type = null;
-        $this->rectorChangeCollector->notifyNodeFileInfo($param);
     }
 
     private function removeParamTypeFromMethodForChildren(string $parentClassName, string $methodName, int $position): void
@@ -222,7 +232,7 @@ CODE_SAMPLE
                 continue;
             }
             $childClassMethod = $this->nodeRepository->findClassMethod($childClassName, $methodName);
-            if ($childClassMethod === null) {
+            if (! $childClassMethod instanceof ClassMethod) {
                 continue;
             }
             $this->removeParamTypeFromMethod($childClassLike, $position, $childClassMethod);
@@ -235,7 +245,6 @@ CODE_SAMPLE
             return false;
         }
         $parentReflectionMethod = new ReflectionMethod($parentClassName, $methodName);
-        /** @var ReflectionParameter[] */
         $parentReflectionMethodParams = $parentReflectionMethod->getParameters();
         foreach ($parentReflectionMethodParams as $reflectionParameter) {
             if ($reflectionParameter->name === $paramName && $reflectionParameter->getType() !== null) {
@@ -253,13 +262,9 @@ CODE_SAMPLE
         if ($param->type === null) {
             return;
         }
-        /** @var PhpDocInfo|null $phpDocInfo */
-        $phpDocInfo = $classMethod->getAttribute(AttributeKey::PHP_DOC_INFO);
-        if ($phpDocInfo === null) {
-            $phpDocInfo = $this->phpDocInfoFactory->createEmpty($classMethod);
-        }
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($classMethod);
         $paramName = $this->getName($param);
         $mappedCurrentParamType = $this->staticTypeMapper->mapPhpParserNodePHPStanType($param->type);
-        $phpDocInfo->changeParamType($mappedCurrentParamType, $param, $paramName);
+        $this->phpDocTypeChanger->changeParamType($phpDocInfo, $mappedCurrentParamType, $param, $paramName);
     }
 }

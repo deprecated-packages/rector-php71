@@ -18,7 +18,7 @@ trait AutoconfigureTrait
     /**
      * Sets whether or not instanceof conditionals should be prepended with a global set.
      *
-     * @return mixed
+     * @return $this
      *
      * @throws InvalidArgumentException when a parent is already set
      */

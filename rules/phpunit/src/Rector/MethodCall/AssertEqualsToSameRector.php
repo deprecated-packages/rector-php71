@@ -15,6 +15,7 @@ use PHPStan\Type\StringType;
 use PHPStan\Type\Type;
 use Rector\Core\PhpParser\Node\Manipulator\IdentifierManipulator;
 use Rector\Core\Rector\AbstractPHPUnitRector;
+use Rector\Core\Util\StaticInstanceOf;
 use Rector\NodeTypeResolver\Node\AttributeKey;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
@@ -83,7 +84,7 @@ final class AssertEqualsToSameRector extends AbstractPHPUnitRector
         }
         $valueNode = $node->args[0];
         $valueNodeType = $this->getNodeType($valueNode->value);
-        if (! $this->isTypes($valueNodeType, self::SCALAR_TYPES)) {
+        if (! StaticInstanceOf::isOneOf($valueNodeType, self::SCALAR_TYPES)) {
             return null;
         }
         $this->identifierManipulator->renameNodeWithMap($node, self::RENAME_METHODS_MAP);
@@ -95,18 +96,5 @@ final class AssertEqualsToSameRector extends AbstractPHPUnitRector
         /** @var Scope $nodeScope */
         $nodeScope = $expr->getAttribute(AttributeKey::SCOPE);
         return $nodeScope->getType($expr);
-    }
-
-    /**
-     * @param string[] $types
-     */
-    private function isTypes(Type $valueType, array $types): bool
-    {
-        foreach ($types as $type) {
-            if (is_a($valueType, $type, true)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

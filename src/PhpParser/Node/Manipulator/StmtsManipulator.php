@@ -8,24 +8,24 @@ use PhpParser\Node;
 use PhpParser\Node\Stmt;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Expression;
-use Rector\Core\PhpParser\NodeTraverser\CallableNodeTraverser;
 use Rector\Core\PhpParser\Printer\BetterStandardPrinter;
+use Symplify\Astral\NodeTraverser\SimpleCallableNodeTraverser;
 
 final class StmtsManipulator
 {
     /**
-     * @var CallableNodeTraverser
+     * @var SimpleCallableNodeTraverser
      */
-    private $callableNodeTraverser;
+    private $simpleCallableNodeTraverser;
 
     /**
      * @var BetterStandardPrinter
      */
     private $betterStandardPrinter;
 
-    public function __construct(BetterStandardPrinter $betterStandardPrinter, CallableNodeTraverser $callableNodeTraverser)
+    public function __construct(BetterStandardPrinter $betterStandardPrinter, SimpleCallableNodeTraverser $simpleCallableNodeTraverser)
     {
-        $this->callableNodeTraverser = $callableNodeTraverser;
+        $this->simpleCallableNodeTraverser = $simpleCallableNodeTraverser;
         $this->betterStandardPrinter = $betterStandardPrinter;
     }
 
@@ -48,7 +48,7 @@ final class StmtsManipulator
      */
     public function filterOutExistingStmts(ClassMethod $classMethod, array $stmts): array
     {
-        $this->callableNodeTraverser->traverseNodesWithCallable((array) $classMethod->stmts, function (Node $node) use (&$stmts) {
+        $this->simpleCallableNodeTraverser->traverseNodesWithCallable((array) $classMethod->stmts, function (Node $node) use (&$stmts) {
             foreach ($stmts as $key => $assign) {
                 if (! $this->betterStandardPrinter->areNodesEqual($node, $assign)) {
                     continue;

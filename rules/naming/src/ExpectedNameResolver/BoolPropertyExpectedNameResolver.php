@@ -28,9 +28,9 @@ final class BoolPropertyExpectedNameResolver extends AbstractExpectedNameResolve
      */
     public function resolve(Node $node): ?string
     {
-        if ($this->nodeTypeResolver->isPropertyBoolean($node)) {
-            return $this->propertyNaming->getExpectedNameFromBooleanPropertyType($node);
+        if (! $this->nodeTypeResolver->isPropertyBoolean($node)) {
+            return null;
         }
-        return null;
+        return $this->propertyNaming->getExpectedNameFromBooleanPropertyType($node);
     }
 }

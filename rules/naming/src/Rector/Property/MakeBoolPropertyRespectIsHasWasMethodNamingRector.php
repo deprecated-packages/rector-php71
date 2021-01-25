@@ -9,6 +9,7 @@ use PhpParser\Node\Stmt\Property;
 use Rector\Core\Rector\AbstractRector;
 use Rector\Naming\ExpectedNameResolver\BoolPropertyExpectedNameResolver;
 use Rector\Naming\PropertyRenamer\BoolPropertyRenamer;
+use Rector\Naming\ValueObject\PropertyRename;
 use Rector\Naming\ValueObjectFactory\PropertyRenameFactory;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
@@ -89,12 +90,11 @@ CODE_SAMPLE
             return null;
         }
         $propertyRename = $this->propertyRenameFactory->create($node, $this->boolPropertyExpectedNameResolver);
-        if ($propertyRename === null) {
+        if (! $propertyRename instanceof PropertyRename) {
             return null;
         }
         $property = $this->boolPropertyRenamer->rename($propertyRename);
-        //        dd($propertyRename->getClassLike());
-        if ($property === null) {
+        if (! $property instanceof \PhpParser\Node\Stmt\Property) {
             return null;
         }
         return $node;

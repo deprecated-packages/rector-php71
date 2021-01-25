@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Rector\Naming\Naming;
 
 use Nette\Utils\Strings;
+use PhpParser\Node\Expr;
+use PhpParser\Node\Stmt\ClassLike;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\Return_;
@@ -18,9 +20,9 @@ use Rector\Naming\ValueObject\ExpectedName;
 use Rector\NetteKdyby\Naming\VariableNaming;
 use Rector\NodeNameResolver\NodeNameResolver;
 use Rector\NodeTypeResolver\Node\AttributeKey;
+use Rector\NodeTypeResolver\NodeTypeResolver;
 use Rector\PHPStanStaticTypeMapper\Utils\TypeUnwrapper;
 use Rector\StaticTypeMapper\ValueObject\Type\SelfObjectType;
-use Rector\StaticTypeMapper\ValueObject\Type\ShortenedObjectType;
 
 /**
  * @deprecated
@@ -78,12 +80,18 @@ final class PropertyNaming
      */
     private $nodeNameResolver;
 
-    public function __construct(TypeUnwrapper $typeUnwrapper, RectorNamingInflector $rectorNamingInflector, BetterNodeFinder $betterNodeFinder, NodeNameResolver $nodeNameResolver)
+    /**
+     * @var NodeTypeResolver
+     */
+    private $nodeTypeResolver;
+
+    public function __construct(TypeUnwrapper $typeUnwrapper, RectorNamingInflector $rectorNamingInflector, BetterNodeFinder $betterNodeFinder, NodeNameResolver $nodeNameResolver, NodeTypeResolver $nodeTypeResolver)
     {
         $this->typeUnwrapper = $typeUnwrapper;
         $this->rectorNamingInflector = $rectorNamingInflector;
         $this->betterNodeFinder = $betterNodeFinder;
         $this->nodeNameResolver = $nodeNameResolver;
+        $this->nodeTypeResolver = $nodeTypeResolver;
     }
 
     public function getExpectedNameFromMethodName(string $methodName): ?ExpectedName
@@ -108,7 +116,7 @@ final class PropertyNaming
         if ($type instanceof StaticType) {
             return null;
         }
-        $className = $this->getClassName($type);
+        $className = $this->nodeTypeResolver->getFullyQualifiedClassName($type);
         foreach (self::EXCLUDED_CLASSES as $excludedClass) {
             if (Strings::match($className, $excludedClass)) {
                 return null;
@@ -145,7 +153,8 @@ final class PropertyNaming
      */
     public function underscoreToName(string $underscoreName): string
     {
-        $pascalCaseName = str_replace('_', '', ucwords($underscoreName, '_'));
+        $uppercaseWords = ucwords($underscoreName, '_');
+        $pascalCaseName = str_replace('_', '', $uppercaseWords);
         return lcfirst($pascalCaseName);
     }
 
@@ -161,14 +170,6 @@ final class PropertyNaming
         }
         $classMethod = reset($classMethods);
         return $this->nodeNameResolver->getName($classMethod);
-    }
-
-    private function getClassName(TypeWithClassName $typeWithClassName): string
-    {
-        if ($typeWithClassName instanceof ShortenedObjectType) {
-            return $typeWithClassName->getFullyQualifiedName();
-        }
-        return $typeWithClassName->getClassName();
     }
 
     private function resolveShortClassName(string $className): string
@@ -266,7 +267,7 @@ final class PropertyNaming
     private function getPrefixedClassMethods(Property $property): array
     {
         $classLike = $property->getAttribute(AttributeKey::CLASS_NODE);
-        if ($classLike === null) {
+        if (! $classLike instanceof ClassLike) {
             return [];
         }
         $classMethods = $this->betterNodeFinder->findInstanceOf($classLike, ClassMethod::class);
@@ -296,7 +297,7 @@ final class PropertyNaming
                 return false;
             }
             $node = $return->expr;
-            if ($node === null) {
+            if (! $node instanceof Expr) {
                 return false;
             }
             return $this->nodeNameResolver->isName($node, $currentName);

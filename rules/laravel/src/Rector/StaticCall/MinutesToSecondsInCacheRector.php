@@ -12,6 +12,7 @@ use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Scalar\LNumber;
+use PhpParser\Node\Stmt\ClassConst;
 use Rector\Core\Rector\AbstractRector;
 use Rector\Laravel\ValueObject\TypeToTimeMethodAndPosition;
 use Rector\NodeCollector\NodeCollector\ParsedNodeCollector;
@@ -150,7 +151,7 @@ CODE_SAMPLE
     private function refactorClassConstFetch(ClassConstFetch $classConstFetch): void
     {
         $classConst = $this->nodeRepository->findClassConstByClassConstFetch($classConstFetch);
-        if ($classConst === null) {
+        if (! $classConst instanceof ClassConst) {
             return;
         }
         $onlyConst = $classConst->consts[0];

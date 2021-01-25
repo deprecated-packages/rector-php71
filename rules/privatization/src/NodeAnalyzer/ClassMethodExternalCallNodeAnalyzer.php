@@ -96,8 +96,8 @@ final class ClassMethodExternalCallNodeAnalyzer
         $arrayCallables = array_filter($methodCalls, function (object $node): bool {
             return $node instanceof ArrayCallable;
         });
+        $className = $classMethod->getAttribute(AttributeKey::CLASS_NAME);
         foreach ($arrayCallables as $arrayCallable) {
-            $className = $classMethod->getAttribute(AttributeKey::CLASS_NAME);
             if ($className === $arrayCallable->getClass() && $methodName === $arrayCallable->getMethod()) {
                 return true;
             }
@@ -111,12 +111,11 @@ final class ClassMethodExternalCallNodeAnalyzer
         if (! $classLike instanceof Class_) {
             return false;
         }
-        if (! $this->nodeTypeResolver->isObjectType($classLike, 'Symfony\Component\EventDispatcher\EventSubscriberInterface')
-        ) {
+        if (! $this->nodeTypeResolver->isObjectType($classLike, 'Symfony\Component\EventDispatcher\EventSubscriberInterface')) {
             return false;
         }
         $getSubscribedEventsClassMethod = $classLike->getMethod('getSubscribedEvents');
-        if ($getSubscribedEventsClassMethod === null) {
+        if (! $getSubscribedEventsClassMethod instanceof ClassMethod) {
             return false;
         }
         $methodNames = $this->eventSubscriberMethodNamesResolver->resolveFromClassMethod($getSubscribedEventsClassMethod);

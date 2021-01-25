@@ -63,6 +63,11 @@ CODE_SAMPLE
         if (! $this->shouldRefactor($node)) {
             return null;
         }
+        $numberNode = clone $node;
+        $numberNodeValue = (string) $numberNode->value;
+        if (Strings::contains($numberNodeValue, '+')) {
+            return null;
+        }
         $node->value = (string) $node->value;
         /**
          * This code follows a guess, to avoid modifying floats needlessly.

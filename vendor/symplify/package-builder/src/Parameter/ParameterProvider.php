@@ -28,6 +28,7 @@ final class ParameterProvider
     }
 
     /**
+     * @api
      * @return mixed|null
      */
     public function provideParameter(string $name)
@@ -35,19 +36,17 @@ final class ParameterProvider
         return $this->parameters[$name] ?? null;
     }
 
+    /**
+     * @api
+     */
     public function provideStringParameter(string $name): string
     {
         $this->ensureParameterIsSet($name);
         return (string) $this->parameters[$name];
     }
 
-    public function provideIntParameter(string $name): int
-    {
-        $this->ensureParameterIsSet($name);
-        return (int) $this->parameters[$name];
-    }
-
     /**
+     * @api
      * @return mixed[]
      */
     public function provideArrayParameter(string $name): array
@@ -56,6 +55,9 @@ final class ParameterProvider
         return $this->parameters[$name];
     }
 
+    /**
+     * @api
+     */
     public function provideBoolParameter(string $parameterName): bool
     {
         return $this->parameters[$parameterName] ?? false;
@@ -67,6 +69,7 @@ final class ParameterProvider
     }
 
     /**
+     * @api
      * @return mixed[]
      */
     public function provide(): array
@@ -74,7 +77,19 @@ final class ParameterProvider
         return $this->parameters;
     }
 
-    private function ensureParameterIsSet(string $name): void
+    /**
+     * @api
+     */
+    public function provideIntParameter(string $name): int
+    {
+        $this->ensureParameterIsSet($name);
+        return (int) $this->parameters[$name];
+    }
+
+    /**
+     * @api
+     */
+    public function ensureParameterIsSet(string $name): void
     {
         if (array_key_exists($name, $this->parameters)) {
             return;

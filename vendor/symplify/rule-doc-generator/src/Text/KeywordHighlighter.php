@@ -52,6 +52,12 @@ final class KeywordHighlighter
     private const METHOD_NAME_REGEX = '#\w+\(\)#';
 
     /**
+     * @var string
+     * @see https://regex101.com/r/18wjck/2
+     */
+    private const COMMA_SPLIT_REGEX = '#(?<call>\w+\(.*\))(\s{0,})(?<comma>,)(?<quote>\`)#';
+
+    /**
      * @var ClassLikeExistenceChecker
      */
     private $classLikeExistenceChecker;
@@ -69,7 +75,9 @@ final class KeywordHighlighter
                 continue;
             }
 
-            $words[$key] = '`' . $word . '`';
+            $words[$key] = Strings::replace('`' . $word . '`', self::COMMA_SPLIT_REGEX, function (array $match): string {
+                return $match['call'] . $match['quote'] . $match['comma'];
+            });
         }
         return implode(' ', $words);
     }
@@ -80,7 +88,10 @@ final class KeywordHighlighter
             return true;
         }
         // already in code quotes
-        if (Strings::startsWith($word, '`') || Strings::endsWith($word, '`')) {
+        if (Strings::startsWith($word, '`')) {
+            return false;
+        }
+        if (Strings::endsWith($word, '`')) {
             return false;
         }
         // part of normal text
@@ -104,7 +115,10 @@ final class KeywordHighlighter
         if (Strings::match($word, self::METHOD_NAME_REGEX)) {
             return true;
         }
-        if (function_exists($word) || function_exists(trim($word, '()'))) {
+        if (function_exists($word)) {
+            return true;
+        }
+        if (function_exists(trim($word, '()'))) {
             return true;
         }
         if ($this->classLikeExistenceChecker->doesClassLikeExist($word)) {

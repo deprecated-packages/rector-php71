@@ -9,15 +9,15 @@ use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\PropertyFetch;
 use PhpParser\Node\Expr\Variable;
-use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Expression;
-use PhpParser\Node\Stmt\Property;
-use PhpParser\NodeTraverser;
 use Rector\Core\Rector\AbstractRector;
 use Rector\Core\ValueObject\MethodName;
+use Rector\Core\ValueObject\PhpVersionFeature;
+use Rector\Doctrine\NodeAnalyzer\MethodCallNameOnTypeResolver;
+use Rector\Doctrine\NodeManipulator\DependencyRemover;
 use Rector\StaticTypeMapper\ValueObject\Type\FullyQualifiedObjectType;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
@@ -36,6 +36,22 @@ final class ManagerRegistryGetManagerToEntityManagerRector extends AbstractRecto
      * @var string
      */
     private const ENTITY_MANAGER = 'entityManager';
+
+    /**
+     * @var MethodCallNameOnTypeResolver
+     */
+    private $methodCallNameOnTypeResolver;
+
+    /**
+     * @var DependencyRemover
+     */
+    private $dependencyRemover;
+
+    public function __construct(MethodCallNameOnTypeResolver $methodCallNameOnTypeResolver, DependencyRemover $dependencyRemover)
+    {
+        $this->methodCallNameOnTypeResolver = $methodCallNameOnTypeResolver;
+        $this->dependencyRemover = $dependencyRemover;
+    }
 
     public function getRuleDefinition(): RuleDefinition
     {
@@ -102,17 +118,17 @@ CODE_SAMPLE
     public function refactor(Node $node): ?Node
     {
         $constructorClassMethod = $node->getMethod(MethodName::CONSTRUCT);
-        if ($constructorClassMethod === null) {
+        if (! $constructorClassMethod instanceof ClassMethod) {
             return null;
         }
         // collect on registry method calls, so we know if the manager registry is needed
-        $registryCalledMethods = $this->resolveManagerRegistryCalledMethodNames($node);
+        $registryCalledMethods = $this->methodCallNameOnTypeResolver->resolve($node, 'Doctrine\Common\Persistence\ManagerRegistry');
         if (! in_array(self::GET_MANAGER, $registryCalledMethods, true)) {
             return null;
         }
         $managerRegistryParam = $this->resolveManagerRegistryParam($constructorClassMethod);
         // no registry manager in the constructor
-        if ($managerRegistryParam === null) {
+        if (! $managerRegistryParam instanceof Param) {
             return null;
         }
         if ($registryCalledMethods === [self::GET_MANAGER]) {
@@ -126,28 +142,6 @@ CODE_SAMPLE
         return $node;
     }
 
-    /**
-     * @return string[]
-     */
-    private function resolveManagerRegistryCalledMethodNames(Class_ $class): array
-    {
-        $registryCalledMethods = [];
-        $this->traverseNodesWithCallable($class->stmts, function (Node $node) use (&$registryCalledMethods) {
-            if (! $node instanceof MethodCall) {
-                return null;
-            }
-            if (! $this->isObjectType($node->var, 'Doctrine\Common\Persistence\ManagerRegistry')) {
-                return null;
-            }
-            $name = $this->getName($node->name);
-            if ($name === null) {
-                return null;
-            }
-            $registryCalledMethods[] = $name;
-        });
-        return array_unique($registryCalledMethods);
-    }
-
     private function resolveManagerRegistryParam(ClassMethod $classMethod): ?Param
     {
         foreach ($classMethod->params as $param) {
@@ -158,8 +152,6 @@ CODE_SAMPLE
             if (! $this->isName($param->type, 'Doctrine\Common\Persistence\ManagerRegistry')) {
                 continue;
             }
-
-            $classMethod->params[] = $this->createEntityManagerParam();
 
             return $param;
         }
@@ -180,7 +172,7 @@ CODE_SAMPLE
 
             unset($classMethod->params[$key]);
         }
-        $this->removeRegistryDependencyAssign($class, $classMethod, $registryParam);
+        $this->dependencyRemover->removeByType($class, $classMethod, $registryParam, 'Doctrine\Common\Persistence\ManagerRegistry');
     }
 
     /**
@@ -218,40 +210,11 @@ CODE_SAMPLE
 
     private function addConstructorDependencyWithProperty(Class_ $class, ClassMethod $classMethod, string $name, FullyQualifiedObjectType $fullyQualifiedObjectType): void
     {
-        $assign = $this->nodeFactory->createPropertyAssignment($name);
-        $classMethod->stmts[] = new Expression($assign);
-        $this->addConstructorDependencyToClass($class, $fullyQualifiedObjectType, $name);
-    }
-
-    private function createEntityManagerParam(): Param
-    {
-        return new Param(new Variable(self::ENTITY_MANAGER), null, new FullyQualified('Doctrine\ORM\EntityManagerInterface'));
-    }
-
-    private function removeRegistryDependencyAssign(Class_ $class, ClassMethod $classMethod, Param $registryParam): void
-    {
-        foreach ((array) $classMethod->stmts as $constructorMethodStmt) {
-            if (! $constructorMethodStmt instanceof Expression) {
-                continue;
-            }
-
-            if (! $constructorMethodStmt->expr instanceof Assign) {
-                continue;
-            }
-
-            /** @var Assign $assign */
-            $assign = $constructorMethodStmt->expr;
-            if (! $this->areNamesEqual($assign->expr, $registryParam->var)) {
-                continue;
-            }
-
-            $this->removeManagerRegistryProperty($class, $assign);
-
-            // remove assign
-            $this->removeNodeFromStatements($classMethod, $constructorMethodStmt);
-
-            break;
+        if (! $this->phpVersionProvider->isAtLeastPhpVersion(PhpVersionFeature::PROPERTY_PROMOTION)) {
+            $assign = $this->nodeFactory->createPropertyAssignment($name);
+            $classMethod->stmts[] = new Expression($assign);
         }
+        $this->addConstructorDependencyToClass($class, $fullyQualifiedObjectType, $name);
     }
 
     private function isRegistryGetManagerMethodCall(Assign $assign): bool
@@ -263,20 +226,5 @@ CODE_SAMPLE
             return false;
         }
         return $this->isName($assign->expr->name, self::GET_MANAGER);
-    }
-
-    private function removeManagerRegistryProperty(Class_ $class, Assign $assign): void
-    {
-        $managerRegistryPropertyName = $this->getName($assign->var);
-        $this->traverseNodesWithCallable($class->stmts, function (Node $node) use ($managerRegistryPropertyName): ?int {
-            if (! $node instanceof Property) {
-                return null;
-            }
-            if (! $this->isName($node, $managerRegistryPropertyName)) {
-                return null;
-            }
-            $this->removeNode($node);
-            return NodeTraverser::STOP_TRAVERSAL;
-        });
     }
 }

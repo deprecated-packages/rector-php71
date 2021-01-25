@@ -113,9 +113,8 @@ CODE_SAMPLE
         if (! $parent instanceof Param && ! $parent instanceof ClassConstFetch) {
             return $this->getName($name);
         }
-        /** @var Name|null $originalName */
         $originalName = $name->getAttribute(AttributeKey::ORIGINAL_NAME);
-        if ($originalName === null) {
+        if (! $originalName instanceof Name) {
             return $this->getName($name);
         }
         // replace parts from the old one

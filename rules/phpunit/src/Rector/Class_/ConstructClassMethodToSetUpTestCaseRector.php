@@ -93,7 +93,7 @@ CODE_SAMPLE
             return null;
         }
         $constructClassMethod = $node->getMethod(MethodName::CONSTRUCT);
-        if ($constructClassMethod === null) {
+        if (! $constructClassMethod instanceof ClassMethod) {
             return null;
         }
         $this->removeNode($constructClassMethod);

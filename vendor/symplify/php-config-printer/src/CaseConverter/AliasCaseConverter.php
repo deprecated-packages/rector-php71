@@ -11,6 +11,7 @@ use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Expression;
+use Symplify\PackageBuilder\Reflection\ClassLikeExistenceChecker;
 use Symplify\PhpConfigPrinter\Contract\CaseConverterInterface;
 use Symplify\PhpConfigPrinter\NodeFactory\ArgsNodeFactory;
 use Symplify\PhpConfigPrinter\NodeFactory\CommonNodeFactory;
@@ -55,11 +56,17 @@ final class AliasCaseConverter implements CaseConverterInterface
      */
     private $serviceOptionNodeFactory;
 
-    public function __construct(CommonNodeFactory $commonNodeFactory, ArgsNodeFactory $argsNodeFactory, ServiceOptionNodeFactory $serviceOptionNodeFactory)
+    /**
+     * @var ClassLikeExistenceChecker
+     */
+    private $classLikeExistenceChecker;
+
+    public function __construct(CommonNodeFactory $commonNodeFactory, ArgsNodeFactory $argsNodeFactory, ServiceOptionNodeFactory $serviceOptionNodeFactory, ClassLikeExistenceChecker $classLikeExistenceChecker)
     {
         $this->commonNodeFactory = $commonNodeFactory;
         $this->argsNodeFactory = $argsNodeFactory;
         $this->serviceOptionNodeFactory = $serviceOptionNodeFactory;
+        $this->classLikeExistenceChecker = $classLikeExistenceChecker;
     }
 
     public function convertToMethodCall($key, $values): Expression
@@ -68,16 +75,8 @@ final class AliasCaseConverter implements CaseConverterInterface
             throw new ShouldNotHappenException();
         }
         $servicesVariable = new Variable(VariableName::SERVICES);
-        if (class_exists($key) || interface_exists($key)) {
-            $classReference = $this->commonNodeFactory->createClassReference($key);
-
-            $argValues = [];
-            $argValues[] = $classReference;
-            $argValues[] = $values[MethodName::ALIAS] ?? $values;
-
-            $args = $this->argsNodeFactory->createFromValues($argValues, true);
-            $methodCall = new MethodCall($servicesVariable, MethodName::ALIAS, $args);
-            return new Expression($methodCall);
+        if ($this->classLikeExistenceChecker->doesClassLikeExist($key)) {
+            return $this->createFromClassLike($key, $values, $servicesVariable);
         }
         // handles: "SomeClass $someVariable: ..."
         $fullClassName = Strings::before($key, ' $');
@@ -85,32 +84,15 @@ final class AliasCaseConverter implements CaseConverterInterface
             $methodCall = $this->createAliasNode($key, $fullClassName, $values);
             return new Expression($methodCall);
         }
-        $methodCall = null;
-        if (isset($values[MethodName::ALIAS])) {
-            $className = $values[MethodName::ALIAS];
-
-            $classReference = $this->commonNodeFactory->createClassReference($className);
-            $args = $this->argsNodeFactory->createFromValues([$key, $classReference]);
-            $methodCall = new MethodCall($servicesVariable, MethodName::ALIAS, $args);
-
-            unset($values[MethodName::ALIAS]);
-        }
-        /** @var string|mixed[] $values */
         if (is_string($values) && $values[0] === '@') {
             $args = $this->argsNodeFactory->createFromValues([$values], true);
             $methodCall = new MethodCall($servicesVariable, MethodName::ALIAS, $args);
-        } elseif (is_array($values)) {
-            if ($methodCall === null) {
-                throw new ShouldNotHappenException();
-            }
-
-            /** @var MethodCall $methodCall */
-            $methodCall = $this->serviceOptionNodeFactory->convertServiceOptionsToNodes($values, $methodCall);
+            return new Expression($methodCall);
         }
-        if ($methodCall === null) {
-            throw new ShouldNotHappenException();
+        if (is_array($values)) {
+            return $this->createFromArrayValues($values, $key, $servicesVariable);
         }
-        return new Expression($methodCall);
+        throw new ShouldNotHappenException();
     }
 
     public function match(string $rootKey, $key, $values): bool
@@ -124,7 +106,10 @@ final class AliasCaseConverter implements CaseConverterInterface
         if (Strings::match($key, self::NAMED_ALIAS_REGEX)) {
             return true;
         }
-        return is_string($values) && $values[0] === '@';
+        if (! is_string($values)) {
+            return false;
+        }
+        return $values[0] === '@';
     }
 
     private function createAliasNode(string $key, string $fullClassName, $serviceValues): MethodCall
@@ -138,5 +123,42 @@ final class AliasCaseConverter implements CaseConverterInterface
         $serviceName = ltrim($serviceValues, '@');
         $args[] = new Arg(new String_($serviceName));
         return new MethodCall(new Variable(VariableName::SERVICES), MethodName::ALIAS, $args);
+    }
+
+    /**
+     * @param mixed $values
+     */
+    private function createFromClassLike(string $key, $values, Variable $servicesVariable): Expression
+    {
+        $classReference = $this->commonNodeFactory->createClassReference($key);
+        $argValues = [];
+        $argValues[] = $classReference;
+        $argValues[] = $values[MethodName::ALIAS] ?? $values;
+        $args = $this->argsNodeFactory->createFromValues($argValues, true);
+        $methodCall = new MethodCall($servicesVariable, MethodName::ALIAS, $args);
+        return new Expression($methodCall);
+    }
+
+    private function createFromAlias(string $className, string $key, Variable $servicesVariable): MethodCall
+    {
+        $classReference = $this->commonNodeFactory->createClassReference($className);
+        $args = $this->argsNodeFactory->createFromValues([$key, $classReference]);
+        return new MethodCall($servicesVariable, MethodName::ALIAS, $args);
+    }
+
+    /**
+     * @param mixed[] $values
+     */
+    private function createFromArrayValues(array $values, string $key, Variable $servicesVariable): Expression
+    {
+        if (isset($values[MethodName::ALIAS])) {
+            $methodCall = $this->createFromAlias($values[MethodName::ALIAS], $key, $servicesVariable);
+            unset($values[MethodName::ALIAS]);
+        } else {
+            throw new ShouldNotHappenException();
+        }
+        /** @var MethodCall $methodCall */
+        $methodCall = $this->serviceOptionNodeFactory->convertServiceOptionsToNodes($values, $methodCall);
+        return new Expression($methodCall);
     }
 }

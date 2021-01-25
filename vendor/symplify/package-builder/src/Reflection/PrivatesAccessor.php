@@ -17,16 +17,7 @@ final class PrivatesAccessor
      */
     public function getPrivateProperty($object, string $propertyName)
     {
-        if (property_exists($object, $propertyName)) {
-            $propertyReflection = new ReflectionProperty($object, $propertyName);
-        } else {
-            $parentClass = get_parent_class($object);
-            if ($parentClass === false) {
-                throw new ShouldNotHappenException();
-            }
-
-            $propertyReflection = new ReflectionProperty($parentClass, $propertyName);
-        }
+        $propertyReflection = $this->resolvePropertyReflection($object, $propertyName);
         $propertyReflection->setAccessible(true);
         return $propertyReflection->getValue($object);
     }
@@ -36,8 +27,23 @@ final class PrivatesAccessor
      */
     public function setPrivateProperty($object, string $propertyName, $value): void
     {
-        $propertyReflection = new ReflectionProperty(get_class($object), $propertyName);
+        $propertyReflection = $this->resolvePropertyReflection($object, $propertyName);
         $propertyReflection->setAccessible(true);
         $propertyReflection->setValue($object, $value);
+    }
+
+    /**
+     * @param object $object
+     */
+    private function resolvePropertyReflection($object, string $propertyName): ReflectionProperty
+    {
+        if (property_exists($object, $propertyName)) {
+            return new ReflectionProperty($object, $propertyName);
+        }
+        $parentClass = get_parent_class($object);
+        if ($parentClass === false) {
+            throw new ShouldNotHappenException();
+        }
+        return new ReflectionProperty($parentClass, $propertyName);
     }
 }

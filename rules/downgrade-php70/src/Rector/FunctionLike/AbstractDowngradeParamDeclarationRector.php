@@ -13,14 +13,26 @@ use PHPStan\Type\IntersectionType;
 use PHPStan\Type\IterableType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\UnionType;
-use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo;
+use Rector\BetterPhpDocParser\PhpDocManipulator\PhpDocTypeChanger;
 use Rector\Core\Rector\AbstractRector;
 use Rector\DowngradePhp70\Contract\Rector\DowngradeParamDeclarationRectorInterface;
-use Rector\NodeTypeResolver\Node\AttributeKey;
 use Traversable;
 
 abstract class AbstractDowngradeParamDeclarationRector extends AbstractRector implements DowngradeParamDeclarationRectorInterface
 {
+    /**
+     * @var PhpDocTypeChanger
+     */
+    private $phpDocTypeChanger;
+
+    /**
+     * @required
+     */
+    public function autowireAbstractDowngradeParamDeclarationRector(PhpDocTypeChanger $phpDocTypeChanger): void
+    {
+        $this->phpDocTypeChanger = $phpDocTypeChanger;
+    }
+
     /**
      * @return string[]
      */
@@ -34,9 +46,6 @@ abstract class AbstractDowngradeParamDeclarationRector extends AbstractRector im
      */
     public function refactor(Node $node): ?Node
     {
-        if ($node->params === null) {
-            return null;
-        }
         if ($node->params === []) {
             return null;
         }
@@ -63,21 +72,15 @@ abstract class AbstractDowngradeParamDeclarationRector extends AbstractRector im
      */
     private function decorateWithDocBlock(FunctionLike $functionLike, Param $param): void
     {
-        $node = $functionLike;
-        /** @var PhpDocInfo|null $phpDocInfo */
-        $phpDocInfo = $node->getAttribute(AttributeKey::PHP_DOC_INFO);
-        if ($phpDocInfo === null) {
-            $phpDocInfo = $this->phpDocInfoFactory->createEmpty($node);
+        if ($param->type === null) {
+            return;
         }
-        if ($param->type !== null) {
-            $type = $this->staticTypeMapper->mapPhpParserNodePHPStanType($param->type);
-
-            if ($type instanceof IterableType) {
-                $type = new UnionType([$type, new IntersectionType([new ObjectType(Traversable::class)])]);
-            }
-
-            $paramName = $this->getName($param->var) ?? '';
-            $phpDocInfo->changeParamType($type, $param, $paramName);
+        $type = $this->staticTypeMapper->mapPhpParserNodePHPStanType($param->type);
+        if ($type instanceof IterableType) {
+            $type = new UnionType([$type, new IntersectionType([new ObjectType(Traversable::class)])]);
         }
+        $paramName = $this->getName($param->var) ?? '';
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($functionLike);
+        $this->phpDocTypeChanger->changeParamType($phpDocInfo, $type, $param, $paramName);
     }
 }

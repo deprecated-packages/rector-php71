@@ -66,6 +66,9 @@ class Cookie
         return new static($name, $value, $data['expires'], $data['path'], $data['domain'], $data['secure'], $data['httponly'], $data['raw'], $data['samesite']);
     }
 
+    /**
+     * @return $this
+     */
     public static function create(string $name, string $value = null, $expire = 0, ?string $path = '/', string $domain = null, bool $secure = null, bool $httpOnly = true, bool $raw = false, ?string $sameSite = self::SAMESITE_LAX)
     {
         return new self($name, $value, $expire, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
@@ -107,7 +110,7 @@ class Cookie
     /**
      * Creates a cookie copy with a new value.
      *
-     * @return mixed
+     * @return static
      */
     public function withValue(?string $value)
     {
@@ -119,7 +122,7 @@ class Cookie
     /**
      * Creates a cookie copy with a new domain that the cookie is available to.
      *
-     * @return mixed
+     * @return static
      */
     public function withDomain(?string $domain)
     {
@@ -133,7 +136,7 @@ class Cookie
      *
      * @param int|string|\DateTimeInterface $expire
      *
-     * @return mixed
+     * @return static
      */
     public function withExpires($expire = 0)
     {
@@ -167,7 +170,7 @@ class Cookie
     /**
      * Creates a cookie copy with a new path on the server in which the cookie will be available on.
      *
-     * @return mixed
+     * @return static
      */
     public function withPath(string $path)
     {
@@ -179,7 +182,7 @@ class Cookie
     /**
      * Creates a cookie copy that only be transmitted over a secure HTTPS connection from the client.
      *
-     * @return mixed
+     * @return static
      */
     public function withSecure(bool $secure = true)
     {
@@ -191,7 +194,7 @@ class Cookie
     /**
      * Creates a cookie copy that be accessible only through the HTTP protocol.
      *
-     * @return mixed
+     * @return static
      */
     public function withHttpOnly(bool $httpOnly = true)
     {
@@ -203,7 +206,7 @@ class Cookie
     /**
      * Creates a cookie copy that uses no url encoding.
      *
-     * @return mixed
+     * @return static
      */
     public function withRaw(bool $raw = true)
     {
@@ -218,7 +221,7 @@ class Cookie
     /**
      * Creates a cookie copy with SameSite attribute.
      *
-     * @return mixed
+     * @return static
      */
     public function withSameSite(?string $sameSite)
     {

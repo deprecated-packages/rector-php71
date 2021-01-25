@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Rector\NetteKdyby\Naming;
 
+use Nette\Utils\Strings;
 use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr;
@@ -90,7 +91,11 @@ final class VariableNaming
         if ($name === null) {
             $name = $fallbackName;
         }
-        return lcfirst($this->createCountedValueName($name, $scope));
+        if (Strings::contains($name, '\\')) {
+            $name = (string) Strings::after($name, '\\', - 1);
+        }
+        $countedValueName = $this->createCountedValueName($name, $scope);
+        return lcfirst($countedValueName);
     }
 
     public function createCountedValueName(string $valueName, ?Scope $scope): string
@@ -136,7 +141,7 @@ final class VariableNaming
         if ($node instanceof FuncCall) {
             return $this->resolveFromNode($node->name);
         }
-        if ($node === null) {
+        if (! $node instanceof Node) {
             throw new NotImplementedException();
         }
         $paramName = $this->nodeNameResolver->getName($node);
@@ -212,7 +217,7 @@ final class VariableNaming
 
     private function isCall(?Node $node): bool
     {
-        if ($node === null) {
+        if (! $node instanceof Node) {
             return false;
         }
         return StaticInstanceOf::isOneOf($node, [MethodCall::class, NullsafeMethodCall::class, StaticCall::class]);
@@ -220,7 +225,7 @@ final class VariableNaming
 
     private function resolveFromMethodCall(?Node $node): ?string
     {
-        if ($node === null) {
+        if (! $node instanceof Node) {
             return null;
         }
         if (! property_exists($node, 'name')) {

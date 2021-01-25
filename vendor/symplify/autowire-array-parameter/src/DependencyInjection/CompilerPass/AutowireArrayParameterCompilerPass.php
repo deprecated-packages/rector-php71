@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Symplify\AutowireArrayParameter\DependencyInjection\CompilerPass;
 
-use Nette\Utils\Reflection;
 use Nette\Utils\Strings;
 use ReflectionClass;
 use ReflectionMethod;
-use ReflectionParameter;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symplify\AutowireArrayParameter\DocBlock\ParamTypeDocBlockResolver;
+use Symplify\AutowireArrayParameter\Skipper\ParameterSkipper;
+use Symplify\AutowireArrayParameter\TypeResolver\ParameterTypeResolver;
 use Symplify\PackageBuilder\DependencyInjection\DefinitionFinder;
 
 /**
  * @inspiration https://github.com/nette/di/pull/178
- * Not final just for BC with previous class location
  * @see \Symplify\AutowireArrayParameter\Tests\DependencyInjection\CompilerPass\AutowireArrayParameterCompilerPassTest
  */
 final class AutowireArrayParameterCompilerPass implements CompilerPassInterface
@@ -50,12 +50,24 @@ final class AutowireArrayParameterCompilerPass implements CompilerPassInterface
     private $definitionFinder;
 
     /**
+     * @var ParameterTypeResolver
+     */
+    private $parameterTypeResolver;
+
+    /**
+     * @var ParameterSkipper
+     */
+    private $parameterSkipper;
+
+    /**
      * @param string[] $excludedFatalClasses
      */
     public function __construct(array $excludedFatalClasses = [])
     {
         $this->definitionFinder = new DefinitionFinder();
-        $this->excludedFatalClasses = array_merge($this->excludedFatalClasses, $excludedFatalClasses);
+        $paramTypeDocBlockResolver = new ParamTypeDocBlockResolver();
+        $this->parameterTypeResolver = new ParameterTypeResolver($paramTypeDocBlockResolver);
+        $this->parameterSkipper = new ParameterSkipper($this->parameterTypeResolver, $excludedFatalClasses);
     }
 
     public function process(ContainerBuilder $containerBuilder): void
@@ -98,7 +110,7 @@ final class AutowireArrayParameterCompilerPass implements CompilerPassInterface
             return true;
         }
         $reflectionClass = $containerBuilder->getReflectionClass($definition->getClass());
-        if ($reflectionClass === null) {
+        if (! $reflectionClass instanceof ReflectionClass) {
             return true;
         }
         if (! $reflectionClass->hasMethod('__construct')) {
@@ -113,11 +125,12 @@ final class AutowireArrayParameterCompilerPass implements CompilerPassInterface
     {
         $reflectionParameters = $reflectionMethod->getParameters();
         foreach ($reflectionParameters as $reflectionParameter) {
-            if ($this->shouldSkipParameter($reflectionMethod, $definition, $reflectionParameter)) {
+            if ($this->parameterSkipper->shouldSkipParameter($reflectionMethod, $definition, $reflectionParameter)) {
                 continue;
             }
 
-            $parameterType = $this->resolveParameterType($reflectionParameter->getName(), $reflectionMethod);
+            $parameterType = $this->parameterTypeResolver->resolveParameterType($reflectionParameter->getName(), $reflectionMethod);
+
             if ($parameterType === null) {
                 continue;
             }
@@ -128,48 +141,6 @@ final class AutowireArrayParameterCompilerPass implements CompilerPassInterface
             $argumentName = '$' . $reflectionParameter->getName();
             $definition->setArgument($argumentName, $this->createReferencesFromDefinitions($definitionsOfType));
         }
-    }
-
-    private function shouldSkipParameter(ReflectionMethod $reflectionMethod, Definition $definition, ReflectionParameter $reflectionParameter): bool
-    {
-        if (! $this->isArrayType($reflectionParameter)) {
-            return true;
-        }
-        // already set
-        $argumentName = '$' . $reflectionParameter->getName();
-        if (isset($definition->getArguments()[$argumentName])) {
-            return true;
-        }
-        $parameterType = $this->resolveParameterType($reflectionParameter->getName(), $reflectionMethod);
-        if ($parameterType === null) {
-            return true;
-        }
-        if (in_array($parameterType, $this->excludedFatalClasses, true)) {
-            return true;
-        }
-        if (! class_exists($parameterType) && ! interface_exists($parameterType)) {
-            return true;
-        }
-        // prevent circular dependency
-        if ($definition->getClass() === null) {
-            return false;
-        }
-        return is_a($definition->getClass(), $parameterType, true);
-    }
-
-    private function resolveParameterType(string $parameterName, ReflectionMethod $reflectionMethod): ?string
-    {
-        $parameterDocTypeRegex = '#@param[ \t]+(?<type>[\w\\\\]+)\[\][ \t]+\$' . $parameterName . '#';
-        // copied from https://github.com/nette/di/blob/d1c0598fdecef6d3b01e2ace5f2c30214b3108e6/src/DI/Autowiring.php#L215
-        $result = Strings::match((string) $reflectionMethod->getDocComment(), $parameterDocTypeRegex);
-        if ($result === null) {
-            return null;
-        }
-        // not a class|interface type
-        if (ctype_lower($result['type'][0])) {
-            return null;
-        }
-        return Reflection::expandClassName($result['type'], $reflectionMethod->getDeclaringClass());
     }
 
     /**
@@ -200,14 +171,5 @@ final class AutowireArrayParameterCompilerPass implements CompilerPassInterface
             $references[] = new Reference($definitionOfTypeName);
         }
         return $references;
-    }
-
-    private function isArrayType(ReflectionParameter $reflectionParameter): bool
-    {
-        if ($reflectionParameter->getType() === null) {
-            return false;
-        }
-        $reflectionParameterType = $reflectionParameter->getType();
-        return $reflectionParameterType->getName() === 'array';
     }
 }

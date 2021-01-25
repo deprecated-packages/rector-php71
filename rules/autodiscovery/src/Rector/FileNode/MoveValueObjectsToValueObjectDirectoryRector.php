@@ -11,6 +11,7 @@ use Rector\Autodiscovery\Analyzer\ClassAnalyzer;
 use Rector\Core\Contract\Rector\ConfigurableRectorInterface;
 use Rector\Core\PhpParser\Node\CustomNode\FileNode;
 use Rector\Core\Rector\AbstractRector;
+use Rector\FileSystemRector\ValueObject\MovedFileWithNodes;
 use Rector\NodeTypeResolver\Node\AttributeKey;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\ConfiguredCodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
@@ -131,9 +132,8 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        /** @var Class_|null $class */
         $class = $this->betterNodeFinder->findFirstInstanceOf([$node], Class_::class);
-        if ($class === null) {
+        if (! $class instanceof Class_) {
             return null;
         }
         if (! $this->isValueObjectMatch($class)) {
@@ -141,7 +141,7 @@ CODE_SAMPLE
         }
         $smartFileInfo = $node->getFileInfo();
         $movedFileWithNodes = $this->movedFileWithNodesFactory->createWithDesiredGroup($smartFileInfo, $node->stmts, 'ValueObject');
-        if ($movedFileWithNodes === null) {
+        if (! $movedFileWithNodes instanceof MovedFileWithNodes) {
             return null;
         }
         $this->addMovedFile($movedFileWithNodes);

@@ -77,7 +77,7 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
      *
      * @param string[]|string $excludes
      *
-     * @return mixed
+     * @return $this
      */
     public final function exclude($excludes)
     {

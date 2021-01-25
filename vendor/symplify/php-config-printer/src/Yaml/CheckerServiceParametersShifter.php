@@ -69,7 +69,10 @@ final class CheckerServiceParametersShifter
      */
     public function process(array $configuration): array
     {
-        if (! isset($configuration[self::SERVICES_KEY]) || ! is_array($configuration[self::SERVICES_KEY])) {
+        if (! isset($configuration[self::SERVICES_KEY])) {
+            return $configuration;
+        }
+        if (! is_array($configuration[self::SERVICES_KEY])) {
             return $configuration;
         }
         $configuration[self::SERVICES_KEY] = $this->processServices($configuration[self::SERVICES_KEY]);
@@ -190,6 +193,9 @@ final class CheckerServiceParametersShifter
         return $serviceDefinition;
     }
 
+    /**
+     * @return mixed|mixed[]|string
+     */
     private function escapeValue($value)
     {
         if (! is_array($value) && ! is_string($value)) {
@@ -209,7 +215,7 @@ final class CheckerServiceParametersShifter
     {
         $reflectionClass = new ReflectionClass(YamlFileLoader::class);
         /** @var array<string, mixed> $staticProperties */
-        $staticProperties = (array) $reflectionClass->getStaticProperties();
+        $staticProperties = $reflectionClass->getStaticProperties();
         /** @var string[] $serviceKeywordsProperty */
         $serviceKeywordsProperty = $staticProperties['serviceKeywords'];
 

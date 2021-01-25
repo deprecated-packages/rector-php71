@@ -30,7 +30,7 @@ class ParametersConfigurator extends AbstractConfigurator
     /**
      * Creates a parameter.
      *
-     * @return mixed
+     * @return $this
      */
     public final function set(string $name, $value)
     {
@@ -41,7 +41,7 @@ class ParametersConfigurator extends AbstractConfigurator
     /**
      * Creates a parameter.
      *
-     * @return mixed
+     * @return $this
      */
     public final function __invoke(string $name, $value)
     {

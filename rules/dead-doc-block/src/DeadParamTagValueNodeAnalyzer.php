@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Rector\DeadDocBlock;
 
+use PhpParser\Node\FunctionLike;
 use PhpParser\Node\Param;
-use PhpParser\Node\Stmt\ClassMethod;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
 use Rector\NodeNameResolver\NodeNameResolver;
 use Rector\NodeTypeResolver\PHPStan\TypeComparator;
@@ -28,24 +28,24 @@ final class DeadParamTagValueNodeAnalyzer
         $this->typeComparator = $typeComparator;
     }
 
-    public function isDead(ParamTagValueNode $paramTagValueNode, ClassMethod $classMethod): bool
+    public function isDead(ParamTagValueNode $paramTagValueNode, FunctionLike $functionLike): bool
     {
-        $param = $this->matchParamByName($paramTagValueNode->parameterName, $classMethod);
-        if ($param === null) {
+        $param = $this->matchParamByName($paramTagValueNode->parameterName, $functionLike);
+        if (! $param instanceof Param) {
             return false;
         }
         if ($param->type === null) {
             return false;
         }
-        if (! $this->typeComparator->arePhpParserAndPhpStanPhpDocTypesEqual($param->type, $paramTagValueNode->type, $classMethod)) {
+        if (! $this->typeComparator->arePhpParserAndPhpStanPhpDocTypesEqual($param->type, $paramTagValueNode->type, $functionLike)) {
             return false;
         }
         return $paramTagValueNode->description === '';
     }
 
-    private function matchParamByName(string $desiredParamName, ClassMethod $classMethod): ?Param
+    private function matchParamByName(string $desiredParamName, FunctionLike $functionLike): ?Param
     {
-        foreach ($classMethod->params as $param) {
+        foreach ($functionLike->getParams() as $param) {
             $paramName = $this->nodeNameResolver->getName($param);
             if ('$' . $paramName !== $desiredParamName) {
                 continue;

@@ -20,7 +20,7 @@ trait FactoryTrait
      *
      * @param string|array $factory A PHP callable reference
      *
-     * @return mixed
+     * @return $this
      */
     public final function factory($factory)
     {

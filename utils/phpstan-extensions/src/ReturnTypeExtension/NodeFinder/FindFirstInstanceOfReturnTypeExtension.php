@@ -39,6 +39,9 @@ final class FindFirstInstanceOfReturnTypeExtension implements DynamicMethodRetur
             return $returnType;
         }
         /** @var ClassConstFetch $secondArgumentNode */
+        if (! $secondArgumentNode->class instanceof Name) {
+            return $returnType;
+        }
         $class = $secondArgumentNode->class->toString();
         return new UnionType([new NullType(), new ObjectType($class)]);
     }

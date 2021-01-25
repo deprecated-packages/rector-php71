@@ -7,10 +7,8 @@ namespace Rector\Sensio\Rector\ClassMethod;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
-use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo;
 use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\Sensio\SensioRouteTagValueNode;
 use Rector\Core\Rector\AbstractRector;
-use Rector\NodeTypeResolver\Node\AttributeKey;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
@@ -67,17 +65,13 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        /** @var PhpDocInfo|null $phpDocInfo */
-        $phpDocInfo = $node->getAttribute(AttributeKey::PHP_DOC_INFO);
-        if ($phpDocInfo === null) {
-            return null;
-        }
-        /** @var SensioRouteTagValueNode|null $sensioRouteTagValueNode */
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($node);
         $sensioRouteTagValueNode = $phpDocInfo->getByType(SensioRouteTagValueNode::class);
-        if ($sensioRouteTagValueNode === null) {
+        if (! $sensioRouteTagValueNode instanceof SensioRouteTagValueNode) {
             return null;
         }
         $sensioRouteTagValueNode->removeService();
+        $phpDocInfo->markAsChanged();
         return $node;
     }
 }

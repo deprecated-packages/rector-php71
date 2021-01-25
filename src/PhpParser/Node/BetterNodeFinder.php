@@ -14,11 +14,14 @@ use PhpParser\Node\Stmt\ClassLike;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\NodeFinder;
 use Rector\Core\PhpParser\Printer\BetterStandardPrinter;
+use Rector\Core\Util\StaticInstanceOf;
 use Rector\NodeNameResolver\NodeNameResolver;
 use Rector\NodeTypeResolver\Node\AttributeKey;
+use Symplify\PackageBuilder\Php\TypeChecker;
 use Webmozart\Assert\Assert;
 
 /**
+ * @template T of Node
  * @see \Rector\Core\Tests\PhpParser\Node\BetterNodeFinder\BetterNodeFinderTest
  */
 final class BetterNodeFinder
@@ -38,37 +41,69 @@ final class BetterNodeFinder
      */
     private $betterStandardPrinter;
 
-    public function __construct(BetterStandardPrinter $betterStandardPrinter, NodeFinder $nodeFinder, NodeNameResolver $nodeNameResolver)
+    /**
+     * @var TypeChecker
+     */
+    private $typeChecker;
+
+    public function __construct(BetterStandardPrinter $betterStandardPrinter, NodeFinder $nodeFinder, NodeNameResolver $nodeNameResolver, TypeChecker $typeChecker)
     {
         $this->nodeFinder = $nodeFinder;
         $this->nodeNameResolver = $nodeNameResolver;
         $this->betterStandardPrinter = $betterStandardPrinter;
+        $this->typeChecker = $typeChecker;
     }
 
     /**
-     * @param string|string[] $type
+     * @param class-string<T> $type
+     * @return T|null
      */
-    public function findFirstParentInstanceOf(Node $node, $type): ?Node
+    public function findParentType(Node $node, string $type): ?Node
     {
-        $types = is_array($type) ? $type : [$type];
-        Assert::allIsAOf($types, Node::class);
-        /** @var Node|null $parentNode */
-        $parentNode = $node->getAttribute(AttributeKey::PARENT_NODE);
-        if ($parentNode === null) {
+        Assert::isAOf($type, Node::class);
+        $parent = $node->getAttribute(AttributeKey::PARENT_NODE);
+        if (! $parent instanceof Node) {
             return null;
         }
         do {
-            if ($this->isTypes($parentNode, $types)) {
-                return $parentNode;
+            if (is_a($parent, $type, true)) {
+                return $parent;
             }
 
-            if ($parentNode === null) {
+            if ($parent === null) {
                 return null;
             }
-        } while ($parentNode = $parentNode->getAttribute(AttributeKey::PARENT_NODE));
+        } while ($parent = $parent->getAttribute(AttributeKey::PARENT_NODE));
         return null;
     }
 
+    /**
+     * @param class-string<T>[] $types
+     * @return T|null
+     */
+    public function findParentTypes(Node $node, array $types): ?Node
+    {
+        Assert::allIsAOf($types, Node::class);
+        $parent = $node->getAttribute(AttributeKey::PARENT_NODE);
+        if (! $parent instanceof Node) {
+            return null;
+        }
+        do {
+            if (StaticInstanceOf::isOneOf($parent, $types)) {
+                return $parent;
+            }
+
+            if ($parent === null) {
+                return null;
+            }
+        } while ($parent = $parent->getAttribute(AttributeKey::PARENT_NODE));
+        return null;
+    }
+
+    /**
+     * @param class-string<T> $type
+     * @return T|null
+     */
     public function findFirstAncestorInstanceOf(Node $node, string $type): ?Node
     {
         $currentNode = $node->getAttribute(AttributeKey::PARENT_NODE);
@@ -83,7 +118,8 @@ final class BetterNodeFinder
     }
 
     /**
-     * @param string[] $types
+     * @param array<class-string<T>> $types
+     * @return T|null
      */
     public function findFirstAncestorInstancesOf(Node $node, array $types): ?Node
     {
@@ -101,8 +137,9 @@ final class BetterNodeFinder
     }
 
     /**
+     * @param class-string<T> $type
      * @param Node|Node[]|Stmt[] $nodes
-     * @return Node[]
+     * @return T[]
      */
     public function findInstanceOf($nodes, string $type): array
     {
@@ -111,7 +148,9 @@ final class BetterNodeFinder
     }
 
     /**
+     * @param class-string<T> $type
      * @param Node|Node[] $nodes
+     * @return T|null
      */
     public function findFirstInstanceOf($nodes, string $type): ?Node
     {
@@ -120,6 +159,7 @@ final class BetterNodeFinder
     }
 
     /**
+     * @param class-string<T> $type
      * @param Node|Node[] $nodes
      */
     public function hasInstanceOfName($nodes, string $type, string $name): bool
@@ -138,6 +178,7 @@ final class BetterNodeFinder
 
     /**
      * @param Node|Node[] $nodes
+     * @return Variable|null
      */
     public function findVariableOfName($nodes, string $name): ?Node
     {
@@ -146,7 +187,7 @@ final class BetterNodeFinder
 
     /**
      * @param Node|Node[] $nodes
-     * @param class-string[] $types
+     * @param class-string<T>[] $types
      */
     public function hasInstancesOf($nodes, array $types): bool
     {
@@ -154,7 +195,7 @@ final class BetterNodeFinder
         foreach ($types as $type) {
             $nodeFinderFindFirstInstanceOf = $this->nodeFinder->findFirstInstanceOf($nodes, $type);
 
-            if ($nodeFinderFindFirstInstanceOf === null) {
+            if (! $nodeFinderFindFirstInstanceOf instanceof Node) {
                 continue;
             }
 
@@ -164,7 +205,9 @@ final class BetterNodeFinder
     }
 
     /**
+     * @param class-string<T> $type
      * @param Node|Node[] $nodes
+     * @return T|null
      */
     public function findLastInstanceOf($nodes, string $type): ?Node
     {
@@ -173,7 +216,8 @@ final class BetterNodeFinder
         if ($foundInstances === []) {
             return null;
         }
-        return array_pop($foundInstances);
+        $lastItemKey = array_key_last($foundInstances);
+        return $foundInstances[$lastItemKey];
     }
 
     /**
@@ -204,6 +248,7 @@ final class BetterNodeFinder
 
     /**
      * @param Node[] $nodes
+     * @return ClassLike|null
      */
     public function findFirstNonAnonymousClass(array $nodes): ?Node
     {
@@ -224,6 +269,9 @@ final class BetterNodeFinder
         return $this->nodeFinder->findFirst($nodes, $filter);
     }
 
+    /**
+     * @return Assign|null
+     */
     public function findPreviousAssignToExpr(Expr $expr): ?Node
     {
         return $this->findFirstPrevious($expr, function (Node $node) use ($expr): bool {
@@ -258,47 +306,31 @@ final class BetterNodeFinder
     }
 
     /**
-     * @param class-string[] $types
+     * @param class-string<T>[] $types
+     * @return T|null
      */
     public function findFirstPreviousOfTypes(Node $mainNode, array $types): ?Node
     {
         return $this->findFirstPrevious($mainNode, function (Node $node) use ($types): bool {
-            foreach ($types as $type) {
-                if (! is_a($node, $type, true)) {
-                    continue;
-                }
-
-                return true;
-            }
-            return false;
+            return $this->typeChecker->isInstanceOf($node, $types);
         });
     }
 
     /**
-     * @param string[] $types
-     */
-    private function isTypes(Node $node, array $types): bool
-    {
-        Assert::allIsAOf($types, Node::class);
-        foreach ($types as $type) {
-            if (is_a($node, $type, true)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * @param Node|Node[] $nodes
+     * @param class-string<T> $type
+     * @return T|null
      */
     private function findInstanceOfName($nodes, string $type, string $name): ?Node
     {
         Assert::isAOf($type, Node::class);
         $foundInstances = $this->nodeFinder->findInstanceOf($nodes, $type);
         foreach ($foundInstances as $foundInstance) {
-            if ($this->nodeNameResolver->isName($foundInstance, $name)) {
-                return $foundInstance;
+            if (! $this->nodeNameResolver->isName($foundInstance, $name)) {
+                continue;
             }
+
+            return $foundInstance;
         }
         return null;
     }

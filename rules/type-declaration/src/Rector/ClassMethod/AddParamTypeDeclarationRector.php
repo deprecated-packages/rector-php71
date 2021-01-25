@@ -122,9 +122,8 @@ CODE_SAMPLE
         if ($classMethod->params === []) {
             return true;
         }
-        /** @var ClassLike|null $classLike */
         $classLike = $classMethod->getAttribute(AttributeKey::CLASS_NODE);
-        if ($classLike === null) {
+        if (! $classLike instanceof ClassLike) {
             return true;
         }
         // skip traits
@@ -151,7 +150,7 @@ CODE_SAMPLE
     private function refactorClassMethodWithTypehintByParameterPosition(ClassMethod $classMethod, AddParamTypeDeclaration $addParamTypeDeclaration): void
     {
         $parameter = $classMethod->params[$addParamTypeDeclaration->getPosition()] ?? null;
-        if ($parameter === null) {
+        if (! $parameter instanceof Param) {
             return;
         }
         $this->refactorParameter($parameter, $addParamTypeDeclaration);

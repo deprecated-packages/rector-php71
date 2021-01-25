@@ -49,7 +49,7 @@ interface ItemInterface extends CacheItemInterface
      *
      * @param string|string[] $tags A tag or array of tags
      *
-     * @return mixed
+     * @return $this
      *
      * @throws InvalidArgumentException When $tag is not valid
      * @throws CacheException           When the item comes from a pool that is not tag-aware

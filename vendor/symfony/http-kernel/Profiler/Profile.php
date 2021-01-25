@@ -65,9 +65,8 @@ class Profile
 
     /**
      * Sets the parent token.
-     * @param mixed $parent
      */
-    public function setParent($parent)
+    public function setParent(self $parent)
     {
         $this->parent = $parent;
     }
@@ -192,16 +191,15 @@ class Profile
 
     /**
      * Adds the child token.
-     * @param mixed $child
      */
-    public function addChild($child)
+    public function addChild(self $child)
     {
         $this->children[] = $child;
         $child->setParent($this);
     }
 
     /**
-     * @return mixed|null
+     * @return $this|null
      */
     public function getChildByToken(string $token)
     {

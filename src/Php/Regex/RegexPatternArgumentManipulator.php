@@ -13,6 +13,8 @@ use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Scalar\String_;
+use PhpParser\Node\Stmt\ClassConst;
+use PhpParser\Node\Stmt\ClassMethod;
 use Rector\Core\PhpParser\Node\BetterNodeFinder;
 use Rector\Core\PhpParser\Printer\BetterStandardPrinter;
 use Rector\NodeCollector\NodeCollector\ParsedNodeCollector;
@@ -170,7 +172,7 @@ final class RegexPatternArgumentManipulator
     private function findAssignerForVariable(Variable $variable): array
     {
         $classMethod = $variable->getAttribute(AttributeKey::METHOD_NODE);
-        if ($classMethod === null) {
+        if (! $classMethod instanceof ClassMethod) {
             return [];
         }
         return $this->betterNodeFinder->find([$classMethod], function (Node $node) use ($variable): ?Assign {
@@ -190,7 +192,7 @@ final class RegexPatternArgumentManipulator
     private function resolveClassConstFetchValue(ClassConstFetch $classConstFetch): array
     {
         $classConstNode = $this->parsedNodeCollector->findClassConstByClassConstFetch($classConstFetch);
-        if ($classConstNode === null) {
+        if (! $classConstNode instanceof ClassConst) {
             return [];
         }
         if ($classConstNode->consts[0]->value instanceof String_) {

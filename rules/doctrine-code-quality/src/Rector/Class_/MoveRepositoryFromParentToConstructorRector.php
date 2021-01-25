@@ -130,7 +130,7 @@ CODE_SAMPLE
         if ($entityClassName === null) {
             throw new RectorProviderException(sprintf('An entity was not provided for "%s" repository by your "%s" class.', $repositoryClassName, get_class($this->doctrineEntityAndRepositoryMapper)));
         }
-        $classConstFetch = $this->createClassConstantReference($entityClassName);
+        $classConstFetch = $this->createClassConstReference($entityClassName);
         $methodCall = $this->builderFactory->methodCall(new Variable('entityManager'), 'getRepository', [$classConstFetch]);
         $methodCall->setAttribute(AttributeKey::CLASS_NODE, $class);
         return $this->createPropertyAssignmentWithExpr('repository', $methodCall);
