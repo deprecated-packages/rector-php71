@@ -1,12 +1,12 @@
 <?php return array (
   'root' => 
   array (
-    'pretty_version' => 'dev-master',
-    'version' => 'dev-master',
+    'pretty_version' => 'dev-add98bdad7cea4161a9ed473f88fa8582fce6c13',
+    'version' => 'dev-add98bdad7cea4161a9ed473f88fa8582fce6c13',
     'aliases' => 
     array (
     ),
-    'reference' => '6ff43c3d7a352a12c8e71d71f4bcc63961e9cc72',
+    'reference' => 'add98bdad7cea4161a9ed473f88fa8582fce6c13',
     'name' => 'rector/rector',
   ),
   'versions' => 
@@ -235,18 +235,18 @@
     ),
     'rector/rector' => 
     array (
-      'pretty_version' => 'dev-master',
-      'version' => 'dev-master',
+      'pretty_version' => 'dev-add98bdad7cea4161a9ed473f88fa8582fce6c13',
+      'version' => 'dev-add98bdad7cea4161a9ed473f88fa8582fce6c13',
       'aliases' => 
       array (
       ),
-      'reference' => '6ff43c3d7a352a12c8e71d71f4bcc63961e9cc72',
+      'reference' => 'add98bdad7cea4161a9ed473f88fa8582fce6c13',
     ),
     'rector/rector-prefixed' => 
     array (
       'replaced' => 
       array (
-        0 => 'dev-master',
+        0 => 'dev-add98bdad7cea4161a9ed473f88fa8582fce6c13',
       ),
     ),
     'sebastian/diff' => 
