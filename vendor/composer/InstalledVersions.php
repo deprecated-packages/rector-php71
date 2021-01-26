@@ -24,12 +24,12 @@ class InstalledVersions
 private static $installed = array (
   'root' => 
   array (
-    'pretty_version' => 'dev-add98bdad7cea4161a9ed473f88fa8582fce6c13',
-    'version' => 'dev-add98bdad7cea4161a9ed473f88fa8582fce6c13',
+    'pretty_version' => 'dev-master',
+    'version' => 'dev-master',
     'aliases' => 
     array (
     ),
-    'reference' => 'add98bdad7cea4161a9ed473f88fa8582fce6c13',
+    'reference' => '485dce60bca30fba674836c083e9c6124b354af2',
     'name' => 'rector/rector',
   ),
   'versions' => 
@@ -258,18 +258,18 @@ private static $installed = array (
     ),
     'rector/rector' => 
     array (
-      'pretty_version' => 'dev-add98bdad7cea4161a9ed473f88fa8582fce6c13',
-      'version' => 'dev-add98bdad7cea4161a9ed473f88fa8582fce6c13',
+      'pretty_version' => 'dev-master',
+      'version' => 'dev-master',
       'aliases' => 
       array (
       ),
-      'reference' => 'add98bdad7cea4161a9ed473f88fa8582fce6c13',
+      'reference' => '485dce60bca30fba674836c083e9c6124b354af2',
     ),
     'rector/rector-prefixed' => 
     array (
       'replaced' => 
       array (
-        0 => 'dev-add98bdad7cea4161a9ed473f88fa8582fce6c13',
+        0 => 'dev-master',
       ),
     ),
     'sebastian/diff' => 
