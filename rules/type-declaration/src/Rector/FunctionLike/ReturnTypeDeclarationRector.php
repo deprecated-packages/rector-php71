@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Rector\TypeDeclaration\Rector\FunctionLike;
 
+use Nette\Utils\Strings;
 use PhpParser\Node;
 use PhpParser\Node\FunctionLike;
 use PhpParser\Node\Name;
+use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\NullableType;
+use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Function_;
 use PhpParser\Node\UnionType as PhpParserUnionType;
@@ -25,6 +28,7 @@ use Rector\TypeDeclaration\PhpDocParser\NonInformativeReturnTagRemover;
 use Rector\TypeDeclaration\TypeAlreadyAddedChecker\ReturnTypeAlreadyAddedChecker;
 use Rector\TypeDeclaration\TypeInferer\ReturnTypeInferer;
 use Rector\TypeDeclaration\TypeInferer\ReturnTypeInferer\ReturnTypeDeclarationReturnTypeInferer;
+use ReflectionClass;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
@@ -159,7 +163,28 @@ CODE_SAMPLE
         if ($this->classMethodReturnTypeOverrideGuard->shouldSkipClassMethod($functionLike)) {
             return true;
         }
-        return $this->isNames($functionLike, self::EXCLUDED_METHOD_NAMES);
+        if ($this->isNames($functionLike, self::EXCLUDED_METHOD_NAMES)) {
+            return true;
+        }
+        return $this->vendorLockResolver->isReturnChangeVendorLockedIn($functionLike);
+    }
+
+    private function isParentInVendor(ClassMethod $classMethod): bool
+    {
+        $parent = $classMethod->getAttribute(AttributeKey::PARENT_NODE);
+        if (! $parent instanceof Class_) {
+            return false;
+        }
+        if (! $parent->extends instanceof FullyQualified) {
+            return false;
+        }
+        $parentName = $parent->extends->toString();
+        $reflectionClass = new ReflectionClass($parentName);
+        if ($reflectionClass->isInternal()) {
+            return true;
+        }
+        $fileName = $reflectionClass->getFileName();
+        return Strings::contains((string) $fileName, 'vendor');
     }
 
     /**
