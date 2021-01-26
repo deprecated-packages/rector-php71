@@ -159,7 +159,10 @@ CODE_SAMPLE
         if ($this->classMethodReturnTypeOverrideGuard->shouldSkipClassMethod($functionLike)) {
             return true;
         }
-        return $this->isNames($functionLike, self::EXCLUDED_METHOD_NAMES);
+        if ($this->isNames($functionLike, self::EXCLUDED_METHOD_NAMES)) {
+            return true;
+        }
+        return $this->vendorLockResolver->isReturnChangeVendorLockedIn($functionLike);
     }
 
     /**
