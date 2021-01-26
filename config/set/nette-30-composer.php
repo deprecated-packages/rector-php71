@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Rector\Composer\Rector\ChangePackageVersionRector;
-use Rector\Composer\Rector\RemovePackageRector;
-use Rector\Composer\Rector\ReplacePackageAndVersionRector;
+use Rector\Composer\Rector\ChangePackageVersionComposerRector;
+use Rector\Composer\Rector\RemovePackageComposerRector;
+use Rector\Composer\Rector\ReplacePackageAndVersionComposerRector;
 use Rector\Composer\ValueObject\PackageAndVersion;
 use Rector\Composer\ValueObject\ReplacePackageAndVersion;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -12,8 +12,8 @@ use Symplify\SymfonyPhpConfig\ValueObjectInliner;
 
 return static function (ContainerConfigurator $containerConfigurator) : void {
     $services = $containerConfigurator->services();
-    $services->set(ChangePackageVersionRector::class)->call('configure', [[
-        ChangePackageVersionRector::PACKAGES_AND_VERSIONS => ValueObjectInliner::inline([
+    $services->set(ChangePackageVersionComposerRector::class)->call('configure', [[
+        ChangePackageVersionComposerRector::PACKAGES_AND_VERSIONS => ValueObjectInliner::inline([
             new PackageAndVersion('nette/nette', '^3.0'),
             // https://github.com/nette/nette/blob/v2.4.0/composer.json vs https://github.com/nette/nette/blob/v3.0.0/composer.json
             // older versions have security issues
@@ -44,11 +44,11 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
             new PackageAndVersion('radekdostal/nette-datetimepicker', '^3.0'),
         ]),
     ]]);
-    $services->set(RemovePackageRector::class)->call('configure', [[
-        RemovePackageRector::PACKAGE_NAMES => ['nette/deprecated', 'nette/reflection'],
+    $services->set(RemovePackageComposerRector::class)->call('configure', [[
+        RemovePackageComposerRector::PACKAGE_NAMES => ['nette/deprecated', 'nette/reflection'],
     ]]);
-    $services->set(ReplacePackageAndVersionRector::class)->call('configure', [[
-        ReplacePackageAndVersionRector::REPLACE_PACKAGES_AND_VERSIONS => ValueObjectInliner::inline([
+    $services->set(ReplacePackageAndVersionComposerRector::class)->call('configure', [[
+        ReplacePackageAndVersionComposerRector::REPLACE_PACKAGES_AND_VERSIONS => ValueObjectInliner::inline([
             // webchemistry to contributte
             new ReplacePackageAndVersion('webchemistry/forms-multiplier', 'contributte/forms-multiplier', '3.1.x-dev'),
         ]),
