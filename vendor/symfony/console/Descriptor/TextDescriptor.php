@@ -38,7 +38,7 @@ class TextDescriptor extends Descriptor
         } else {
             $default = '';
         }
-        $totalWidth = isset($options['total_width']) ? $options['total_width'] : Helper::strlen($argument->getName());
+        $totalWidth = $options['total_width'] ?? Helper::strlen($argument->getName());
         $spacingWidth = $totalWidth - \strlen($argument->getName());
         $this->writeText(sprintf(
             '  <info>%s</info>  %s%s%s',
@@ -68,7 +68,7 @@ class TextDescriptor extends Descriptor
                 $value = '['.$value.']';
             }
         }
-        $totalWidth = isset($options['total_width']) ? $options['total_width'] : $this->calculateTotalWidthForOptions([$option]);
+        $totalWidth = $options['total_width'] ?? $this->calculateTotalWidthForOptions([$option]);
         $synopsis = sprintf('%s%s', $option->getShortcut() ? sprintf('-%s, ', $option->getShortcut()) : '    ', sprintf('--%s%s', $option->getName(), $value));
         $spacingWidth = $totalWidth - Helper::strlen($synopsis);
         $this->writeText(sprintf(
@@ -160,7 +160,7 @@ class TextDescriptor extends Descriptor
      */
     protected function describeApplication(Application $application, array $options = [])
     {
-        $describedNamespace = isset($options['namespace']) ? $options['namespace'] : null;
+        $describedNamespace = $options['namespace'] ?? null;
         $description = new ApplicationDescription($application, $describedNamespace);
         if (isset($options['raw_text']) && $options['raw_text']) {
             $width = $this->getColumnWidth($description->getCommands());

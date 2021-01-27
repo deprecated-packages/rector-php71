@@ -23,6 +23,8 @@ interface LoaderInterface
      *
      * @param mixed $resource The resource
      *
+     * @return mixed
+     *
      * @throws \Exception If something went wrong
      * @param string $type
      */

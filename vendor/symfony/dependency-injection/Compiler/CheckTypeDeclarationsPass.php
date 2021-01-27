@@ -83,7 +83,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
         if (isset($this->skippedIds[$this->currentId])) {
             return $value;
         }
-        if (!$value instanceof Definition || $value->hasErrors()) {
+        if (!$value instanceof Definition || $value->hasErrors() || $value->isDeprecated()) {
             return parent::processValue($value, $isRoot);
         }
         if (!$this->autoload && !class_exists($class = $value->getClass(), false) && !interface_exists($class, false)) {
@@ -252,13 +252,23 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
         if ('object' === $type && !isset(self::BUILTIN_TYPES[$class])) {
             return;
         }
+        if ('mixed' === $type) {
+            return;
+        }
         if (is_a($class, $type, true)) {
             return;
         }
-        $checkFunction = sprintf('is_%s', $type);
-        if (!$reflectionType->isBuiltin() || !$checkFunction($value)) {
-            throw new InvalidParameterTypeException($this->currentId, \is_object($value) ? $class : get_debug_type($value), $parameter);
+        if ('false' === $type) {
+            if (false === $value) {
+                return;
+            }
+        } elseif ($reflectionType->isBuiltin()) {
+            $checkFunction = sprintf('is_%s', $type);
+            if ($checkFunction($value)) {
+                return;
+            }
         }
+        throw new InvalidParameterTypeException($this->currentId, \is_object($value) ? $class : get_debug_type($value), $parameter);
     }
 
     private function getExpressionLanguage(): ExpressionLanguage

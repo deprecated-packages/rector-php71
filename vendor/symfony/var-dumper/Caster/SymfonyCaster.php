@@ -19,7 +19,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class SymfonyCaster
 {
-    private static $requestGetters = [
+    private const REQUEST_GETTERS = [
         'pathInfo' => 'getPathInfo',
         'requestUri' => 'getRequestUri',
         'baseUrl' => 'getBaseUrl',
@@ -31,7 +31,7 @@ class SymfonyCaster
     public static function castRequest(Request $request, array $a, Stub $stub, bool $isNested)
     {
         $clone = null;
-        foreach (self::$requestGetters as $prop => $getter) {
+        foreach (self::REQUEST_GETTERS as $prop => $getter) {
             $key = Caster::PREFIX_PROTECTED.$prop;
             if (\array_key_exists($key, $a) && null === $a[$key]) {
                 if (null === $clone) {

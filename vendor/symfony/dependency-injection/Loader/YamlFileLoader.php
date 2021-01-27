@@ -39,7 +39,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlFileLoader extends FileLoader
 {
-    private static $serviceKeywords = [
+    private const SERVICE_KEYWORDS = [
         'alias' => 'alias',
         'parent' => 'parent',
         'class' => 'class',
@@ -65,7 +65,7 @@ class YamlFileLoader extends FileLoader
         'bind' => 'bind',
     ];
 
-    private static $prototypeKeywords = [
+    private const PROTOTYPE_KEYWORDS = [
         'resource' => 'resource',
         'namespace' => 'namespace',
         'exclude' => 'exclude',
@@ -86,7 +86,7 @@ class YamlFileLoader extends FileLoader
         'bind' => 'bind',
     ];
 
-    private static $instanceofKeywords = [
+    private const INSTANCEOF_KEYWORDS = [
         'shared' => 'shared',
         'lazy' => 'lazy',
         'public' => 'public',
@@ -98,7 +98,7 @@ class YamlFileLoader extends FileLoader
         'bind' => 'bind',
     ];
 
-    private static $defaultsKeywords = [
+    private const DEFAULTS_KEYWORDS = [
         'public' => 'public',
         'tags' => 'tags',
         'autowire' => 'autowire',
@@ -236,8 +236,8 @@ class YamlFileLoader extends FileLoader
             throw new InvalidArgumentException(sprintf('Service "_defaults" key must be an array, "%s" given in "%s".', get_debug_type($defaults), $file));
         }
         foreach ($defaults as $key => $default) {
-            if (!isset(self::$defaultsKeywords[$key])) {
-                throw new InvalidArgumentException(sprintf('The configuration key "%s" cannot be used to define a default value in "%s". Allowed keys are "%s".', $key, $file, implode('", "', self::$defaultsKeywords)));
+            if (!isset(self::DEFAULTS_KEYWORDS[$key])) {
+                throw new InvalidArgumentException(sprintf('The configuration key "%s" cannot be used to define a default value in "%s". Allowed keys are "%s".', $key, $file, implode('", "', self::DEFAULTS_KEYWORDS)));
             }
         }
         if (isset($defaults['tags'])) {
@@ -297,7 +297,7 @@ class YamlFileLoader extends FileLoader
     /**
      * Parses a definition.
      *
-     * @param array|string $service
+     * @param array|string|null $service
      *
      * @throws InvalidArgumentException When tags are invalid
      */
@@ -332,7 +332,7 @@ class YamlFileLoader extends FileLoader
             $stack = [];
 
             foreach ($service['stack'] as $k => $frame) {
-                if (\is_array($frame) && 1 === \count($frame) && !isset(self::$serviceKeywords[key($frame)])) {
+                if (\is_array($frame) && 1 === \count($frame) && !isset(self::SERVICE_KEYWORDS[key($frame)])) {
                     $frame = [
                         'class' => key($frame),
                         'arguments' => current($frame),
@@ -516,7 +516,7 @@ class YamlFileLoader extends FileLoader
                 $definition->addMethodCall($method, $args, $returnsClone);
             }
         }
-        $tags = isset($service['tags']) ? $service['tags'] : [];
+        $tags = $service['tags'] ?? [];
         if (!\is_array($tags)) {
             throw new InvalidArgumentException(sprintf('Parameter "tags" must be an array for service "%s" in "%s". Check your YAML syntax.', $id, $file));
         }
@@ -569,8 +569,8 @@ class YamlFileLoader extends FileLoader
                 throw new InvalidArgumentException(sprintf('Invalid value "%s" for attribute "decoration_on_invalid" on service "%s". Did you mean "exception", "ignore" or null in "%s"?', $decorationOnInvalid, $id, $file));
             }
 
-            $renameId = isset($service['decoration_inner_name']) ? $service['decoration_inner_name'] : null;
-            $priority = isset($service['decoration_priority']) ? $service['decoration_priority'] : 0;
+            $renameId = $service['decoration_inner_name'] ?? null;
+            $priority = $service['decoration_priority'] ?? 0;
 
             $definition->setDecoratedService($decorates, $renameId, $priority, $invalidBehavior);
         }
@@ -614,8 +614,8 @@ class YamlFileLoader extends FileLoader
             if (!\is_string($service['resource'])) {
                 throw new InvalidArgumentException(sprintf('A "resource" attribute must be of type string for service "%s" in "%s". Check your YAML syntax.', $id, $file));
             }
-            $exclude = isset($service['exclude']) ? $service['exclude'] : null;
-            $namespace = isset($service['namespace']) ? $service['namespace'] : $id;
+            $exclude = $service['exclude'] ?? null;
+            $namespace = $service['namespace'] ?? $id;
             $this->registerClasses($definition, $namespace, $service['resource'], $exclude);
         } else {
             $this->setDefinition($id, $definition);
@@ -669,7 +669,7 @@ class YamlFileLoader extends FileLoader
      */
     protected function loadFile($file)
     {
-        if (!class_exists('Symfony\Component\Yaml\Parser')) {
+        if (!class_exists(\Symfony\Component\Yaml\Parser::class)) {
             throw new RuntimeException('Unable to load YAML config files as the Symfony Yaml Component is not installed.');
         }
         if (!stream_is_local($file)) {
@@ -781,7 +781,7 @@ class YamlFileLoader extends FileLoader
                 $instanceof = $this->instanceof;
                 $this->instanceof = [];
 
-                $id = sprintf('.%d_%s', ++$this->anonymousServicesCount, preg_replace('/^.*\\\\/', '', isset($argument['class']) ? $argument['class'] : '').$this->anonymousServicesSuffix);
+                $id = sprintf('.%d_%s', ++$this->anonymousServicesCount, preg_replace('/^.*\\\\/', '', $argument['class'] ?? '').$this->anonymousServicesSuffix);
                 $this->parseDefinition($id, $argument, $file, []);
 
                 if (!$this->container->hasDefinition($id)) {
@@ -807,7 +807,7 @@ class YamlFileLoader extends FileLoader
             }
         } elseif (\is_string($value) && 0 === strpos($value, '@=')) {
             if (!class_exists(Expression::class)) {
-                throw new \LogicException(sprintf('The "@=" expression syntax cannot be used without the ExpressionLanguage component. Try running "composer require symfony/expression-language".'));
+                throw new \LogicException('The "@=" expression syntax cannot be used without the ExpressionLanguage component. Try running "composer require symfony/expression-language".');
             }
 
             return new Expression(substr($value, 2));
@@ -857,11 +857,11 @@ class YamlFileLoader extends FileLoader
     private function checkDefinition(string $id, array $definition, string $file)
     {
         if ($this->isLoadingInstanceof) {
-            $keywords = self::$instanceofKeywords;
+            $keywords = self::INSTANCEOF_KEYWORDS;
         } elseif (isset($definition['resource']) || isset($definition['namespace'])) {
-            $keywords = self::$prototypeKeywords;
+            $keywords = self::PROTOTYPE_KEYWORDS;
         } else {
-            $keywords = self::$serviceKeywords;
+            $keywords = self::SERVICE_KEYWORDS;
         }
         foreach ($definition as $key => $value) {
             if (!isset($keywords[$key])) {

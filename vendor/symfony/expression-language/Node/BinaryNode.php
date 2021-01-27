@@ -20,13 +20,13 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  */
 class BinaryNode extends Node
 {
-    private static $operators = [
+    private const OPERATORS = [
         '~' => '.',
         'and' => '&&',
         'or' => '||',
     ];
 
-    private static $functions = [
+    private const FUNCTIONS = [
         '**' => 'pow',
         '..' => 'range',
         'in' => 'in_array',
@@ -47,14 +47,14 @@ class BinaryNode extends Node
 
             return;
         }
-        if (isset(self::$functions[$operator])) {
-            $compiler->raw(sprintf('%s(', self::$functions[$operator]))->compile($this->nodes['left'])->raw(', ')->compile($this->nodes['right'])->raw(')')
+        if (isset(self::FUNCTIONS[$operator])) {
+            $compiler->raw(sprintf('%s(', self::FUNCTIONS[$operator]))->compile($this->nodes['left'])->raw(', ')->compile($this->nodes['right'])->raw(')')
             ;
 
             return;
         }
-        if (isset(self::$operators[$operator])) {
-            $operator = self::$operators[$operator];
+        if (isset(self::OPERATORS[$operator])) {
+            $operator = self::OPERATORS[$operator];
         }
         $compiler->raw('(')->compile($this->nodes['left'])->raw(' ')->raw($operator)->raw(' ')->compile($this->nodes['right'])->raw(')')
         ;
@@ -64,13 +64,13 @@ class BinaryNode extends Node
     {
         $operator = $this->attributes['operator'];
         $left = $this->nodes['left']->evaluate($functions, $values);
-        if (isset(self::$functions[$operator])) {
+        if (isset(self::FUNCTIONS[$operator])) {
             $right = $this->nodes['right']->evaluate($functions, $values);
 
             if ('not in' === $operator) {
                 return !\in_array($left, $right);
             }
-            $f = self::$functions[$operator];
+            $f = self::FUNCTIONS[$operator];
 
             return $f($left, $right);
         }

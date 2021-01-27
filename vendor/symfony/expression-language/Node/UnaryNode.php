@@ -20,7 +20,7 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  */
 class UnaryNode extends Node
 {
-    private static $operators = [
+    private const OPERATORS = [
         '!' => '!',
         'not' => '!',
         '+' => '+',
@@ -34,7 +34,7 @@ class UnaryNode extends Node
 
     public function compile(Compiler $compiler)
     {
-        $compiler->raw('(')->raw(self::$operators[$this->attributes['operator']])->compile($this->nodes['node'])->raw(')')
+        $compiler->raw('(')->raw(self::OPERATORS[$this->attributes['operator']])->compile($this->nodes['node'])->raw(')')
         ;
     }
 

@@ -66,7 +66,7 @@ final class RemoveUselessJustForSakeInterfaceRector extends AbstractRector
             }
 
             // 1. replace current interface with one more parent or remove it
-            $this->removeOrReplaceImlementedInterface($implementedInterfaceName, $node, $key);
+            $this->removeOrReplaceImplementedInterface($implementedInterfaceName, $node, $key);
 
             // 2. remove file if not in /vendor
             $classFileLocation = $this->resolveClassFileLocation($implementedInterfaceName);
@@ -142,7 +142,7 @@ CODE_SAMPLE
         });
     }
 
-    private function removeOrReplaceImlementedInterface(string $implementedInterfaceName, Class_ $class, int $key): void
+    private function removeOrReplaceImplementedInterface(string $implementedInterfaceName, Class_ $class, int $key): void
     {
         $parentInterface = $this->getParentInterfaceIfFound($implementedInterfaceName);
         if ($parentInterface !== null) {

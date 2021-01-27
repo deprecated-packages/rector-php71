@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class FileBag extends ParameterBag
 {
-    private static $fileKeys = ['error', 'name', 'size', 'tmp_name', 'type'];
+    private const FILE_KEYS = ['error', 'name', 'size', 'tmp_name', 'type'];
 
     /**
      * @param array|UploadedFile[] $parameters An array of HTTP files
@@ -78,7 +78,7 @@ class FileBag extends ParameterBag
             $keys = array_keys($file);
             sort($keys);
 
-            if ($keys == self::$fileKeys) {
+            if (self::FILE_KEYS == $keys) {
                 if (\UPLOAD_ERR_NO_FILE == $file['error']) {
                     $file = null;
                 } else {
@@ -114,11 +114,11 @@ class FileBag extends ParameterBag
     {
         $keys = array_keys($data);
         sort($keys);
-        if (self::$fileKeys != $keys || !isset($data['name']) || !\is_array($data['name'])) {
+        if (self::FILE_KEYS != $keys || !isset($data['name']) || !\is_array($data['name'])) {
             return $data;
         }
         $files = $data;
-        foreach (self::$fileKeys as $k) {
+        foreach (self::FILE_KEYS as $k) {
             unset($files[$k]);
         }
         foreach ($data['name'] as $key => $name) {
