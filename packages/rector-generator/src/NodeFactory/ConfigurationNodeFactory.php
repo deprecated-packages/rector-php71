@@ -124,6 +124,7 @@ final class ConfigurationNodeFactory
 
     private function createConstantInConfigurationCoalesce(string $constantName, Variable $configurationVariable): Coalesce
     {
+        $constantName = strtoupper($constantName);
         $classConstFetch = new ClassConstFetch(new Name('self'), $constantName);
         $arrayDimFetch = new ArrayDimFetch($configurationVariable, $classConstFetch);
         $emptyArray = new Array_([]);
