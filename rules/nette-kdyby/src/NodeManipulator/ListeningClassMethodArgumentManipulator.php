@@ -104,15 +104,7 @@ final class ListeningClassMethodArgumentManipulator
         }
     }
 
-    private function changeClassParamToEventClass(string $eventClass, ClassMethod $classMethod): void
-    {
-        $paramName = $this->classNaming->getVariableName($eventClass);
-        $eventVariable = new Variable($paramName);
-        $param = new Param($eventVariable, null, new FullyQualified($eventClass));
-        $classMethod->params = [$param];
-    }
-
-    private function isParamUsedInClassMethodBody(ClassMethod $classMethod, Param $param): bool
+    public function isParamUsedInClassMethodBody(ClassMethod $classMethod, Param $param): bool
     {
         return (bool) $this->betterNodeFinder->findFirst((array) $classMethod->stmts, function (Node $node) use ($param): bool {
             if (! $node instanceof Variable) {
@@ -120,6 +112,14 @@ final class ListeningClassMethodArgumentManipulator
             }
             return $this->betterStandardPrinter->areNodesEqual($node, $param->var);
         });
+    }
+
+    private function changeClassParamToEventClass(string $eventClass, ClassMethod $classMethod): void
+    {
+        $paramName = $this->classNaming->getVariableName($eventClass);
+        $eventVariable = new Variable($paramName);
+        $param = new Param($eventVariable, null, new FullyQualified($eventClass));
+        $classMethod->params = [$param];
     }
 
     private function createEventGetterToVariableMethodCall(string $eventClass, Param $param, ?EventAndListenerTree $eventAndListenerTree = null): Assign

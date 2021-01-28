@@ -12,7 +12,7 @@ use PhpParser\Node\Stmt\Class_;
 use Rector\Core\Rector\AbstractRector;
 use Rector\Symfony\ValueObject\ServiceDefinition;
 use Rector\SymfonyCodeQuality\ApplicationMetadata\ListenerServiceDefinitionProvider;
-use Rector\SymfonyCodeQuality\NodeFactory\GetSubscriberEventsClassMethodFactory;
+use Rector\SymfonyCodeQuality\NodeFactory\GetSubscribedEventsClassMethodFactory;
 use Rector\SymfonyCodeQuality\ValueObject\EventNameToClassAndConstant;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
@@ -54,11 +54,11 @@ final class EventListenerToEventSubscriberRector extends AbstractRector
     private $listenerServiceDefinitionProvider;
 
     /**
-     * @var GetSubscriberEventsClassMethodFactory
+     * @var GetSubscribedEventsClassMethodFactory
      */
-    private $getSubscriberEventsClassMethodFactory;
+    private $getSubscribedEventsClassMethodFactory;
 
-    public function __construct(ListenerServiceDefinitionProvider $listenerServiceDefinitionProvider, GetSubscriberEventsClassMethodFactory $getSubscriberEventsClassMethodFactory)
+    public function __construct(ListenerServiceDefinitionProvider $listenerServiceDefinitionProvider, GetSubscribedEventsClassMethodFactory $getSubscribedEventsClassMethodFactory)
     {
         $this->eventNamesToClassConstants = [
             // kernel events
@@ -76,7 +76,7 @@ final class EventListenerToEventSubscriberRector extends AbstractRector
             new EventNameToClassAndConstant('console.error', self::CONSOLE_EVENTS_CLASS, 'ERROR'),
         ];
         $this->listenerServiceDefinitionProvider = $listenerServiceDefinitionProvider;
-        $this->getSubscriberEventsClassMethodFactory = $getSubscriberEventsClassMethodFactory;
+        $this->getSubscribedEventsClassMethodFactory = $getSubscribedEventsClassMethodFactory;
     }
 
     public function getRuleDefinition(): RuleDefinition
@@ -171,7 +171,7 @@ CODE_SAMPLE
         // remove suffix
         $classShortName = Strings::replace($classShortName, self::LISTENER_MATCH_REGEX, '$1');
         $class->name = new Identifier($classShortName . 'EventSubscriber');
-        $classMethod = $this->getSubscriberEventsClassMethodFactory->createFromEventsToMethods($eventsToMethods, $this->eventNamesToClassConstants);
+        $classMethod = $this->getSubscribedEventsClassMethodFactory->createFromServiceDefinitionsAndEventsToMethods($eventsToMethods, $this->eventNamesToClassConstants);
         $class->stmts[] = $classMethod;
         return $class;
     }
