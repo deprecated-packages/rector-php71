@@ -45,7 +45,7 @@ final class LogoutHandlerToLogoutEventSubscriberRector extends AbstractRector
 
     public function getRuleDefinition(): RuleDefinition
     {
-        return new RuleDefinition('Change logout handler to an event listener that listens to LogoutEent', [
+        return new RuleDefinition('Change logout handler to an event listener that listens to LogoutEvent', [
             new CodeSample(<<<'CODE_SAMPLE'
 use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
 use Symfony\Component\HttpFoundation\Request;

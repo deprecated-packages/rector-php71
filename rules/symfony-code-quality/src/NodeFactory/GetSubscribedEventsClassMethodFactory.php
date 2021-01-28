@@ -26,8 +26,9 @@ use Rector\Symfony\Contract\Tag\TagInterface;
 use Rector\Symfony\ValueObject\ServiceDefinition;
 use Rector\Symfony\ValueObject\Tag;
 use Rector\Symfony\ValueObject\Tag\EventListenerTag;
+use Rector\SymfonyCodeQuality\Contract\EventReferenceToMethodNameInterface;
 use Rector\SymfonyCodeQuality\ValueObject\EventNameToClassAndConstant;
-use Rector\SymfonyCodeQuality\ValueObject\EventReferenceToMethodName;
+use Rector\SymfonyCodeQuality\ValueObject\EventReferenceToMethodNameWithPriority;
 
 final class GetSubscribedEventsClassMethodFactory
 {
@@ -77,14 +78,16 @@ final class GetSubscribedEventsClassMethodFactory
     }
 
     /**
-     * @param EventReferenceToMethodName[] $eventReferencesToMethodNames
+     * @param EventReferenceToMethodNameInterface[] $eventReferencesToMethodNames
      */
     public function create(array $eventReferencesToMethodNames): ClassMethod
     {
         $getSubscribersClassMethod = $this->createClassMethod();
         $eventsToMethodsArray = new Array_();
         foreach ($eventReferencesToMethodNames as $eventReferencesToMethodName) {
-            $eventsToMethodsArray->items[] = $this->createArrayItemFromMethodAndPriority(null, $eventReferencesToMethodName->getMethodName(), $eventReferencesToMethodName->getClassConstFetch());
+            $priority = $eventReferencesToMethodName instanceof EventReferenceToMethodNameWithPriority ? $eventReferencesToMethodName->getPriority() : null;
+
+            $eventsToMethodsArray->items[] = $this->createArrayItemFromMethodAndPriority($priority, $eventReferencesToMethodName->getMethodName(), $eventReferencesToMethodName->getClassConstFetch());
         }
         $getSubscribersClassMethod->stmts[] = new Return_($eventsToMethodsArray);
         $this->decorateClassMethodWithReturnType($getSubscribersClassMethod);
