@@ -179,11 +179,15 @@ CODE_SAMPLE
     {
         $position = $argumentAdder->getPosition();
         $argumentName = $argumentAdder->getArgumentName();
+        if ($argumentName === null) {
+            return true;
+        }
         if ($node instanceof ClassMethod) {
             // already added?
             if (! isset($node->params[$position])) {
                 return false;
             }
+
             return $this->isName($node->params[$position], $argumentName);
         }
         // already added?
