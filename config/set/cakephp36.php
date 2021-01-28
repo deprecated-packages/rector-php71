@@ -5,8 +5,8 @@ declare(strict_types=1);
 use Rector\Renaming\Rector\MethodCall\RenameMethodRector;
 use Rector\Renaming\Rector\Name\RenameClassRector;
 use Rector\Renaming\ValueObject\MethodCallRename;
-use Rector\Transform\Rector\Assign\PropertyToMethodRector;
-use Rector\Transform\ValueObject\PropertyToMethod;
+use Rector\Transform\Rector\Assign\PropertyFetchToMethodCallRector;
+use Rector\Transform\ValueObject\PropertyFetchToMethodCall;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symplify\SymfonyPhpConfig\ValueObjectInliner;
 
@@ -20,11 +20,11 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
             new MethodCallRename('Cake\Validation\ValidationSet', 'isEmptyAllowed', 'allowEmpty'),
         ]),
     ]]);
-    $services->set(PropertyToMethodRector::class)->call('configure', [[
-        PropertyToMethodRector::PROPERTIES_TO_METHOD_CALLS => ValueObjectInliner::inline([
-            new PropertyToMethod('Cake\Controller\Controller', 'name', 'getName', 'setName'),
-            new PropertyToMethod('Cake\Controller\Controller', 'plugin', 'getPlugin', 'setPlugin'),
-            new PropertyToMethod('Cake\Form\Form', 'validator', 'getValidator', 'setValidator'),
+    $services->set(PropertyFetchToMethodCallRector::class)->call('configure', [[
+        PropertyFetchToMethodCallRector::PROPERTIES_TO_METHOD_CALLS => ValueObjectInliner::inline([
+            new PropertyFetchToMethodCall('Cake\Controller\Controller', 'name', 'getName', 'setName'),
+            new PropertyFetchToMethodCall('Cake\Controller\Controller', 'plugin', 'getPlugin', 'setPlugin'),
+            new PropertyFetchToMethodCall('Cake\Form\Form', 'validator', 'getValidator', 'setValidator'),
         ]),
     ]]);
     $services->set(RenameClassRector::class)->call('configure', [[

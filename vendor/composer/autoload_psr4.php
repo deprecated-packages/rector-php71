@@ -51,6 +51,7 @@ return array(
     'Symfony\\Component\\Console\\' => array($vendorDir . '/symfony/console'),
     'Symfony\\Component\\Config\\' => array($vendorDir . '/symfony/config'),
     'Symfony\\Component\\Cache\\' => array($vendorDir . '/symfony/cache'),
+    'Rector\\Visibility\\' => array($baseDir . '/rules/visibility/src'),
     'Rector\\VendorLocker\\' => array($baseDir . '/packages/vendor-locker/src'),
     'Rector\\TypeDeclaration\\' => array($baseDir . '/rules/type-declaration/src'),
     'Rector\\Twig\\' => array($baseDir . '/rules/twig/src'),

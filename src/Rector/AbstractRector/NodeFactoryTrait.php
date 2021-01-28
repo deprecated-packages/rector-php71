@@ -74,12 +74,12 @@ trait NodeFactoryTrait
 
     protected function createFalse(): ConstFetch
     {
-        return new ConstFetch(new Name('false'));
+        return $this->nodeFactory->createFalse();
     }
 
     protected function createTrue(): ConstFetch
     {
-        return new ConstFetch(new Name('true'));
+        return $this->nodeFactory->createTrue();
     }
 
     /**
