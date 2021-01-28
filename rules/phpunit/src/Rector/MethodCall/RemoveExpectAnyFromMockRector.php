@@ -6,7 +6,8 @@ namespace Rector\PHPUnit\Rector\MethodCall;
 
 use PhpParser\Node;
 use PhpParser\Node\Expr\MethodCall;
-use Rector\Core\Rector\AbstractPHPUnitRector;
+use Rector\Core\Rector\AbstractRector;
+use Rector\PHPUnit\NodeAnalyzer\TestsNodeAnalyzer;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
@@ -14,8 +15,18 @@ use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
  * @see https://github.com/symfony/symfony/pull/30813/files#r270879504
  * @see \Rector\PHPUnit\Tests\Rector\MethodCall\RemoveExpectAnyFromMockRector\RemoveExpectAnyFromMockRectorTest
  */
-final class RemoveExpectAnyFromMockRector extends AbstractPHPUnitRector
+final class RemoveExpectAnyFromMockRector extends AbstractRector
 {
+    /**
+     * @var TestsNodeAnalyzer
+     */
+    private $testsNodeAnalyzer;
+
+    public function __construct(TestsNodeAnalyzer $testsNodeAnalyzer)
+    {
+        $this->testsNodeAnalyzer = $testsNodeAnalyzer;
+    }
+
     public function getRuleDefinition(): RuleDefinition
     {
         return new RuleDefinition('Remove `expect($this->any())` from mocks as it has no added value', [
@@ -47,7 +58,6 @@ class SomeClass extends TestCase
 }
 CODE_SAMPLE
 ),
-
         ]);
     }
 
@@ -64,7 +74,7 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        if (! $this->isInTestClass($node)) {
+        if (! $this->testsNodeAnalyzer->isInTestClass($node)) {
             return null;
         }
         if (! $this->isName($node->name, 'expects')) {

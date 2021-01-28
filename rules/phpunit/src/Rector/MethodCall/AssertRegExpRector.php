@@ -13,14 +13,15 @@ use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Scalar\LNumber;
 use Rector\Core\Exception\ShouldNotHappenException;
-use Rector\Core\Rector\AbstractPHPUnitRector;
+use Rector\Core\Rector\AbstractRector;
+use Rector\PHPUnit\NodeAnalyzer\TestsNodeAnalyzer;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
 /**
  * @see \Rector\PHPUnit\Tests\Rector\MethodCall\AssertRegExpRector\AssertRegExpRectorTest
  */
-final class AssertRegExpRector extends AbstractPHPUnitRector
+final class AssertRegExpRector extends AbstractRector
 {
     /**
      * @var string
@@ -41,6 +42,16 @@ final class AssertRegExpRector extends AbstractPHPUnitRector
      * @var string
      */
     private const ASSERT_NOT_EQUALS = 'assertNotEquals';
+
+    /**
+     * @var TestsNodeAnalyzer
+     */
+    private $testsNodeAnalyzer;
+
+    public function __construct(TestsNodeAnalyzer $testsNodeAnalyzer)
+    {
+        $this->testsNodeAnalyzer = $testsNodeAnalyzer;
+    }
 
     public function getRuleDefinition(): RuleDefinition
     {
@@ -63,7 +74,7 @@ final class AssertRegExpRector extends AbstractPHPUnitRector
      */
     public function refactor(Node $node): ?Node
     {
-        if (! $this->isPHPUnitMethodNames($node, [self::ASSERT_SAME, self::ASSERT_EQUALS, self::ASSERT_NOT_SAME, self::ASSERT_NOT_EQUALS])) {
+        if (! $this->testsNodeAnalyzer->isPHPUnitMethodNames($node, [self::ASSERT_SAME, self::ASSERT_EQUALS, self::ASSERT_NOT_SAME, self::ASSERT_NOT_EQUALS])) {
             return null;
         }
         /** @var FuncCall|Node $secondArgumentValue */
