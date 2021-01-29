@@ -77,7 +77,8 @@ final class ExtendsTemplateTypeMapFallbackFactory
         if (! $parentClassReflection instanceof ClassReflection) {
             return [];
         }
-        return array_keys($parentClassReflection->getTemplateTypeMap()->getTypes());
+        $templateTypeMap = $parentClassReflection->getTemplateTypeMap();
+        return array_keys($templateTypeMap->getTypes());
     }
 
     private function createTemplateObjectType(TemplateTypeScope $templateTypeScope, string $parentGenericTypeName, TypeWithClassName $typeWithClassName): TemplateObjectType
