@@ -121,7 +121,8 @@ final class RectorsFinder
             return true;
         }
         if (! class_exists($class)) {
-            throw new ShouldNotHappenException($class);
+            $message = sprintf('Class "%s" was not found', $class);
+            throw new ShouldNotHappenException($message);
         }
         $reflectionClass = new ReflectionClass($class);
         return $reflectionClass->isAbstract();

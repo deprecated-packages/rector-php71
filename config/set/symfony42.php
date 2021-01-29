@@ -5,6 +5,7 @@ declare(strict_types=1);
 use PHPStan\Type\IterableType;
 use PHPStan\Type\MixedType;
 
+use Rector\Core\ValueObject\MethodName;
 use Rector\Core\ValueObject\Visibility;
 use Rector\Generic\NodeAnalyzer\ArgumentAddingScope;
 use Rector\Generic\Rector\ClassMethod\ArgumentAdderRector;
@@ -12,9 +13,9 @@ use Rector\Generic\Rector\ClassMethod\ArgumentDefaultValueReplacerRector;
 use Rector\Generic\Rector\ClassMethod\WrapReturnRector;
 use Rector\Generic\ValueObject\ArgumentAdder;
 use Rector\Generic\ValueObject\ArgumentDefaultValueReplacer;
-use Rector\Generic\ValueObject\ArgumentRemover;
 use Rector\Generic\ValueObject\WrapReturn;
 use Rector\Removing\Rector\ClassMethod\ArgumentRemoverRector;
+use Rector\Removing\ValueObject\ArgumentRemover;
 use Rector\Renaming\Rector\MethodCall\RenameMethodRector;
 use Rector\Renaming\Rector\Name\RenameClassRector;
 use Rector\Renaming\ValueObject\MethodCallRename;
@@ -93,15 +94,15 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
     $services->set(ArgumentDefaultValueReplacerRector::class)->call('configure', [[
         // https://github.com/symfony/symfony/commit/9493cfd5f2366dab19bbdde0d0291d0575454567
         ArgumentDefaultValueReplacerRector::REPLACED_ARGUMENTS => ValueObjectInliner::inline([
-            new ArgumentDefaultValueReplacer('Symfony\Component\HttpFoundation\Cookie', '__construct', 5, false, null),
-            new ArgumentDefaultValueReplacer('Symfony\Component\HttpFoundation\Cookie', '__construct', 8, null, 'lax'),
+            new ArgumentDefaultValueReplacer('Symfony\Component\HttpFoundation\Cookie', MethodName::CONSTRUCT, 5, false, null),
+            new ArgumentDefaultValueReplacer('Symfony\Component\HttpFoundation\Cookie', MethodName::CONSTRUCT, 8, null, 'lax'),
         ]),
     ]]);
     $services->set(ArgumentRemoverRector::class)->call('configure', [[
         # https://github.com/symfony/symfony/commit/f5c355e1ba399a1b3512367647d902148bdaf09f
         ArgumentRemoverRector::REMOVED_ARGUMENTS => ValueObjectInliner::inline([
-            new ArgumentRemover('Symfony\Component\HttpKernel\DataCollector\ConfigDataCollector', '__construct', 0, null),
-            new ArgumentRemover('Symfony\Component\HttpKernel\DataCollector\ConfigDataCollector', '__construct', 1, null),
+            new ArgumentRemover('Symfony\Component\HttpKernel\DataCollector\ConfigDataCollector', MethodName::CONSTRUCT, 0, null),
+            new ArgumentRemover('Symfony\Component\HttpKernel\DataCollector\ConfigDataCollector', MethodName::CONSTRUCT, 1, null),
         ]),
     ]]);
 };

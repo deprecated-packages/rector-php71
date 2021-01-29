@@ -11,6 +11,7 @@ use PHPStan\Type\NullType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\StringType;
 use PHPStan\Type\UnionType;
+use Rector\Core\ValueObject\MethodName;
 use Rector\Nette\Rector\ClassMethod\TranslateClassMethodToVariadicsRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeDeclarationRector;
 use Rector\TypeDeclaration\ValueObject\AddParamTypeDeclaration;
@@ -45,11 +46,11 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
             new AddParamTypeDeclaration('Nette\Forms\Container', 'addMultiSelect', 3, new IntegerType()),
             new AddParamTypeDeclaration('Nette\Forms\Rendering\DefaultFormRenderer', 'render', 1, new StringType()),
             new AddParamTypeDeclaration('RadekDostal\NetteComponents\DateTimePicker\DateTimePicker', 'register', 0, new StringType()),
-            new AddParamTypeDeclaration('Nette\Bridges\SecurityDI\SecurityExtension', '__construct', 0, new BooleanType()),
+            new AddParamTypeDeclaration('Nette\Bridges\SecurityDI\SecurityExtension', MethodName::CONSTRUCT, 0, new BooleanType()),
             new AddParamTypeDeclaration('Nette\Security\IUserStorage', 'setAuthenticated', 0, new BooleanType()),
             new AddParamTypeDeclaration('Nette\Security\IUserStorage', 'setIdentity', 0, new UnionType([new ObjectType('Nette\Security\IIdentity'), new NullType()])),
             new AddParamTypeDeclaration('Nette\Security\IUserStorage', 'setExpiration', 1, new IntegerType()),
-            new AddParamTypeDeclaration('Nette\Security\Identity', '__construct', 2, $iterableType),
+            new AddParamTypeDeclaration('Nette\Security\Identity', MethodName::CONSTRUCT, 2, $iterableType),
             new AddParamTypeDeclaration('Nette\Security\Identity', '__set', 0, new StringType()),
             new AddParamTypeDeclaration('Nette\Security\Identity', '&__get', 0, new StringType()),
             new AddParamTypeDeclaration('Nette\Security\Identity', '__isset', 0, new StringType()),
