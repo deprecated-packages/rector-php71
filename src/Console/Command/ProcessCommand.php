@@ -134,6 +134,8 @@ final class ProcessCommand extends AbstractCommand
 
         $this->addOption(Option::OPTION_NO_PROGRESS_BAR, null, InputOption::VALUE_NONE, 'Hide progress bar. Useful e.g. for nicer CI output.');
 
+        $this->addOption(Option::OPTION_NO_DIFFS, null, InputOption::VALUE_NONE, 'Hide diffs of changed files. Useful e.g. for nicer CI output.');
+
         $this->addOption(Option::OPTION_OUTPUT_FILE, null, InputOption::VALUE_REQUIRED, 'Location for file to dump result in. Useful for Docker or automated processes');
 
         $this->addOption(Option::CACHE_DEBUG, null, InputOption::VALUE_NONE, 'Debug changed file cache');
