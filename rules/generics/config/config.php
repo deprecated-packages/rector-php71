@@ -10,5 +10,5 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
         ->public()
         ->autowire()
         ->autoconfigure();
-    $services->load('Rector\Generics\\', __DIR__ . '/../src')->exclude([__DIR__ . '/../src/Rector']);
+    $services->load('Rector\Generics\\', __DIR__ . '/../src')->exclude([__DIR__ . '/../src/Rector', __DIR__ . '/../src/ValueObject']);
 };
