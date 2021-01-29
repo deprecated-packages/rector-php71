@@ -18,5 +18,4 @@ return array(
     'b6b991a57620e2fb6b2f66f03fe9ddc2' => $vendorDir . '/symfony/string/Resources/functions.php',
     '25072dd6e2470089de65ae7bf11d3109' => $vendorDir . '/symfony/polyfill-php72/bootstrap.php',
     'b686b8e46447868025a15ce5d0cb2634' => $vendorDir . '/symfony/polyfill-php74/bootstrap.php',
-    '3723632d98fc07164cc21d70a0808697' => $baseDir . '/rules/restoration/tests/Rector/Use_/RestoreFullyQualifiedNameRector/Source/ShortClassOnly.php',
 );
