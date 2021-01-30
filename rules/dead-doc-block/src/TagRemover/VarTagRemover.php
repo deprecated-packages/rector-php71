@@ -16,6 +16,7 @@ use Rector\AttributeAwarePhpDoc\Ast\Type\AttributeAwareUnionTypeNode;
 use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfoFactory;
 use Rector\PHPStanStaticTypeMapper\DoctrineTypeAnalyzer;
 use Rector\StaticTypeMapper\StaticTypeMapper;
+use Symplify\PackageBuilder\Reflection\ClassLikeExistenceChecker;
 
 final class VarTagRemover
 {
@@ -34,11 +35,17 @@ final class VarTagRemover
      */
     private $phpDocInfoFactory;
 
-    public function __construct(DoctrineTypeAnalyzer $doctrineTypeAnalyzer, StaticTypeMapper $staticTypeMapper, PhpDocInfoFactory $phpDocInfoFactory)
+    /**
+     * @var ClassLikeExistenceChecker
+     */
+    private $classLikeExistenceChecker;
+
+    public function __construct(DoctrineTypeAnalyzer $doctrineTypeAnalyzer, StaticTypeMapper $staticTypeMapper, PhpDocInfoFactory $phpDocInfoFactory, ClassLikeExistenceChecker $classLikeExistenceChecker)
     {
         $this->doctrineTypeAnalyzer = $doctrineTypeAnalyzer;
         $this->staticTypeMapper = $staticTypeMapper;
         $this->phpDocInfoFactory = $phpDocInfoFactory;
+        $this->classLikeExistenceChecker = $classLikeExistenceChecker;
     }
 
     /**
@@ -77,7 +84,7 @@ final class VarTagRemover
     {
         if ($varTagValueNode->type instanceof AttributeAwareUnionTypeNode) {
             foreach ($varTagValueNode->type->types as $type) {
-                if ($type instanceof AttributeAwareArrayTypeNode && class_exists((string) $type->type)) {
+                if ($type instanceof AttributeAwareArrayTypeNode && $this->classLikeExistenceChecker->doesClassLikeExist((string) $type->type)) {
                     return true;
                 }
             }
