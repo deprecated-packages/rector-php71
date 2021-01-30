@@ -62,6 +62,9 @@ CODE_SAMPLE
         if (! $entityTagValueNode instanceof EntityTagValueNode) {
             return null;
         }
+        if (! $entityTagValueNode->hasRepositoryClass()) {
+            return null;
+        }
         $entityTagValueNode->removeRepositoryClass();
         $phpDocInfo->markAsChanged();
         return $node;

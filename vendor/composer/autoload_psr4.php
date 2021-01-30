@@ -148,7 +148,6 @@ return array(
     'Rector\\BetterPhpDocParser\\' => array($baseDir . '/packages/better-php-doc-parser/src'),
     'Rector\\Autodiscovery\\' => array($baseDir . '/rules/autodiscovery/src'),
     'Rector\\AttributeAwarePhpDoc\\' => array($baseDir . '/packages/attribute-aware-php-doc/src'),
-    'Rector\\Architecture\\' => array($baseDir . '/rules/architecture/src'),
     'Psr\\SimpleCache\\' => array($vendorDir . '/psr/simple-cache/src'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/Psr/Log'),
     'Psr\\EventDispatcher\\' => array($vendorDir . '/psr/event-dispatcher/src'),
