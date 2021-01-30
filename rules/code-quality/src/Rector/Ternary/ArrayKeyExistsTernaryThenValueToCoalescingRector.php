@@ -71,7 +71,7 @@ CODE_SAMPLE
         if (! $this->areArrayKeysExistsArgsMatchingDimFetch($node->cond, $node->if)) {
             return null;
         }
-        if (! $this->isNull($node->else)) {
+        if (! $this->valueResolver->isNull($node->else)) {
             return null;
         }
         return new Coalesce($node->if, $node->else);

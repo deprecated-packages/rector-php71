@@ -130,7 +130,7 @@ CODE_SAMPLE
                 continue;
             }
 
-            $contextOptionValue = $this->isTrue($arrayItem->value);
+            $contextOptionValue = $this->valueResolver->isTrue($arrayItem->value);
             unset($contextOptions->items[$index]);
         }
         return $contextOptionValue;

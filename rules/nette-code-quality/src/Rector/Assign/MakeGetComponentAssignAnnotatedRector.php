@@ -200,7 +200,7 @@ CODE_SAMPLE
 
     private function resolveTypeFromShortControlNameAndVariable(String_ $shortControlString, Scope $scope, Expr $expr): Type
     {
-        $componentName = $this->getValue($shortControlString);
+        $componentName = $this->valueResolver->getValue($shortControlString);
         $componentName = ucfirst($componentName);
         $methodName = sprintf('createComponent%s', $componentName);
         $calledOnType = $scope->getType($expr);

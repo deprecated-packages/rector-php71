@@ -125,13 +125,13 @@ CODE_SAMPLE
         if (! $ternary->cond instanceof Identical) {
             return false;
         }
-        if ($this->areNodesEqual($ternary->cond->left, $funcCall->args[0]->value) && ! $this->isNull($ternary->cond->right)) {
+        if ($this->areNodesEqual($ternary->cond->left, $funcCall->args[0]->value) && ! $this->valueResolver->isNull($ternary->cond->right)) {
             return true;
         }
         if (! $this->areNodesEqual($ternary->cond->right, $funcCall->args[0]->value)) {
             return false;
         }
-        return ! $this->isNull($ternary->cond->left);
+        return ! $this->valueResolver->isNull($ternary->cond->left);
     }
 
     /**
@@ -142,12 +142,12 @@ CODE_SAMPLE
         if (! $ternary->cond instanceof NotIdentical) {
             return false;
         }
-        if ($this->areNodesEqual($ternary->cond->left, $funcCall->args[0]->value) && $this->isNull($ternary->cond->right)) {
+        if ($this->areNodesEqual($ternary->cond->left, $funcCall->args[0]->value) && $this->valueResolver->isNull($ternary->cond->right)) {
             return true;
         }
         if (! $this->areNodesEqual($ternary->cond->right, $funcCall->args[0]->value)) {
             return false;
         }
-        return $this->isNull($ternary->cond->left);
+        return $this->valueResolver->isNull($ternary->cond->left);
     }
 }

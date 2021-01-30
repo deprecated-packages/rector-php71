@@ -26,10 +26,13 @@ use Rector\Core\Exclusion\ExclusionManager;
 use Rector\Core\Logging\CurrentRectorProvider;
 use Rector\Core\NodeAnalyzer\ClassNodeAnalyzer;
 use Rector\Core\Php\PhpVersionProvider;
+use Rector\Core\PhpParser\Node\BetterNodeFinder;
 use Rector\Core\PhpParser\Node\Manipulator\VisibilityManipulator;
 use Rector\Core\PhpParser\Node\NodeFactory;
+use Rector\Core\PhpParser\Node\Value\ValueResolver;
 use Rector\Core\Rector\AbstractRector\AbstractRectorTrait;
 use Rector\Core\ValueObject\ProjectType;
+use Rector\NodeCollector\NodeCollector\NodeRepository;
 use Rector\NodeTypeResolver\Node\AttributeKey;
 use Rector\StaticTypeMapper\StaticTypeMapper;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -94,6 +97,21 @@ abstract class AbstractTemporaryRector extends NodeVisitorAbstract implements Ph
     protected $visibilityManipulator;
 
     /**
+     * @var ValueResolver
+     */
+    protected $valueResolver;
+
+    /**
+     * @var NodeRepository
+     */
+    protected $nodeRepository;
+
+    /**
+     * @var BetterNodeFinder
+     */
+    protected $betterNodeFinder;
+
+    /**
      * @var SymfonyStyle
      */
     private $symfonyStyle;
@@ -131,7 +149,7 @@ abstract class AbstractTemporaryRector extends NodeVisitorAbstract implements Ph
     /**
      * @required
      */
-    public function autowireAbstractTemporaryRector(VisibilityManipulator $visibilityManipulator, NodeFactory $nodeFactory, PhpDocInfoFactory $phpDocInfoFactory, SymfonyStyle $symfonyStyle, PhpVersionProvider $phpVersionProvider, BuilderFactory $builderFactory, ExclusionManager $exclusionManager, StaticTypeMapper $staticTypeMapper, ParameterProvider $parameterProvider, CurrentRectorProvider $currentRectorProvider, ClassNodeAnalyzer $classNodeAnalyzer, CurrentNodeProvider $currentNodeProvider, Skipper $skipper): void
+    public function autowireAbstractTemporaryRector(VisibilityManipulator $visibilityManipulator, NodeFactory $nodeFactory, PhpDocInfoFactory $phpDocInfoFactory, SymfonyStyle $symfonyStyle, PhpVersionProvider $phpVersionProvider, BuilderFactory $builderFactory, ExclusionManager $exclusionManager, StaticTypeMapper $staticTypeMapper, ParameterProvider $parameterProvider, CurrentRectorProvider $currentRectorProvider, ClassNodeAnalyzer $classNodeAnalyzer, CurrentNodeProvider $currentNodeProvider, Skipper $skipper, ValueResolver $valueResolver, NodeRepository $nodeRepository, BetterNodeFinder $betterNodeFinder): void
     {
         $this->visibilityManipulator = $visibilityManipulator;
         $this->nodeFactory = $nodeFactory;
@@ -146,6 +164,9 @@ abstract class AbstractTemporaryRector extends NodeVisitorAbstract implements Ph
         $this->classNodeAnalyzer = $classNodeAnalyzer;
         $this->currentNodeProvider = $currentNodeProvider;
         $this->skipper = $skipper;
+        $this->valueResolver = $valueResolver;
+        $this->nodeRepository = $nodeRepository;
+        $this->betterNodeFinder = $betterNodeFinder;
     }
 
     /**
@@ -212,7 +233,7 @@ abstract class AbstractTemporaryRector extends NodeVisitorAbstract implements Ph
     protected function areValues(array $nodes, array $expectedValues): bool
     {
         foreach ($nodes as $i => $node) {
-            if ($node !== null && $this->isValue($node, $expectedValues[$i])) {
+            if ($node !== null && $this->valueResolver->isValue($node, $expectedValues[$i])) {
                 continue;
             }
 

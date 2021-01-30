@@ -133,7 +133,7 @@ CODE_SAMPLE
         if ($node->expr === null) {
             return false;
         }
-        return $this->isNull($node->expr);
+        return $this->valueResolver->isNull($node->expr);
     }
 
     /**

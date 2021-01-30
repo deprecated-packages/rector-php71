@@ -137,7 +137,7 @@ CODE_SAMPLE
             if (! $node->expr instanceof String_) {
                 return false;
             }
-            return $this->isValue($node->expr, '');
+            return $this->valueResolver->isValue($node->expr, '');
         });
         if ($variableAssign instanceof Assign) {
             $variableAssign->expr = new Array_();

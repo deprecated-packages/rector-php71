@@ -193,10 +193,10 @@ CODE_SAMPLE
             if (! $node instanceof BinaryOp) {
                 return null;
             }
-            if ($this->propertyFetchManipulator->isLocalPropertyOfNames($node->left, $propertyNames) && $this->isNull($node->right)) {
+            if ($this->propertyFetchManipulator->isLocalPropertyOfNames($node->left, $propertyNames) && $this->valueResolver->isNull($node->right)) {
                 $node->right = new Array_();
             }
-            if ($this->propertyFetchManipulator->isLocalPropertyOfNames($node->right, $propertyNames) && $this->isNull($node->left)) {
+            if ($this->propertyFetchManipulator->isLocalPropertyOfNames($node->right, $propertyNames) && $this->valueResolver->isNull($node->left)) {
                 $node->left = new Array_();
             }
             return $node;
@@ -219,12 +219,12 @@ CODE_SAMPLE
         if (! $expr instanceof NotIdentical) {
             return false;
         }
-        if ($this->propertyFetchManipulator->isLocalPropertyOfNames($expr->left, $propertyNames) && $this->isNull($expr->right)) {
+        if ($this->propertyFetchManipulator->isLocalPropertyOfNames($expr->left, $propertyNames) && $this->valueResolver->isNull($expr->right)) {
             return true;
         }
         if (! $this->propertyFetchManipulator->isLocalPropertyOfNames($expr->right, $propertyNames)) {
             return false;
         }
-        return $this->isNull($expr->left);
+        return $this->valueResolver->isNull($expr->left);
     }
 }

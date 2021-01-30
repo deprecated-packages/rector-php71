@@ -121,7 +121,7 @@ CODE_SAMPLE
                     return false;
                 }
 
-                return $this->isFalse($node->expr);
+                return $this->valueResolver->isFalse($node->expr);
             }
             return false;
         });

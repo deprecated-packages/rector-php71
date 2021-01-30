@@ -56,7 +56,7 @@ CODE_SAMPLE
         if (! $compareValue instanceof Expr) {
             return null;
         }
-        if (! $this->isFalse($compareValue)) {
+        if (! $this->valueResolver->isFalse($compareValue)) {
             return null;
         }
         return new BooleanNot($this->getFunction($node));

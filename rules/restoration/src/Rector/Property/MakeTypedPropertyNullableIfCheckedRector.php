@@ -157,9 +157,9 @@ CODE_SAMPLE
         if (! $node instanceof Identical && ! $node instanceof NotIdentical) {
             return null;
         }
-        if ($node->left instanceof PropertyFetch && $this->isNull($node->right)) {
+        if ($node->left instanceof PropertyFetch && $this->valueResolver->isNull($node->right)) {
             $propertyFetch = $node->left;
-        } elseif ($node->right instanceof PropertyFetch && $this->isNull($node->left)) {
+        } elseif ($node->right instanceof PropertyFetch && $this->valueResolver->isNull($node->left)) {
             $propertyFetch = $node->right;
         } else {
             return null;

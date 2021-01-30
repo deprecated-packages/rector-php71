@@ -64,7 +64,7 @@ CODE_SAMPLE
 
     private function isTrueOrBooleanAndTrues(Node $node): bool
     {
-        if ($this->isTrue($node)) {
+        if ($this->valueResolver->isTrue($node)) {
             return true;
         }
         if (! $node instanceof BooleanAnd) {

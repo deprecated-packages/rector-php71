@@ -65,6 +65,6 @@ abstract class AbstractFormAddRector extends AbstractRector
         ) {
             return true;
         }
-        return $this->isValue($typeValue, 'collection');
+        return $this->valueResolver->isValue($typeValue, 'collection');
     }
 }

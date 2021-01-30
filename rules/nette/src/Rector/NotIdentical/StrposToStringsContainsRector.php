@@ -67,7 +67,7 @@ CODE_SAMPLE
         if (! $funcCall instanceof FuncCall) {
             return null;
         }
-        if (isset($funcCall->args[2]) && ! $this->isValue($funcCall->args[2]->value, 0)) {
+        if (isset($funcCall->args[2]) && ! $this->valueResolver->isValue($funcCall->args[2]->value, 0)) {
             return null;
         }
         $containsStaticCall = $this->nodeFactory->createStaticCall('Nette\Utils\Strings', 'contains');
@@ -81,7 +81,7 @@ CODE_SAMPLE
 
     private function matchStrposInComparisonToFalse(BinaryOp $binaryOp): ?FuncCall
     {
-        if ($this->isFalse($binaryOp->left)) {
+        if ($this->valueResolver->isFalse($binaryOp->left)) {
             if (! $binaryOp->right instanceof FuncCall) {
                 return null;
             }
@@ -90,7 +90,7 @@ CODE_SAMPLE
                 return $binaryOp->right;
             }
         }
-        if ($this->isFalse($binaryOp->right)) {
+        if ($this->valueResolver->isFalse($binaryOp->right)) {
             if (! $binaryOp->left instanceof FuncCall) {
                 return null;
             }

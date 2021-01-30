@@ -54,7 +54,7 @@ final class SimplifyArraySearchRector extends AbstractRector
         $twoNodeMatch = $this->binaryOpManipulator->matchFirstAndSecondConditionNode($node, function (Node $node): bool {
             return $this->isFuncCallName($node, 'array_search');
         }, function (Node $node): bool {
-            return $this->isFalse($node);
+            return $this->valueResolver->isFalse($node);
         });
         if (! $twoNodeMatch instanceof TwoNodeMatch) {
             return null;

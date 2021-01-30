@@ -107,7 +107,7 @@ CODE_SAMPLE
             }
 
             foreach (self::OLD_TO_NEW_OPTION_NAME as $oldName => $newName) {
-                if (! $this->isValue($arrayItem->key, $oldName)) {
+                if (! $this->valueResolver->isValue($arrayItem->key, $oldName)) {
                     continue;
                 }
 

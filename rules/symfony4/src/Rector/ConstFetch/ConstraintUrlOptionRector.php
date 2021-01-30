@@ -44,7 +44,7 @@ final class ConstraintUrlOptionRector extends AbstractRector
      */
     public function refactor(Node $node): ?Node
     {
-        if (! $this->isTrue($node)) {
+        if (! $this->valueResolver->isTrue($node)) {
             return null;
         }
         $prevNode = $node->getAttribute(AttributeKey::PREVIOUS_NODE);

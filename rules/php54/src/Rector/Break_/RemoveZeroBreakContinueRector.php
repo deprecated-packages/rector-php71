@@ -77,7 +77,7 @@ CODE_SAMPLE
             return null;
         }
         if ($node->num instanceof LNumber) {
-            $number = $this->getValue($node->num);
+            $number = $this->valueResolver->getValue($node->num);
             if ($number > 1) {
                 return null;
             }

@@ -116,7 +116,7 @@ CODE_SAMPLE
         $oldArgs = $node->args;
         $node->args = [];
         $eventReference = $oldArgs[0]->value;
-        $classAndStaticProperty = $this->getValue($eventReference, true);
+        $classAndStaticProperty = $this->valueResolver->getValue($eventReference, true);
         $eventClassName = $this->eventClassNaming->createEventClassNameFromClassPropertyReference($classAndStaticProperty);
         $args = $this->createNewArgs($oldArgs);
         $new = new New_(new FullyQualified($eventClassName), $args);

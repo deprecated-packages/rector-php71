@@ -94,7 +94,7 @@ CODE_SAMPLE
                 continue;
             }
 
-            if (! $this->isValues($optionsArrayItem->key, ['type', 'entry_type'])) {
+            if (! $this->valueResolver->isValues($optionsArrayItem->key, ['type', 'entry_type'])) {
                 continue;
             }
 

@@ -101,7 +101,7 @@ CODE_SAMPLE
         if ($returnToRemove->expr === null) {
             return null;
         }
-        if (! $this->isBool($returnToRemove->expr)) {
+        if (! $this->valueResolver->isTrueOrFalse($returnToRemove->expr)) {
             return null;
         }
         if ($return->expr === null) {
@@ -136,7 +136,7 @@ CODE_SAMPLE
         if (! $returnExpression instanceof Expr) {
             return true;
         }
-        if (! $this->isBool($returnExpression)) {
+        if (! $this->valueResolver->isTrueOrFalse($returnExpression)) {
             return true;
         }
         $foreachValueStaticType = $this->getStaticType($foreach->expr);
@@ -171,7 +171,7 @@ CODE_SAMPLE
         if ($ifStatment->expr === null) {
             return false;
         }
-        return $this->isBool($ifStatment->expr);
+        return $this->valueResolver->isTrueOrFalse($ifStatment->expr);
     }
 
     /**
@@ -188,7 +188,7 @@ CODE_SAMPLE
 
     private function createReturn(Expr $expr, FuncCall $funcCall): Return_
     {
-        $expr = $this->isFalse($expr) ? new BooleanNot($funcCall) : $funcCall;
+        $expr = $this->valueResolver->isFalse($expr) ? new BooleanNot($funcCall) : $funcCall;
         return new Return_($expr);
     }
 }

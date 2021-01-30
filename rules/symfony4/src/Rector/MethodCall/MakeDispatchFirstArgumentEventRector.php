@@ -121,7 +121,7 @@ CODE_SAMPLE
         if (! $methodCall->args[1]->value instanceof ClassConstFetch) {
             return false;
         }
-        $classConst = $this->getValue($methodCall->args[1]->value);
+        $classConst = $this->valueResolver->getValue($methodCall->args[1]->value);
         $eventStaticType = $this->getStaticType($methodCall->args[0]->value);
         if (! $eventStaticType instanceof ObjectType) {
             return false;
