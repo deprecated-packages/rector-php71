@@ -7,7 +7,6 @@ namespace Rector\Symfony3\Rector\ClassMethod;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassLike;
 use PhpParser\Node\Stmt\ClassMethod;
-use Rector\BetterPhpDocParser\PhpDocManipulator\PhpDocTagRemover;
 use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\Sensio\SensioMethodTagValueNode;
 use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\Symfony\SymfonyRouteTagValueNode;
 use Rector\Core\Rector\AbstractRector;
@@ -23,16 +22,6 @@ use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
  */
 final class MergeMethodAnnotationToRouteAnnotationRector extends AbstractRector
 {
-    /**
-     * @var PhpDocTagRemover
-     */
-    private $phpDocTagRemover;
-
-    public function __construct(PhpDocTagRemover $phpDocTagRemover)
-    {
-        $this->phpDocTagRemover = $phpDocTagRemover;
-    }
-
     public function getRuleDefinition(): RuleDefinition
     {
         return new RuleDefinition('Merge removed @Method annotation to @Route one', [
@@ -100,7 +89,7 @@ CODE_SAMPLE
             return null;
         }
         $symfonyRouteTagValueNode->changeMethods($methods);
-        $this->phpDocTagRemover->removeTagValueFromNode($phpDocInfo, $sensioMethodTagValueNode);
+        $phpDocInfo->removeByType(SensioMethodTagValueNode::class);
         return $node;
     }
 }

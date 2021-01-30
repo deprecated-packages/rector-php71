@@ -15,15 +15,15 @@ use PhpParser\Node\Stmt\Property;
 use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfoFactory;
 use Rector\BetterPhpDocParser\PhpDocManipulator\PhpDocTagRemover;
 use Rector\PhpAttribute\Contract\PhpAttributableTagNodeInterface;
-use Rector\PhpAttribute\Printer\PhpAttributteGroupFactory;
+use Rector\PhpAttribute\Printer\PhpAttributeGroupFactory;
 use Rector\Testing\PHPUnit\StaticPHPUnitEnvironment;
 
 final class AnnotationToAttributeConverter
 {
     /**
-     * @var PhpAttributteGroupFactory
+     * @var PhpAttributeGroupFactory
      */
-    private $phpAttributteGroupFactory;
+    private $phpAttributeGroupFactory;
 
     /**
      * @var PhpDocInfoFactory
@@ -35,9 +35,9 @@ final class AnnotationToAttributeConverter
      */
     private $phpDocTagRemover;
 
-    public function __construct(PhpAttributteGroupFactory $phpAttributteGroupFactory, PhpDocInfoFactory $phpDocInfoFactory, PhpDocTagRemover $phpDocTagRemover)
+    public function __construct(PhpAttributeGroupFactory $phpAttributeGroupFactory, PhpDocInfoFactory $phpDocInfoFactory, PhpDocTagRemover $phpDocTagRemover)
     {
-        $this->phpAttributteGroupFactory = $phpAttributteGroupFactory;
+        $this->phpAttributeGroupFactory = $phpAttributeGroupFactory;
         $this->phpDocInfoFactory = $phpDocInfoFactory;
         $this->phpDocTagRemover = $phpDocTagRemover;
     }
@@ -48,13 +48,13 @@ final class AnnotationToAttributeConverter
     public function convertNode(Node $node): ?Node
     {
         $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($node);
-        $hasNewAttrGroups = false;
         // 0. has 0 nodes, nothing to change
         /** @var PhpAttributableTagNodeInterface[] $phpAttributableTagNodes */
         $phpAttributableTagNodes = $phpDocInfo->findAllByType(PhpAttributableTagNodeInterface::class);
         if ($phpAttributableTagNodes === []) {
             return null;
         }
+        $hasNewAttrGroups = false;
         // 1. keep only those, whom's attribute class exists
         $phpAttributableTagNodes = $this->filterOnlyExistingAttributes($phpAttributableTagNodes);
         if ($phpAttributableTagNodes !== []) {
@@ -65,7 +65,7 @@ final class AnnotationToAttributeConverter
             $this->phpDocTagRemover->removeTagValueFromNode($phpDocInfo, $phpAttributableTagNode);
         }
         // 3. convert annotations to attributes
-        $newAttrGroups = $this->phpAttributteGroupFactory->create($phpAttributableTagNodes);
+        $newAttrGroups = $this->phpAttributeGroupFactory->create($phpAttributableTagNodes);
         $node->attrGroups = array_merge($node->attrGroups, $newAttrGroups);
         if ($hasNewAttrGroups) {
             return $node;

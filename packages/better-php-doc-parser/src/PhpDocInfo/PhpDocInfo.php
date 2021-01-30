@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Rector\BetterPhpDocParser\PhpDocInfo;
 
 use PhpParser\Node;
+use PHPStan\PhpDocParser\Ast\Node as PhpDocNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\GenericTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
@@ -260,14 +261,18 @@ final class PhpDocInfo
     }
 
     /**
-     * @template T as \PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagValueNode
+     * @template T as \PHPStan\PhpDocParser\Ast\Node
      * @param class-string<T> $type
      * @return T|null
      */
-    public function getByType(string $type): ?PhpDocTagValueNode
+    public function getByType(string $type): ?PhpDocNode
     {
         $this->ensureTypeIsTagValueNode($type, __METHOD__);
         foreach ($this->phpDocNode->children as $phpDocChildNode) {
+            if (is_a($phpDocChildNode, $type, true)) {
+                return $phpDocChildNode;
+            }
+
             if (! $phpDocChildNode instanceof PhpDocTagNode) {
                 continue;
             }
@@ -291,6 +296,11 @@ final class PhpDocInfo
         $this->ensureTypeIsTagValueNode($type, __METHOD__);
         $foundTagsValueNodes = [];
         foreach ($this->phpDocNode->children as $phpDocChildNode) {
+            if (is_a($phpDocChildNode, $type, true)) {
+                $foundTagsValueNodes[] = $phpDocChildNode;
+                continue;
+            }
+
             if (! $phpDocChildNode instanceof PhpDocTagNode) {
                 continue;
             }
@@ -313,6 +323,11 @@ final class PhpDocInfo
     {
         $this->ensureTypeIsTagValueNode($type, __METHOD__);
         foreach ($this->phpDocNode->children as $key => $phpDocChildNode) {
+            if (is_a($phpDocChildNode, $type, true)) {
+                unset($this->phpDocNode->children[$key]);
+                $this->markAsChanged();
+            }
+
             if (! $phpDocChildNode instanceof PhpDocTagNode) {
                 continue;
             }
@@ -322,7 +337,6 @@ final class PhpDocInfo
             }
 
             unset($this->phpDocNode->children[$key]);
-
             $this->markAsChanged();
         }
     }
@@ -343,6 +357,9 @@ final class PhpDocInfo
         return $paramTypesByName;
     }
 
+    /**
+     * @todo remove to keep united API, just 1 usage
+     */
     public function addBareTag(string $tag): void
     {
         $tag = '@' . ltrim($tag, '@');
@@ -352,6 +369,9 @@ final class PhpDocInfo
 
     public function addTagValueNode(PhpDocTagValueNode $phpDocTagValueNode): void
     {
+        if (is_a($phpDocTagValueNode, PhpDocTagNode::class)) {
+            throw new ShouldNotHappenException();
+        }
         $name = $this->resolveNameForPhpDocTagValueNode($phpDocTagValueNode);
         $attributeAwarePhpDocTagNode = new AttributeAwarePhpDocTagNode($name, $phpDocTagValueNode);
         $this->addPhpDocTagNode($attributeAwarePhpDocTagNode);
@@ -480,7 +500,7 @@ final class PhpDocInfo
                 return $name;
             }
         }
-        throw new NotImplementedException();
+        throw new NotImplementedException(get_class($phpDocTagValueNode));
     }
 
     /**

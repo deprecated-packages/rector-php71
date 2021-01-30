@@ -9,6 +9,7 @@ use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\Doctrine\AbstractDoctrineTa
 use Rector\Core\Exception\ShouldNotHappenException;
 use Rector\PhpAttribute\Contract\ManyPhpAttributableTagNodeInterface;
 use Rector\PhpAttribute\Contract\PhpAttributableTagNodeInterface;
+use Rector\PhpAttribute\Printer\PhpAttributeGroupFactory;
 
 final class JoinTableTagValueNode extends AbstractDoctrineTagValueNode implements PhpAttributableTagNodeInterface, ManyPhpAttributableTagNodeInterface
 {
@@ -118,7 +119,7 @@ final class JoinTableTagValueNode extends AbstractDoctrineTagValueNode implement
 
     public function getAttributeClassName(): string
     {
-        return 'TBA';
+        return PhpAttributeGroupFactory::TO_BE_ANNOUNCED;
     }
 
     /**

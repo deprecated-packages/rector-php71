@@ -2,17 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Rector\BetterPhpDocParser\PhpDocNodeFactory;
+namespace Rector\BetterPhpDocParser\PhpDocNodeFactory\StringMatchingPhpDocNodeFactory;
 
+use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\PhpDoc\InvalidTagValueNode;
-use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
 use PHPStan\PhpDocParser\Parser\ParserException;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
-use Rector\AttributeAwarePhpDoc\Ast\PhpDoc\DataProviderTagValueNode;
+use Rector\BetterPhpDocParser\Contract\PhpDocParserAwareInterface;
+use Rector\BetterPhpDocParser\Contract\StringTagMatchingPhpDocNodeFactoryInterface;
+use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\PHPUnit\PHPUnitDataProviderTagValueNode;
 use Symplify\PackageBuilder\Reflection\PrivatesCaller;
 
-final class PHPUnitDataProviderDocNodeFactory
+final class PHPUnitDataProviderDocNodeFactory implements StringTagMatchingPhpDocNodeFactoryInterface, PhpDocParserAwareInterface
 {
     /**
      * @var PrivatesCaller
@@ -29,19 +32,20 @@ final class PHPUnitDataProviderDocNodeFactory
         $this->privatesCaller = $privatesCaller;
     }
 
-    public function createFromTokens(TokenIterator $tokenIterator): ?PhpDocTagValueNode
+    public function createFromTokens(TokenIterator $tokenIterator): ?Node
     {
         try {
             $tokenIterator->pushSavePoint();
-            $attributeAwareDataProviderTagValueNode = $this->parseDataProviderTagValue($tokenIterator);
+            $phpUnitDataProviderTagValueNode = $this->parseDataProviderTagValue($tokenIterator);
             $tokenIterator->dropSavePoint();
 
-            return $attributeAwareDataProviderTagValueNode;
+            return $phpUnitDataProviderTagValueNode;
         } catch (ParserException $parserException) {
             $tokenIterator->rollback();
             $description = $this->privatesCaller->callPrivateMethod($this->phpDocParser, 'parseOptionalDescription', [$tokenIterator]);
 
-            return new InvalidTagValueNode($description, $parserException);
+            $invalidTagValueNode = new InvalidTagValueNode($description, $parserException);
+            return new PhpDocTagNode('', $invalidTagValueNode);
         }
     }
 
@@ -53,12 +57,17 @@ final class PHPUnitDataProviderDocNodeFactory
         $this->phpDocParser = $phpDocParser;
     }
 
+    public function match(string $tag): bool
+    {
+        return strtolower($tag) === PHPUnitDataProviderTagValueNode::NAME;
+    }
+
     /**
      * Override of parent private method to allow reference: https://github.com/rectorphp/rector/pull/1735
      */
-    private function parseDataProviderTagValue(TokenIterator $tokenIterator): DataProviderTagValueNode
+    private function parseDataProviderTagValue(TokenIterator $tokenIterator): PHPUnitDataProviderTagValueNode
     {
         $method = $this->privatesCaller->callPrivateMethod($this->phpDocParser, 'parseOptionalDescription', [$tokenIterator]);
-        return new DataProviderTagValueNode($method);
+        return new PHPUnitDataProviderTagValueNode($method);
     }
 }

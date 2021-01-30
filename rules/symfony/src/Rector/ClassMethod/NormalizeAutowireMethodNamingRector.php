@@ -7,9 +7,9 @@ namespace Rector\Symfony\Rector\ClassMethod;
 use PhpParser\Node;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Stmt\ClassMethod;
+use Rector\AttributeAwarePhpDoc\Ast\PhpDoc\SymfonyRequiredTagNode;
 use Rector\Core\Rector\AbstractRector;
 use Rector\NodeTypeResolver\Node\AttributeKey;
-use Rector\PhpAttribute\ValueObject\TagName;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
@@ -57,7 +57,8 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        if (! $this->hasTagByName($node, TagName::REQUIRED)) {
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($node);
+        if (! $phpDocInfo->hasByType(SymfonyRequiredTagNode::class)) {
             return null;
         }
         $classShortName = $node->getAttribute(AttributeKey::CLASS_SHORT_NAME);

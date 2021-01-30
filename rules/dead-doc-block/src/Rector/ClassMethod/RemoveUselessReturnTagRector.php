@@ -6,10 +6,8 @@ namespace Rector\DeadDocBlock\Rector\ClassMethod;
 
 use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassMethod;
-use Rector\AttributeAwarePhpDoc\Ast\PhpDoc\AttributeAwareReturnTagValueNode;
-use Rector\BetterPhpDocParser\PhpDocManipulator\PhpDocTagRemover;
 use Rector\Core\Rector\AbstractRector;
-use Rector\DeadDocBlock\DeadReturnTagValueNodeAnalyzer;
+use Rector\DeadDocBlock\TagRemover\ReturnTagRemover;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
@@ -19,19 +17,13 @@ use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 final class RemoveUselessReturnTagRector extends AbstractRector
 {
     /**
-     * @var DeadReturnTagValueNodeAnalyzer
+     * @var ReturnTagRemover
      */
-    private $deadReturnTagValueNodeAnalyzer;
+    private $returnTagRemover;
 
-    /**
-     * @var PhpDocTagRemover
-     */
-    private $phpDocTagRemover;
-
-    public function __construct(DeadReturnTagValueNodeAnalyzer $deadReturnTagValueNodeAnalyzer, PhpDocTagRemover $phpDocTagRemover)
+    public function __construct(ReturnTagRemover $returnTagRemover)
     {
-        $this->deadReturnTagValueNodeAnalyzer = $deadReturnTagValueNodeAnalyzer;
-        $this->phpDocTagRemover = $phpDocTagRemover;
+        $this->returnTagRemover = $returnTagRemover;
     }
 
     public function getRuleDefinition(): RuleDefinition
@@ -79,14 +71,10 @@ CODE_SAMPLE
     public function refactor(Node $node): ?Node
     {
         $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($node);
-        $attributeAwareReturnTagValueNode = $phpDocInfo->getReturnTagValue();
-        if (! $attributeAwareReturnTagValueNode instanceof AttributeAwareReturnTagValueNode) {
-            return null;
+        $this->returnTagRemover->removeReturnTagIfUseless($phpDocInfo, $node);
+        if ($phpDocInfo->hasChanged()) {
+            return $node;
         }
-        if (! $this->deadReturnTagValueNodeAnalyzer->isDead($attributeAwareReturnTagValueNode, $node)) {
-            return null;
-        }
-        $this->phpDocTagRemover->removeTagValueFromNode($phpDocInfo, $attributeAwareReturnTagValueNode);
-        return $node;
+        return null;
     }
 }
