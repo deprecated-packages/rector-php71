@@ -9,10 +9,14 @@ use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\New_;
 use PhpParser\Node\Expr\StaticCall;
+use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Stmt\Return_;
+use PhpParser\NodeFinder;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeWithClassName;
 use Rector\Core\Util\StaticInstanceOf;
+use Rector\Defluent\Reflection\MethodCallToClassMethodParser;
 use Rector\NodeNameResolver\NodeNameResolver;
 use Rector\NodeTypeResolver\Node\AttributeKey;
 use Rector\NodeTypeResolver\NodeTypeResolver;
@@ -41,10 +45,22 @@ final class FluentChainMethodCallNodeAnalyzer
      */
     private $nodeNameResolver;
 
-    public function __construct(NodeNameResolver $nodeNameResolver, NodeTypeResolver $nodeTypeResolver)
+    /**
+     * @var NodeFinder
+     */
+    private $nodeFinder;
+
+    /**
+     * @var MethodCallToClassMethodParser
+     */
+    private $methodCallToClassMethodParser;
+
+    public function __construct(NodeNameResolver $nodeNameResolver, NodeTypeResolver $nodeTypeResolver, NodeFinder $nodeFinder, MethodCallToClassMethodParser $methodCallToClassMethodParser)
     {
         $this->nodeTypeResolver = $nodeTypeResolver;
         $this->nodeNameResolver = $nodeNameResolver;
+        $this->nodeFinder = $nodeFinder;
+        $this->methodCallToClassMethodParser = $methodCallToClassMethodParser;
     }
 
     /**
@@ -79,7 +95,7 @@ final class FluentChainMethodCallNodeAnalyzer
                 }
             }
         }
-        return true;
+        return ! $this->isMethodCallCreatingNewInstance($methodCall);
     }
 
     public function isLastChainMethodCall(MethodCall $methodCall): bool
@@ -195,5 +211,26 @@ final class FluentChainMethodCallNodeAnalyzer
     private function isCall(Expr $expr): bool
     {
         return StaticInstanceOf::isOneOf($expr, [MethodCall::class, StaticCall::class]);
+    }
+
+    private function isMethodCallCreatingNewInstance(MethodCall $methodCall): bool
+    {
+        $classMethod = $this->methodCallToClassMethodParser->parseMethodCall($methodCall);
+        if (! $classMethod instanceof ClassMethod) {
+            return false;
+        }
+        /** @var Return_[] $returns */
+        $returns = $this->nodeFinder->findInstanceOf($classMethod, Return_::class);
+        foreach ($returns as $return) {
+            if (! $return->expr instanceof New_) {
+                continue;
+            }
+
+            $new = $return->expr;
+            if ($this->nodeNameResolver->isName($new->class, 'self')) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -6,9 +6,9 @@ namespace Rector\Generics\Reflection;
 
 use Nette\Utils\Strings;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
-use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\MethodReflection;
 use Rector\Generics\TagValueNodeFactory\MethodTagValueNodeFactory;
+use Rector\Generics\ValueObject\ChildParentClassReflections;
 use Symplify\SimplePhpDocParser\SimplePhpDocParser;
 use Symplify\SimplePhpDocParser\ValueObject\Ast\PhpDoc\SimplePhpDocNode;
 
@@ -33,9 +33,10 @@ final class ClassGenericMethodResolver
     /**
      * @return MethodTagValueNode[]
      */
-    public function resolveFromClass(ClassReflection $classReflection): array
+    public function resolveFromClass(ChildParentClassReflections $genericChildParentClassReflections): array
     {
         $methodTagValueNodes = [];
+        $classReflection = $genericChildParentClassReflections->getParentClassReflection();
         $templateNames = array_keys($classReflection->getTemplateTags());
         foreach ($classReflection->getNativeMethods() as $methodReflection) {
             $parentMethodDocComment = $methodReflection->getDocComment();
@@ -45,7 +46,7 @@ final class ClassGenericMethodResolver
 
             // how to parse?
             $parentMethodSimplePhpDocNode = $this->simplePhpDocParser->parseDocBlock($parentMethodDocComment);
-            $methodTagValueNode = $this->resolveMethodTagValueNode($parentMethodSimplePhpDocNode, $templateNames, $methodReflection);
+            $methodTagValueNode = $this->resolveMethodTagValueNode($parentMethodSimplePhpDocNode, $templateNames, $methodReflection, $genericChildParentClassReflections);
             if (! $methodTagValueNode instanceof MethodTagValueNode) {
                 continue;
             }
@@ -58,7 +59,7 @@ final class ClassGenericMethodResolver
     /**
      * @param string[] $templateNames
      */
-    private function resolveMethodTagValueNode(SimplePhpDocNode $simplePhpDocNode, array $templateNames, MethodReflection $methodReflection): ?MethodTagValueNode
+    private function resolveMethodTagValueNode(SimplePhpDocNode $simplePhpDocNode, array $templateNames, MethodReflection $methodReflection, ChildParentClassReflections $genericChildParentClassReflections): ?MethodTagValueNode
     {
         foreach ($simplePhpDocNode->getReturnTagValues() as $returnTagValueNode) {
             foreach ($templateNames as $templateName) {
@@ -67,7 +68,7 @@ final class ClassGenericMethodResolver
                     continue;
                 }
 
-                return $this->methodTagValueNodeFactory->createFromMethodReflectionAndReturnTagValueNode($methodReflection, $returnTagValueNode);
+                return $this->methodTagValueNodeFactory->createFromMethodReflectionAndReturnTagValueNode($methodReflection, $returnTagValueNode, $genericChildParentClassReflections);
             }
         }
         return null;

@@ -34,7 +34,7 @@ final class GenericTypeSpecifier
      */
     public function replaceGenericTypesWithSpecificTypes(array $methodTagValueNodes, Node $node, ClassReflection $classReflection): void
     {
-        $templateTypeMap = $this->resolveAvailableTempalteTypeMap($classReflection);
+        $templateTypeMap = $this->resolveAvailableTemplateTypeMap($classReflection);
         foreach ($methodTagValueNodes as $methodTagValueNode) {
             if ($methodTagValueNode->returnType === null) {
                 continue;
@@ -48,7 +48,7 @@ final class GenericTypeSpecifier
         }
     }
 
-    private function resolveAvailableTempalteTypeMap(ClassReflection $classReflection): TemplateTypeMap
+    private function resolveAvailableTemplateTypeMap(ClassReflection $classReflection): TemplateTypeMap
     {
         $templateTypeMap = $classReflection->getTemplateTypeMap();
         // add template map from extends
