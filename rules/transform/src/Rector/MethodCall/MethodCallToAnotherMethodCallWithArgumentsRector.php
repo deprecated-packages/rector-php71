@@ -72,7 +72,7 @@ CODE_SAMPLE
             }
 
             $node->name = new Identifier($methodCallRenamedWithAddedArgument->getNewMethod());
-            $node->args = $this->createArgs($methodCallRenamedWithAddedArgument->getNewArguments());
+            $node->args = $this->nodeFactory->createArgs($methodCallRenamedWithAddedArgument->getNewArguments());
 
             return $node;
         }

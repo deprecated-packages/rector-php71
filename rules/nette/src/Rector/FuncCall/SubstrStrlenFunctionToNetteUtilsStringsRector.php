@@ -67,7 +67,7 @@ CODE_SAMPLE
                 continue;
             }
 
-            return $this->createStaticCall('Nette\Utils\Strings', $staticMethod, $node->args);
+            return $this->nodeFactory->createStaticCall('Nette\Utils\Strings', $staticMethod, $node->args);
         }
         return null;
     }

@@ -55,7 +55,7 @@ final class RedirectToRouteRector extends AbstractRector
         if (! $this->isName($argumentValue->name, 'generateUrl')) {
             return null;
         }
-        return $this->createMethodCall('this', 'redirectToRoute', $this->resolveArguments($node));
+        return $this->nodeFactory->createMethodCall('this', 'redirectToRoute', $this->resolveArguments($node));
     }
 
     /**

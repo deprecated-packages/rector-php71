@@ -60,7 +60,7 @@ CODE_SAMPLE
             return null;
         }
         $onlyProperty = $node->props[0];
-        $onlyProperty->default = $this->createNull();
+        $onlyProperty->default = $this->nodeFactory->createNull();
         return $node;
     }
 

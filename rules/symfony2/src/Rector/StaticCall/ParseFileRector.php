@@ -68,7 +68,7 @@ final class ParseFileRector extends AbstractRector
         if (! $this->isArgumentYamlFile($node)) {
             return null;
         }
-        $funcCall = $this->createFuncCall('file_get_contents', [$node->args[0]]);
+        $funcCall = $this->nodeFactory->createFuncCall('file_get_contents', [$node->args[0]]);
         $node->args[0] = new Arg($funcCall);
         return $node;
     }

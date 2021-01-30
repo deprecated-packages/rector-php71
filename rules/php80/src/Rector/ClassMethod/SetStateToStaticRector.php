@@ -55,7 +55,7 @@ CODE_SAMPLE
         if ($this->shouldSkip($node)) {
             return null;
         }
-        $this->makeStatic($node);
+        $this->visibilityManipulator->makeStatic($node);
         return $node;
     }
 

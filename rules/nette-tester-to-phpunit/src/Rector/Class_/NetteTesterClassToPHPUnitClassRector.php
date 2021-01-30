@@ -117,7 +117,7 @@ CODE_SAMPLE
     {
         foreach ($class->getMethods() as $classMethod) {
             if ($this->isNames($classMethod, [MethodName::SET_UP, MethodName::TEAR_DOWN])) {
-                $this->makeProtected($classMethod);
+                $this->visibilityManipulator->makeProtected($classMethod);
             }
         }
     }

@@ -83,7 +83,7 @@ CODE_SAMPLE
         if (! $this->areNodesEqual($needle, $comparedNeedleExpr)) {
             return null;
         }
-        return $this->createFuncCall('str_ends_with', [$haystack, $needle]);
+        return $this->nodeFactory->createFuncCall('str_ends_with', [$haystack, $needle]);
     }
 
     private function refactorSubstrCompare(BinaryOp $binaryOp): ?FuncCall
@@ -107,7 +107,7 @@ CODE_SAMPLE
         if (! $this->areNodesEqual($needle, $comparedNeedleExpr)) {
             return null;
         }
-        return $this->createFuncCall('str_ends_with', [$haystack, $needle]);
+        return $this->nodeFactory->createFuncCall('str_ends_with', [$haystack, $needle]);
     }
 
     private function matchUnaryMinusStrlenFuncCallArgValue(Node $node): ?Expr

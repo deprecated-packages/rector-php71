@@ -149,6 +149,6 @@ CODE_SAMPLE
         if ($classMethod->isPrivate()) {
             return;
         }
-        $this->makePrivate($classMethod);
+        $this->visibilityManipulator->makePrivate($classMethod);
     }
 }

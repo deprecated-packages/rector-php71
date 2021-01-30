@@ -66,7 +66,7 @@ CODE_SAMPLE
         /** @var FuncCall $funcCall */
         $funcCall = $node->if;
         $firstExpr = $funcCall->args[0]->value;
-        return $this->createFuncCall('get_debug_type', [$firstExpr]);
+        return $this->nodeFactory->createFuncCall('get_debug_type', [$firstExpr]);
     }
 
     private function shouldSkip(Ternary $ternary): bool

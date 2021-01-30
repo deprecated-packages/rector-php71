@@ -57,7 +57,7 @@ final class FuncCallToStaticCallRector extends AbstractRector implements Configu
                 continue;
             }
 
-            return $this->createStaticCall($funcCallsToStaticCall->getNewClassName(), $funcCallsToStaticCall->getNewMethodName(), $node->args);
+            return $this->nodeFactory->createStaticCall($funcCallsToStaticCall->getNewClassName(), $funcCallsToStaticCall->getNewMethodName(), $node->args);
         }
         return null;
     }

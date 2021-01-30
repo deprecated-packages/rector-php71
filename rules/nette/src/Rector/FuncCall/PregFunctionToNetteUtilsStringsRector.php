@@ -133,7 +133,7 @@ CODE_SAMPLE
             $args[] = $funcCall->args[1];
             $args[] = $funcCall->args[0];
         }
-        return $this->createStaticCall('Nette\Utils\Strings', $methodName, $args);
+        return $this->nodeFactory->createStaticCall('Nette\Utils\Strings', $methodName, $args);
     }
 
     /**

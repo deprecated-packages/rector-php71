@@ -92,6 +92,6 @@ CODE_SAMPLE
             return null;
         }
         $this->addConstructorDependencyToClass($classLike, new StringType(), $propertyName);
-        return $this->createPropertyFetch('this', $propertyName);
+        return $this->nodeFactory->createPropertyFetch('this', $propertyName);
     }
 }

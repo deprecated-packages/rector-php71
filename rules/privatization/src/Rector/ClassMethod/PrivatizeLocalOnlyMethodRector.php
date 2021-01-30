@@ -118,7 +118,7 @@ CODE_SAMPLE
         if ($this->classMethodExternalCallNodeAnalyzer->hasExternalCall($node)) {
             return null;
         }
-        $this->makePrivate($node);
+        $this->visibilityManipulator->makePrivate($node);
         return $node;
     }
 

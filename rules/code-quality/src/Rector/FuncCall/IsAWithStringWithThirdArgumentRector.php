@@ -66,7 +66,7 @@ CODE_SAMPLE
         if (! $firstArgumentStaticType instanceof StringType) {
             return null;
         }
-        $node->args[2] = new Arg($this->createTrue());
+        $node->args[2] = new Arg($this->nodeFactory->createTrue());
         return $node;
     }
 }

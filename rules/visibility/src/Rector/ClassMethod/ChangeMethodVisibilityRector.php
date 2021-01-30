@@ -98,7 +98,7 @@ CODE_SAMPLE
                 continue;
             }
 
-            $this->changeNodeVisibility($node, $methodVisibility->getVisibility());
+            $this->visibilityManipulator->changeNodeVisibility($node, $methodVisibility->getVisibility());
 
             return $node;
         }

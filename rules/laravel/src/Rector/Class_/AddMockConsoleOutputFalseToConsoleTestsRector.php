@@ -130,6 +130,6 @@ CODE_SAMPLE
     private function createAssign(): Assign
     {
         $propertyFetch = new PropertyFetch(new Variable('this'), 'mockConsoleOutput');
-        return new Assign($propertyFetch, $this->createFalse());
+        return new Assign($propertyFetch, $this->nodeFactory->createFalse());
     }
 }

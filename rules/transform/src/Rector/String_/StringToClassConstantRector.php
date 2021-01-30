@@ -75,7 +75,7 @@ CODE_SAMPLE
                 continue;
             }
 
-            return $this->createClassConstFetch($stringToClassConstant->getClass(), $stringToClassConstant->getConstant());
+            return $this->nodeFactory->createClassConstFetch($stringToClassConstant->getClass(), $stringToClassConstant->getConstant());
         }
         return $node;
     }

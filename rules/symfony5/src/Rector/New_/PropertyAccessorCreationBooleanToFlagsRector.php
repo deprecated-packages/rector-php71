@@ -61,7 +61,7 @@ CODE_SAMPLE
         }
         $isTrue = $this->isTrue($node->args[0]->value);
         $bitwiseOr = $this->prepareFlags($isTrue);
-        $node->args[0] = $this->createArg($bitwiseOr);
+        $node->args[0] = $this->nodeFactory->createArg($bitwiseOr);
         return $node;
     }
 
@@ -78,11 +78,11 @@ CODE_SAMPLE
 
     private function prepareFlags(bool $currentValue): BitwiseOr
     {
-        $classConstFetch = $this->createClassConstFetch('Symfony\Component\PropertyAccess\PropertyAccessor', 'MAGIC_GET');
-        $magicSet = $this->createClassConstFetch('Symfony\Component\PropertyAccess\PropertyAccessor', 'MAGIC_SET');
+        $classConstFetch = $this->nodeFactory->createClassConstFetch('Symfony\Component\PropertyAccess\PropertyAccessor', 'MAGIC_GET');
+        $magicSet = $this->nodeFactory->createClassConstFetch('Symfony\Component\PropertyAccess\PropertyAccessor', 'MAGIC_SET');
         if (! $currentValue) {
             return new BitwiseOr($classConstFetch, $magicSet);
         }
-        return new BitwiseOr(new BitwiseOr($this->createClassConstFetch('Symfony\Component\PropertyAccess\PropertyAccessor', 'MAGIC_CALL'), $classConstFetch), $magicSet);
+        return new BitwiseOr(new BitwiseOr($this->nodeFactory->createClassConstFetch('Symfony\Component\PropertyAccess\PropertyAccessor', 'MAGIC_CALL'), $classConstFetch), $magicSet);
     }
 }

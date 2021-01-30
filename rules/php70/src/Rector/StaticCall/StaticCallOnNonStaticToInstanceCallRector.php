@@ -127,7 +127,7 @@ CODE_SAMPLE
         if ($this->classMethodManipulator->isStaticClassMethod($classMethodNode)) {
             return null;
         }
-        $this->makeStatic($classMethodNode);
+        $this->visibilityManipulator->makeStatic($classMethodNode);
         return null;
     }
 

@@ -81,6 +81,6 @@ CODE_SAMPLE
             $arguments = [$new->args[0]];
         }
         $new = new New_(new FullyQualified('Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor'), $arguments);
-        return new New_(new FullyQualified('Symfony\Component\Form\Extension\Core\DataMapper\DataMapper'), [$this->createArg($new)]);
+        return new New_(new FullyQualified('Symfony\Component\Form\Extension\Core\DataMapper\DataMapper'), [$this->nodeFactory->createArg($new)]);
     }
 }

@@ -93,7 +93,7 @@ CODE_SAMPLE
                 continue;
             }
 
-            return $this->createStaticCall($methodCallToStaticCall->getNewClass(), $methodCallToStaticCall->getNewMethod(), $node->args);
+            return $this->nodeFactory->createStaticCall($methodCallToStaticCall->getNewClass(), $methodCallToStaticCall->getNewMethod(), $node->args);
         }
         return null;
     }

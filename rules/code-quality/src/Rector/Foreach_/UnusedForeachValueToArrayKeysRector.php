@@ -120,6 +120,6 @@ CODE_SAMPLE
         // remove key value
         $foreach->valueVar = $foreach->keyVar;
         $foreach->keyVar = null;
-        $foreach->expr = $this->createFuncCall('array_keys', [$foreach->expr]);
+        $foreach->expr = $this->nodeFactory->createFuncCall('array_keys', [$foreach->expr]);
     }
 }

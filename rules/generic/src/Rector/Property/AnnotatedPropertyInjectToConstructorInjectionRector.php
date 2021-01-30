@@ -88,9 +88,9 @@ CODE_SAMPLE
         $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($node);
         $phpDocInfo->removeByType(NetteInjectTagNode::class);
         if ($this->propertyUsageAnalyzer->isPropertyFetchedInChildClass($node)) {
-            $this->makeProtected($node);
+            $this->visibilityManipulator->makeProtected($node);
         } else {
-            $this->makePrivate($node);
+            $this->visibilityManipulator->makePrivate($node);
         }
         $this->addPropertyToCollector($node);
         if ($this->isAtLeastPhpVersion(PhpVersionFeature::PROPERTY_PROMOTION)) {

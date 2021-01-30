@@ -107,10 +107,10 @@ CODE_SAMPLE
         if ($propertyToMethodCall->getNewSetMethod() === null) {
             throw new ShouldNotHappenException();
         }
-        $args = $this->createArgs([$assign->expr]);
+        $args = $this->nodeFactory->createArgs([$assign->expr]);
         /** @var Variable $variable */
         $variable = $propertyFetchNode->var;
-        return $this->createMethodCall($variable, $propertyToMethodCall->getNewSetMethod(), $args);
+        return $this->nodeFactory->createMethodCall($variable, $propertyToMethodCall->getNewSetMethod(), $args);
     }
 
     private function processGetter(Assign $assign): ?Node
@@ -123,10 +123,10 @@ CODE_SAMPLE
         }
         // simple method name
         if ($propertyToMethodCall->getNewGetMethod() !== '') {
-            $assign->expr = $this->createMethodCall($propertyFetchNode->var, $propertyToMethodCall->getNewGetMethod());
+            $assign->expr = $this->nodeFactory->createMethodCall($propertyFetchNode->var, $propertyToMethodCall->getNewGetMethod());
 
             if ($propertyToMethodCall->getNewGetArguments() !== []) {
-                $args = $this->createArgs($propertyToMethodCall->getNewGetArguments());
+                $args = $this->nodeFactory->createArgs($propertyToMethodCall->getNewGetArguments());
                 $assign->expr->args = $args;
             }
 

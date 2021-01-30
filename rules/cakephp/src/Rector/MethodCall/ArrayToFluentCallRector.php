@@ -157,8 +157,8 @@ CODE_SAMPLE
         }
         $node = $methodCall;
         foreach ($arrayItemsAndFluentClass->getFluentCalls() as $method => $expr) {
-            $args = $this->createArgs([$expr]);
-            $node = $this->createMethodCall($node, $method, $args);
+            $args = $this->nodeFactory->createArgs([$expr]);
+            $node = $this->nodeFactory->createMethodCall($node, $method, $args);
         }
         return $node;
     }

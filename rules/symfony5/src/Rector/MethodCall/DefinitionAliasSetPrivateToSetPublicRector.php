@@ -87,14 +87,14 @@ CODE_SAMPLE
         $argValue = $argValue instanceof ConstFetch
             ? $this->createNegationConsFetch($argValue)
             : new BooleanNot($argValue);
-        return $this->createMethodCall($node->var, 'setPublic', [$argValue]);
+        return $this->nodeFactory->createMethodCall($node->var, 'setPublic', [$argValue]);
     }
 
     private function createNegationConsFetch(ConstFetch $constFetch): ConstFetch
     {
         if ($this->isFalse($constFetch)) {
-            return $this->createTrue();
+            return $this->nodeFactory->createTrue();
         }
-        return $this->createFalse();
+        return $this->nodeFactory->createFalse();
     }
 }

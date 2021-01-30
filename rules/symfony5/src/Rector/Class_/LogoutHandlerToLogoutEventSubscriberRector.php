@@ -112,7 +112,7 @@ CODE_SAMPLE
         $node->stmts[] = $this->onLogoutClassMethodFactory->createFromLogoutClassMethod($logoutClassMethod);
         $this->removeNode($logoutClassMethod);
         // 3. add getSubscribedEvents() class method
-        $classConstFetch = $this->createClassConstReference('Symfony\Component\Security\Http\Event\LogoutEvent');
+        $classConstFetch = $this->nodeFactory->createClassConstReference('Symfony\Component\Security\Http\Event\LogoutEvent');
         $eventReferencesToMethodNames = [new EventReferenceToMethodName($classConstFetch, 'onLogout')];
         $getSubscribedEventsClassMethod = $this->getSubscribedEventsClassMethodFactory->create($eventReferencesToMethodNames);
         $node->stmts[] = $getSubscribedEventsClassMethod;

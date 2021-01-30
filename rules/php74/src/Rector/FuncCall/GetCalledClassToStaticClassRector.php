@@ -62,6 +62,6 @@ CODE_SAMPLE
         if (! $this->isName($node, 'get_called_class')) {
             return null;
         }
-        return $this->createClassConstFetch('static', 'class');
+        return $this->nodeFactory->createClassConstFetch('static', 'class');
     }
 }

@@ -65,7 +65,7 @@ CODE_SAMPLE
         if (! $this->isBoolDocType($node)) {
             return null;
         }
-        $onlyProperty->default = $this->createFalse();
+        $onlyProperty->default = $this->nodeFactory->createFalse();
         return $node;
     }
 

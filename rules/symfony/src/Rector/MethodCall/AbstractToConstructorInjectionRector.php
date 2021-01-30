@@ -52,7 +52,7 @@ abstract class AbstractToConstructorInjectionRector extends AbstractRector
             throw new ShouldNotHappenException();
         }
         $this->addConstructorDependencyToClass($classLike, $serviceType, $propertyName);
-        return $this->createPropertyFetch('this', $propertyName);
+        return $this->nodeFactory->createPropertyFetch('this', $propertyName);
     }
 
     private function getServiceTypeFromMethodCallArgument(MethodCall $methodCall): ?Type

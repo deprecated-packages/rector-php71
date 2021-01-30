@@ -95,7 +95,7 @@ CODE_SAMPLE
             return null;
         }
         // change static calls to non-static ones, but only if in non-static method!!!
-        $this->makeNonStatic($classMethod);
+        $this->visibilityManipulator->makeNonStatic($classMethod);
         return $classMethod;
     }
 

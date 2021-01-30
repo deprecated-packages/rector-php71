@@ -94,7 +94,7 @@ CODE_SAMPLE
             return $this->castToArray($countedNode, $node);
         }
         if ($this->isNullableType($countedNode) || $this->isStaticType($countedNode, NullType::class)) {
-            $identical = new Identical($countedNode, $this->createNull());
+            $identical = new Identical($countedNode, $this->nodeFactory->createNull());
             $ternary = new Ternary($identical, new LNumber(0), $node);
             // prevent infinity loop re-resolution
             $node->setAttribute(self::ALREADY_CHANGED_ON_COUNT, true);
@@ -104,7 +104,7 @@ CODE_SAMPLE
             $conditionNode = new FuncCall(new Name('is_countable'), [new Arg($countedNode)]);
         } else {
             $instanceof = new Instanceof_($countedNode, new FullyQualified('Countable'));
-            $conditionNode = new BooleanOr($this->createFuncCall('is_array', [new Arg($countedNode)]), $instanceof);
+            $conditionNode = new BooleanOr($this->nodeFactory->createFuncCall('is_array', [new Arg($countedNode)]), $instanceof);
         }
         // prevent infinity loop re-resolution
         $node->setAttribute(self::ALREADY_CHANGED_ON_COUNT, true);

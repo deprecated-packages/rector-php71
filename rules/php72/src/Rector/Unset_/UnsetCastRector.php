@@ -53,7 +53,7 @@ CODE_SAMPLE
                 $unset = $node->expr;
 
                 if ($this->areNodesEqual($node->var, $unset->expr)) {
-                    return $this->createFuncCall('unset', [$node->var]);
+                    return $this->nodeFactory->createFuncCall('unset', [$node->var]);
                 }
             }
 
@@ -65,6 +65,6 @@ CODE_SAMPLE
 
             return null;
         }
-        return $this->createNull();
+        return $this->nodeFactory->createNull();
     }
 }

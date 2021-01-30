@@ -114,7 +114,7 @@ CODE_SAMPLE
         if ($this->shouldSkipClassMethod($node)) {
             return null;
         }
-        $this->makeStatic($node);
+        $this->visibilityManipulator->makeStatic($node);
         $this->refactorEventNames($node);
         $listeningClassMethods = $this->listeningMethodsCollector->collectFromClassAndGetSubscribedEventClassMethod($node, ListeningMethodsCollector::EVENT_TYPE_CONTRIBUTTE);
         $this->listeningClassMethodArgumentManipulator->change($listeningClassMethods);

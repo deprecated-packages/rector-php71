@@ -179,9 +179,9 @@ CODE_SAMPLE
                 $methodName = 'isAOf';
             }
 
-            $args = $this->createArgs($arguments);
+            $args = $this->nodeFactory->createArgs($arguments);
 
-            $staticCall = $this->createStaticCall('Webmozart\Assert\Assert', $methodName, $args);
+            $staticCall = $this->nodeFactory->createStaticCall('Webmozart\Assert\Assert', $methodName, $args);
             $assertStatements[] = new Expression($staticCall);
         }
         return $this->addStatements($classMethod, $assertStatements);

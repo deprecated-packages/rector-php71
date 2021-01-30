@@ -138,7 +138,7 @@ CODE_SAMPLE
         if (! $this->isName($new->class, 'Nette\Application\UI\Form')) {
             return null;
         }
-        return $this->createMethodCall('this', 'createFormBuilder');
+        return $this->nodeFactory->createMethodCall('this', 'createFormBuilder');
     }
 
     private function processAddMethod(MethodCall $methodCall, string $method, string $classType): void
@@ -155,7 +155,7 @@ CODE_SAMPLE
         }
         $this->addChoiceTypeOptions($method, $optionsArray);
         $this->addMultiFileTypeOptions($method, $optionsArray);
-        $methodCall->args[1] = new Arg($this->createClassConstReference($classType));
+        $methodCall->args[1] = new Arg($this->nodeFactory->createClassConstReference($classType));
         if ($optionsArray->items !== []) {
             $methodCall->args[2] = new Arg($optionsArray);
         }
@@ -178,8 +178,8 @@ CODE_SAMPLE
         } else {
             return;
         }
-        $optionsArray->items[] = new ArrayItem($expanded ? $this->createTrue() : $this->createFalse(), new String_('expanded'));
-        $optionsArray->items[] = new ArrayItem($multiple ? $this->createTrue() : $this->createFalse(), new String_('multiple'));
+        $optionsArray->items[] = new ArrayItem($expanded ? $this->nodeFactory->createTrue() : $this->nodeFactory->createFalse(), new String_('expanded'));
+        $optionsArray->items[] = new ArrayItem($multiple ? $this->nodeFactory->createTrue() : $this->nodeFactory->createFalse(), new String_('multiple'));
     }
 
     private function addMultiFileTypeOptions(string $method, Array_ $optionsArray): void
@@ -187,6 +187,6 @@ CODE_SAMPLE
         if ($method !== 'addMultiUpload') {
             return;
         }
-        $optionsArray->items[] = new ArrayItem($this->createTrue(), new String_('multiple'));
+        $optionsArray->items[] = new ArrayItem($this->nodeFactory->createTrue(), new String_('multiple'));
     }
 }

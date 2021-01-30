@@ -82,6 +82,6 @@ CODE_SAMPLE
     private function createGuardAssign(Variable $guardVariable): Assign
     {
         $string = new String_('auth.defaults.guard');
-        return new Assign($guardVariable, $this->createFuncCall('config', [$string]));
+        return new Assign($guardVariable, $this->nodeFactory->createFuncCall('config', [$string]));
     }
 }

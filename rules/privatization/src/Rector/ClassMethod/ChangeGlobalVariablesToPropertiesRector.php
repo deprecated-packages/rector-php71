@@ -132,6 +132,6 @@ CODE_SAMPLE
         if ($variableName === null) {
             return null;
         }
-        return $this->createPropertyFetch('this', $variableName);
+        return $this->nodeFactory->createPropertyFetch('this', $variableName);
     }
 }

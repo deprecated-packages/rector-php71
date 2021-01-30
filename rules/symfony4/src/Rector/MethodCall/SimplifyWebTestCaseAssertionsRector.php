@@ -97,8 +97,8 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        $clientGetResponseMethodCall = $this->createMethodCall('client', 'getResponse');
-        $this->getStatusCodeMethodCall = $this->createMethodCall($clientGetResponseMethodCall, 'getStatusCode');
+        $clientGetResponseMethodCall = $this->nodeFactory->createMethodCall('client', 'getResponse');
+        $this->getStatusCodeMethodCall = $this->nodeFactory->createMethodCall($clientGetResponseMethodCall, 'getStatusCode');
         if (! $this->isInWebTestCase($node)) {
             return null;
         }
@@ -106,9 +106,9 @@ CODE_SAMPLE
         $args = [];
         $args[] = new Arg(new LNumber(200));
         $args[] = new Arg($this->getStatusCodeMethodCall);
-        $methodCall = $this->createLocalMethodCall(self::ASSERT_SAME, $args);
+        $methodCall = $this->nodeFactory->createLocalMethodCall(self::ASSERT_SAME, $args);
         if ($this->areNodesEqual($node, $methodCall)) {
-            return $this->createLocalMethodCall('assertResponseIsSuccessful');
+            return $this->nodeFactory->createLocalMethodCall('assertResponseIsSuccessful');
         }
         // assertResponseStatusCodeSame
         $newNode = $this->processAssertResponseStatusCodeSame($node);
@@ -118,7 +118,7 @@ CODE_SAMPLE
         // assertSelectorTextContains
         $args = $this->matchAssertContainsCrawlerArg($node);
         if ($args !== null) {
-            return $this->createLocalMethodCall('assertSelectorTextContains', $args);
+            return $this->nodeFactory->createLocalMethodCall('assertSelectorTextContains', $args);
         }
         return $this->processAssertResponseRedirects($node);
     }
@@ -145,7 +145,7 @@ CODE_SAMPLE
         if (in_array($statusCode, [200, 301], true)) {
             return null;
         }
-        return $this->createLocalMethodCall('assertResponseStatusCodeSame', [$methodCall->args[0]]);
+        return $this->nodeFactory->createLocalMethodCall('assertResponseStatusCodeSame', [$methodCall->args[0]]);
     }
 
     /**
@@ -189,11 +189,11 @@ CODE_SAMPLE
         $args = [];
         $args[] = new Arg(new LNumber(301));
         $args[] = new Arg($this->getStatusCodeMethodCall);
-        $match = $this->createLocalMethodCall(self::ASSERT_SAME, $args);
+        $match = $this->nodeFactory->createLocalMethodCall(self::ASSERT_SAME, $args);
         if ($this->areNodesEqual($previousNode, $match)) {
-            $getResponseMethodCall = $this->createMethodCall('client', 'getResponse');
+            $getResponseMethodCall = $this->nodeFactory->createMethodCall('client', 'getResponse');
             $propertyFetch = new PropertyFetch($getResponseMethodCall, 'headers');
-            $clientGetLocation = $this->createMethodCall($propertyFetch, 'get', [new Arg(new String_('Location'))]);
+            $clientGetLocation = $this->nodeFactory->createMethodCall($propertyFetch, 'get', [new Arg(new String_('Location'))]);
 
             if (! isset($methodCall->args[1])) {
                 return null;
@@ -206,7 +206,7 @@ CODE_SAMPLE
 
                 $this->removeNode($previousNode);
 
-                return $this->createLocalMethodCall('assertResponseRedirects', $args);
+                return $this->nodeFactory->createLocalMethodCall('assertResponseRedirects', $args);
             }
         }
         return null;

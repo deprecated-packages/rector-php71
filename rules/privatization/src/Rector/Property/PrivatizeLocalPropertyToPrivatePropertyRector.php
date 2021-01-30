@@ -100,7 +100,7 @@ CODE_SAMPLE
         if ([$propertyClassName] !== $usedPropertyFetchClassNames) {
             return null;
         }
-        $this->makePrivate($node);
+        $this->visibilityManipulator->makePrivate($node);
         return $node;
     }
 

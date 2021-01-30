@@ -117,7 +117,7 @@ CODE_SAMPLE
         if ($hasUnpacked) {
             return $methodCall;
         }
-        $methodCall->args[$firstSpreadParamPosition] = new Arg($this->createArray($variadicArgs));
+        $methodCall->args[$firstSpreadParamPosition] = new Arg($this->nodeFactory->createArray($variadicArgs));
         return $methodCall;
     }
 

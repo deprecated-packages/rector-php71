@@ -81,7 +81,7 @@ CODE_SAMPLE
                 continue;
             }
 
-            return $this->createMethodCall($string->expr, $methodName);
+            return $this->nodeFactory->createMethodCall($string->expr, $methodName);
         }
         return null;
     }

@@ -112,7 +112,7 @@ CODE_SAMPLE
             return $castNode;
         }
         if ($typeNode === 'null') {
-            return new Assign($varNode, $this->createNull());
+            return new Assign($varNode, $this->nodeFactory->createNull());
         }
         return $node;
     }

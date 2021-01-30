@@ -37,7 +37,7 @@ final class StrictArraySearchRector extends AbstractRector
             return null;
         }
         if (count($node->args) === 2) {
-            $node->args[2] = $this->createArg($this->createTrue());
+            $node->args[2] = $this->nodeFactory->createArg($this->nodeFactory->createTrue());
         }
         return $node;
     }

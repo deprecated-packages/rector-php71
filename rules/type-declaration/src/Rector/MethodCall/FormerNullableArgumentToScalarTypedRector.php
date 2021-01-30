@@ -122,7 +122,7 @@ CODE_SAMPLE
             $arg->value = new DNumber(0);
         }
         if ($parameterType instanceof BooleanType) {
-            $arg->value = $this->createFalse();
+            $arg->value = $this->nodeFactory->createFalse();
         }
     }
 }

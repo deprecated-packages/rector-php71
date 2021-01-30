@@ -44,6 +44,6 @@ final class SimplifyFuncGetArgsCountRector extends AbstractRector
         if (! $this->isName($innerFuncCall, 'func_get_args')) {
             return $node;
         }
-        return $this->createFuncCall('func_num_args');
+        return $this->nodeFactory->createFuncCall('func_num_args');
     }
 }

@@ -52,7 +52,7 @@ final class CallUserMethodRector extends AbstractRector
         $node->name = new Name($newName);
         $oldArgs = $node->args;
         unset($node->args[1]);
-        $newArgs = [$this->createArg([$oldArgs[1]->value, $oldArgs[0]->value])];
+        $newArgs = [$this->nodeFactory->createArg([$oldArgs[1]->value, $oldArgs[0]->value])];
         unset($oldArgs[0]);
         unset($oldArgs[1]);
         $node->args = $this->appendArgs($newArgs, $oldArgs);

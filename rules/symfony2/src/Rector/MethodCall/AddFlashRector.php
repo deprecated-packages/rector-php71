@@ -77,6 +77,6 @@ CODE_SAMPLE
         ) {
             return null;
         }
-        return $this->createMethodCall('this', 'addFlash', $node->args);
+        return $this->nodeFactory->createMethodCall('this', 'addFlash', $node->args);
     }
 }

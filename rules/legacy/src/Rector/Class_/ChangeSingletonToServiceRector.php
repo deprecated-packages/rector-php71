@@ -133,7 +133,7 @@ CODE_SAMPLE
             if ($classMethod->stmts === []) {
                 $this->removeNodeFromStatements($class, $classMethod);
             } else {
-                $this->makePublic($classMethod);
+                $this->visibilityManipulator->makePublic($classMethod);
             }
         }
         $this->removePropertyByName($class, $propertyAndClassMethodName->getPropertyName());

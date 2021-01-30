@@ -77,7 +77,8 @@ CODE_SAMPLE
                 return null;
             }
 
-            $this->makeNonStatic($node);
+            $this->visibilityManipulator->makeNonStatic($node);
+
             return $node;
         }
         return null;

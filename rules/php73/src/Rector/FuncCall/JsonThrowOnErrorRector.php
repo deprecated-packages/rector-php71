@@ -78,7 +78,7 @@ CODE_SAMPLE
         }
         // set default to inter-args
         if (! isset($funcCall->args[1])) {
-            $funcCall->args[1] = new Arg($this->createFalse());
+            $funcCall->args[1] = new Arg($this->nodeFactory->createFalse());
         }
         if (! isset($funcCall->args[2])) {
             $funcCall->args[2] = new Arg(new LNumber(512));

@@ -131,9 +131,9 @@ CODE_SAMPLE
         if (! $entityObjectType instanceof TypeWithClassName) {
             throw new RectorProviderException(sprintf('An entity was not found for "%s" repository.', $repositoryClassName));
         }
-        $classConstFetch = $this->createClassConstReference($entityObjectType->getClassName());
+        $classConstFetch = $this->nodeFactory->createClassConstReference($entityObjectType->getClassName());
         $methodCall = $this->builderFactory->methodCall(new Variable('entityManager'), 'getRepository', [$classConstFetch]);
         $methodCall->setAttribute(AttributeKey::CLASS_NODE, $repositoryClassName);
-        return $this->createPropertyAssignmentWithExpr('repository', $methodCall);
+        return $this->nodeFactory->createPropertyAssignmentWithExpr('repository', $methodCall);
     }
 }

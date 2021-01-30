@@ -71,15 +71,15 @@ CODE_SAMPLE
         $eachFuncCall = $node->expr;
         // only key: list($key, ) = each($values);
         if ($listNode->items[0] && $listNode->items[1] === null) {
-            $keyFuncCall = $this->createFuncCall('key', $eachFuncCall->args);
+            $keyFuncCall = $this->nodeFactory->createFuncCall('key', $eachFuncCall->args);
             return new Assign($listNode->items[0]->value, $keyFuncCall);
         }
         // only value: list(, $value) = each($values);
         if ($listNode->items[1] && $listNode->items[0] === null) {
-            $nextFuncCall = $this->createFuncCall('next', $eachFuncCall->args);
+            $nextFuncCall = $this->nodeFactory->createFuncCall('next', $eachFuncCall->args);
             $this->addNodeAfterNode($nextFuncCall, $node);
 
-            $currentFuncCall = $this->createFuncCall('current', $eachFuncCall->args);
+            $currentFuncCall = $this->nodeFactory->createFuncCall('current', $eachFuncCall->args);
 
             $secondArrayItem = $listNode->items[1];
             if (! $secondArrayItem instanceof ArrayItem) {
@@ -92,16 +92,16 @@ CODE_SAMPLE
         // $key = key($values);
         // $value = current($values);
         // next($values);
-        $currentFuncCall = $this->createFuncCall('current', $eachFuncCall->args);
+        $currentFuncCall = $this->nodeFactory->createFuncCall('current', $eachFuncCall->args);
         $secondArrayItem = $listNode->items[1];
         if (! $secondArrayItem instanceof ArrayItem) {
             throw new ShouldNotHappenException();
         }
         $assign = new Assign($secondArrayItem->value, $currentFuncCall);
         $this->addNodeAfterNode($assign, $node);
-        $nextFuncCall = $this->createFuncCall('next', $eachFuncCall->args);
+        $nextFuncCall = $this->nodeFactory->createFuncCall('next', $eachFuncCall->args);
         $this->addNodeAfterNode($nextFuncCall, $node);
-        $keyFuncCall = $this->createFuncCall('key', $eachFuncCall->args);
+        $keyFuncCall = $this->nodeFactory->createFuncCall('key', $eachFuncCall->args);
         $firstArrayItem = $listNode->items[0];
         if (! $firstArrayItem instanceof ArrayItem) {
             throw new ShouldNotHappenException();

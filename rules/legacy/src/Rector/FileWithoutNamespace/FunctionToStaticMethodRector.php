@@ -142,7 +142,7 @@ CODE_SAMPLE
                     continue;
                 }
 
-                $staticCall = $this->createStaticCall($functionToStaticCall->getClass(), $functionToStaticCall->getMethod());
+                $staticCall = $this->nodeFactory->createStaticCall($functionToStaticCall->getClass(), $functionToStaticCall->getMethod());
                 $staticCall->args = $node->args;
 
                 return $staticCall;
