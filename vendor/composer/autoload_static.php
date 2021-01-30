@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit07d7d63da976619bbfa7c797527dc532
+class ComposerStaticInit9b6c45f3ba06259abe7dc6b1caa892d4
 {
     public static $files = array (
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
@@ -99,7 +99,6 @@ class ComposerStaticInit07d7d63da976619bbfa7c797527dc532
             'Rector\\ReadWrite\\' => 17,
             'Rector\\Privatization\\' => 21,
             'Rector\\PostRector\\' => 18,
-            'Rector\\Polyfill\\' => 16,
             'Rector\\PhpSpecToPHPUnit\\' => 24,
             'Rector\\PhpAttribute\\' => 20,
             'Rector\\Php80\\' => 13,
@@ -113,7 +112,6 @@ class ComposerStaticInit07d7d63da976619bbfa7c797527dc532
             'Rector\\Php54\\' => 13,
             'Rector\\Php53\\' => 13,
             'Rector\\Php52\\' => 13,
-            'Rector\\Performance\\' => 19,
             'Rector\\PSR4\\' => 12,
             'Rector\\PHPUnit\\' => 15,
             'Rector\\PHPUnitSymfony\\' => 22,
@@ -479,10 +477,6 @@ class ComposerStaticInit07d7d63da976619bbfa7c797527dc532
         array (
             0 => __DIR__ . '/../..' . '/packages/post-rector/src',
         ),
-        'Rector\\Polyfill\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/rules/polyfill/src',
-        ),
         'Rector\\PhpSpecToPHPUnit\\' => 
         array (
             0 => __DIR__ . '/../..' . '/rules/php-spec-to-phpunit/src',
@@ -534,10 +528,6 @@ class ComposerStaticInit07d7d63da976619bbfa7c797527dc532
         'Rector\\Php52\\' => 
         array (
             0 => __DIR__ . '/../..' . '/rules/php52/src',
-        ),
-        'Rector\\Performance\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/rules/performance/src',
         ),
         'Rector\\PSR4\\' => 
         array (
@@ -912,9 +902,9 @@ class ComposerStaticInit07d7d63da976619bbfa7c797527dc532
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit07d7d63da976619bbfa7c797527dc532::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit07d7d63da976619bbfa7c797527dc532::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit07d7d63da976619bbfa7c797527dc532::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit9b6c45f3ba06259abe7dc6b1caa892d4::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit9b6c45f3ba06259abe7dc6b1caa892d4::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit9b6c45f3ba06259abe7dc6b1caa892d4::$classMap;
 
         }, null, ClassLoader::class);
     }
