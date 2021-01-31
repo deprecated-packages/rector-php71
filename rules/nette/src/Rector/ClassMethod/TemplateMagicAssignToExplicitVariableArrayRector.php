@@ -110,9 +110,6 @@ CODE_SAMPLE
 
     private function createRenderMethodCall(ClassMethod $classMethod, MagicTemplatePropertyCalls $magicTemplatePropertyCalls): MethodCall
     {
-        if ($this->isObjectType($classMethod, 'Nette\Application\UI\Presenter')) {
-            return $this->actionRenderFactory->createThisTemplateRenderMethodCall($magicTemplatePropertyCalls);
-        }
-        return $this->actionRenderFactory->createThisRenderMethodCall($magicTemplatePropertyCalls);
+        return $this->actionRenderFactory->createThisTemplateRenderMethodCall($magicTemplatePropertyCalls);
     }
 }
