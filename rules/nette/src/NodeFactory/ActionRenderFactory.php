@@ -44,8 +44,8 @@ final class ActionRenderFactory
 
     private function addArguments(MagicTemplatePropertyCalls $magicTemplatePropertyCalls, MethodCall $methodCall): void
     {
-        if ($magicTemplatePropertyCalls->getTemplateFileExpr() !== null) {
-            $methodCall->args[0] = new Arg($magicTemplatePropertyCalls->getTemplateFileExpr());
+        if ($magicTemplatePropertyCalls->getFirstTemplateFileExpr() !== null) {
+            $methodCall->args[0] = new Arg($magicTemplatePropertyCalls->getFirstTemplateFileExpr());
         }
         if ($magicTemplatePropertyCalls->getTemplateVariables() !== []) {
             $templateVariablesArray = $this->createTemplateVariablesArray($magicTemplatePropertyCalls->getTemplateVariables());
