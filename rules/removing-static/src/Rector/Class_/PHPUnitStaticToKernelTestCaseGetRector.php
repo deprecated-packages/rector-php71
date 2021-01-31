@@ -28,6 +28,7 @@ use Rector\Core\ValueObject\MethodName;
 use Rector\Naming\Naming\PropertyNaming;
 use Rector\NodeTypeResolver\Node\AttributeKey;
 use Rector\PHPUnit\NodeFactory\SetUpClassMethodFactory;
+use Rector\RemovingStatic\NodeFactory\SetUpFactory;
 use Rector\RemovingStatic\ValueObject\PHPUnitClass;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\ConfiguredCodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
@@ -68,11 +69,17 @@ final class PHPUnitStaticToKernelTestCaseGetRector extends AbstractRector implem
      */
     private $setUpClassMethodFactory;
 
-    public function __construct(PropertyNaming $propertyNaming, ClassInsertManipulator $classInsertManipulator, SetUpClassMethodFactory $setUpClassMethodFactory)
+    /**
+     * @var SetUpFactory
+     */
+    private $setUpFactory;
+
+    public function __construct(PropertyNaming $propertyNaming, ClassInsertManipulator $classInsertManipulator, SetUpClassMethodFactory $setUpClassMethodFactory, SetUpFactory $setUpFactory)
     {
         $this->propertyNaming = $propertyNaming;
         $this->classInsertManipulator = $classInsertManipulator;
         $this->setUpClassMethodFactory = $setUpClassMethodFactory;
+        $this->setUpFactory = $setUpFactory;
     }
 
     public function getRuleDefinition(): RuleDefinition
@@ -193,7 +200,7 @@ CODE_SAMPLE
         }
         // add all properties to class
         $class = $this->addNewPropertiesToClass($class, $newPropertyTypes);
-        $parentSetUpStaticCallExpression = $this->createParentSetUpStaticCall();
+        $parentSetUpStaticCallExpression = $this->setUpFactory->createParentStaticCall();
         foreach ($newPropertyTypes as $type) {
             // container fetch assign
             $assign = $this->createContainerGetTypeToPropertyAssign($type);
@@ -261,12 +268,6 @@ CODE_SAMPLE
         // add property to the start of the class
         $class->stmts = array_merge($properties, $class->stmts);
         return $class;
-    }
-
-    private function createParentSetUpStaticCall(): Expression
-    {
-        $parentSetupStaticCall = $this->nodeFactory->createStaticCall('parent', MethodName::SET_UP);
-        return new Expression($parentSetupStaticCall);
     }
 
     private function createContainerGetTypeToPropertyAssign(ObjectType $objectType): Expression

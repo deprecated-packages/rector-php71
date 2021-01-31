@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit56e9cf5aa94c758ab6819b020308dcb6
+class ComposerStaticInit67ea887bcd1668fba68c17ad7e24dc37
 {
     public static $files = array (
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
@@ -133,7 +133,6 @@ class ComposerStaticInit56e9cf5aa94c758ab6819b020308dcb6
             'Rector\\MysqlToMysqli\\' => 21,
             'Rector\\MockistaToMockery\\' => 25,
             'Rector\\MockeryToProphecy\\' => 25,
-            'Rector\\MagicDisclosure\\' => 23,
             'Rector\\Legacy\\' => 14,
             'Rector\\Laravel\\' => 15,
             'Rector\\Generics\\' => 16,
@@ -613,10 +612,6 @@ class ComposerStaticInit56e9cf5aa94c758ab6819b020308dcb6
         array (
             0 => __DIR__ . '/../..' . '/rules/mockery-to-prophecy/src',
         ),
-        'Rector\\MagicDisclosure\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/rules/magic-disclosure/src',
-        ),
         'Rector\\Legacy\\' => 
         array (
             0 => __DIR__ . '/../..' . '/rules/legacy/src',
@@ -902,9 +897,9 @@ class ComposerStaticInit56e9cf5aa94c758ab6819b020308dcb6
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit56e9cf5aa94c758ab6819b020308dcb6::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit56e9cf5aa94c758ab6819b020308dcb6::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit56e9cf5aa94c758ab6819b020308dcb6::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit67ea887bcd1668fba68c17ad7e24dc37::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit67ea887bcd1668fba68c17ad7e24dc37::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit67ea887bcd1668fba68c17ad7e24dc37::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -27,7 +27,7 @@ use Rector\BetterPhpDocParser\Contract\PhpDocNode\ShortNameAwareTagInterface;
 use Rector\BetterPhpDocParser\Contract\PhpDocNode\TypeAwareTagValueNodeInterface;
 use Rector\ChangesReporting\Collector\RectorChangeCollector;
 use Rector\Core\Configuration\CurrentNodeProvider;
-use Rector\Core\Exception\NotImplementedException;
+use Rector\Core\Exception\NotImplementedYetException;
 use Rector\Core\Exception\ShouldNotHappenException;
 use Rector\Core\Util\StaticInstanceOf;
 use Rector\PhpAttribute\Contract\PhpAttributableTagNodeInterface;
@@ -488,7 +488,7 @@ final class PhpDocInfo
                 return $name;
             }
         }
-        throw new NotImplementedException(get_class($phpDocTagValueNode));
+        throw new NotImplementedYetException(get_class($phpDocTagValueNode));
     }
 
     /**

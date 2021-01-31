@@ -109,7 +109,6 @@ return array(
     'Rector\\MysqlToMysqli\\' => array($baseDir . '/rules/mysql-to-mysqli/src'),
     'Rector\\MockistaToMockery\\' => array($baseDir . '/rules/mockista-to-mockery/src'),
     'Rector\\MockeryToProphecy\\' => array($baseDir . '/rules/mockery-to-prophecy/src'),
-    'Rector\\MagicDisclosure\\' => array($baseDir . '/rules/magic-disclosure/src'),
     'Rector\\Legacy\\' => array($baseDir . '/rules/legacy/src'),
     'Rector\\Laravel\\' => array($baseDir . '/rules/laravel/src'),
     'Rector\\Generics\\' => array($baseDir . '/rules/generics/src'),

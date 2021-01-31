@@ -13,7 +13,7 @@ use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Stmt\Class_;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\TypeWithClassName;
-use Rector\Core\Exception\Bridge\RectorProviderException;
+use Rector\Core\Exception\ShouldNotHappenException;
 use Rector\Core\PhpParser\Node\Manipulator\ClassDependencyManipulator;
 use Rector\Core\PhpParser\Node\Manipulator\ClassInsertManipulator;
 use Rector\Core\Rector\AbstractRector;
@@ -129,7 +129,7 @@ CODE_SAMPLE
         $entityObjectType = $this->entityObjectTypeResolver->resolveFromRepositoryClass($repositoryClass);
         $repositoryClassName = (string) $repositoryClass->getAttribute(AttributeKey::CLASS_NAME);
         if (! $entityObjectType instanceof TypeWithClassName) {
-            throw new RectorProviderException(sprintf('An entity was not found for "%s" repository.', $repositoryClassName));
+            throw new ShouldNotHappenException(sprintf('An entity was not found for "%s" repository.', $repositoryClassName));
         }
         $classConstFetch = $this->nodeFactory->createClassConstReference($entityObjectType->getClassName());
         $methodCall = $this->builderFactory->methodCall(new Variable('entityManager'), 'getRepository', [$classConstFetch]);

@@ -47,7 +47,7 @@ use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfoFactory;
 use Rector\BetterPhpDocParser\PhpDocManipulator\PhpDocTypeChanger;
 use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\Nette\NetteInjectTagNode;
 use Rector\Core\Configuration\CurrentNodeProvider;
-use Rector\Core\Exception\NotImplementedException;
+use Rector\Core\Exception\NotImplementedYetException;
 use Rector\Core\Php\PhpVersionProvider;
 use Rector\Core\ValueObject\MethodName;
 use Rector\Core\ValueObject\PhpVersionFeature;
@@ -561,7 +561,7 @@ final class NodeFactory
         if ($arrayItem !== null) {
             return $this->createArrayItemWithKey($key, $arrayItem);
         }
-        throw new NotImplementedException(sprintf('Not implemented yet. Go to "%s()" and add check for "%s" node.', __METHOD__, is_object($item) ? get_class($item) : $item));
+        throw new NotImplementedYetException(sprintf('Not implemented yet. Go to "%s()" and add check for "%s" node.', __METHOD__, is_object($item) ? get_class($item) : $item));
     }
 
     /**

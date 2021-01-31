@@ -19,7 +19,7 @@ use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\JMS\JMSInjectTagValueNode;
 use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\PHPDI\PHPDIInjectTagValueNode;
 use Rector\ChangesReporting\Application\ErrorAndDiffCollector;
 use Rector\Core\Contract\Rector\ConfigurableRectorInterface;
-use Rector\Core\Exception\NotImplementedException;
+use Rector\Core\Exception\NotImplementedYetException;
 use Rector\Core\Exception\ShouldNotHappenException;
 use Rector\Core\Rector\AbstractRector;
 use Rector\Core\ValueObject\PhpVersionFeature;
@@ -165,7 +165,7 @@ CODE_SAMPLE
         }
         $availableAnnotations = array_keys(self::ANNOTATION_TO_TAG_CLASS);
         $errorMessage = sprintf('Annotation class "%s" is not implemented yet. Use one of "%s" or add custom tag for it to Rector.', $annotationClass, implode('", "', $availableAnnotations));
-        throw new NotImplementedException($errorMessage);
+        throw new NotImplementedYetException($errorMessage);
     }
 
     private function isParameterInject(PhpDocTagValueNode $phpDocTagValueNode): bool
