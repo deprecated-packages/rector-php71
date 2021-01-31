@@ -134,7 +134,7 @@ CODE_SAMPLE
     {
         $this->processGetPresenterGetSessionMethodCall($classMethod);
         $classMethod->name = new Identifier('action');
-        $magicTemplatePropertyCalls = $this->templatePropertyAssignCollector->collectTemplateFileNameVariablesAndNodesToRemove($classMethod);
+        $magicTemplatePropertyCalls = $this->templatePropertyAssignCollector->collectMagicTemplatePropertyCalls($classMethod);
         $methodCall = $this->actionRenderFactory->createThisRenderMethodCall($magicTemplatePropertyCalls);
         // add return in the end
         $return = new Return_($methodCall);
