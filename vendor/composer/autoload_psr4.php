@@ -131,7 +131,6 @@ return array(
     'Rector\\DeadDocBlock\\' => array($baseDir . '/rules/dead-doc-block/src'),
     'Rector\\DeadCode\\' => array($baseDir . '/rules/dead-code/src'),
     'Rector\\Core\\' => array($baseDir . '/src'),
-    'Rector\\ConsoleDiffer\\' => array($baseDir . '/packages/console-differ/src'),
     'Rector\\Composer\\' => array($baseDir . '/rules/composer/src'),
     'Rector\\Compiler\\' => array($baseDir . '/utils/compiler/src'),
     'Rector\\Comments\\' => array($baseDir . '/packages/comments/src'),
