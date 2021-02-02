@@ -263,6 +263,7 @@ final class ClassRenamer
         if (! $classLike instanceof Class_) {
             return;
         }
+        $classLike->implements = array_unique($classLike->implements);
         foreach ($classLike->implements as $key => $implementName) {
             if (! $implementName instanceof Name) {
                 continue;
