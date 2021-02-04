@@ -8,6 +8,7 @@ use PhpParser\Node;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\StaticCall;
+use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Expression;
@@ -145,6 +146,10 @@ CODE_SAMPLE
         if (count($stmts) !== 1) {
             return;
         }
+        $params = $constructClassMethod->getParams();
+        if ($params !== [] && $this->hasPropertyPromotion($params)) {
+            return;
+        }
         $onlyNode = $stmts[0];
         if ($onlyNode instanceof Expression) {
             $onlyNode = $onlyNode->expr;
@@ -156,10 +161,26 @@ CODE_SAMPLE
         if (! $onlyNode instanceof StaticCall) {
             return;
         }
+        if (! $this->isName($onlyNode->name, MethodName::CONSTRUCT)) {
+            return;
+        }
         if ($onlyNode->args !== []) {
             return;
         }
         $this->removeNode($constructClassMethod);
+    }
+
+    /**
+     * @param Param[] $params
+     */
+    private function hasPropertyPromotion(array $params): bool
+    {
+        foreach ($params as $param) {
+            if ($param->flags !== 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private function matchCommandNameNodeInConstruct(StaticCall $staticCall): ?Expr
