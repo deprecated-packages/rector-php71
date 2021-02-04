@@ -30,7 +30,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '3784552b70e7413555a70ba8b11617b7a830242a',
+    'reference' => '760facb75b41f63be650686f1ef66599e57a18e5',
     'name' => 'rector/rector',
   ),
   'versions' => 
@@ -91,12 +91,12 @@ private static $installed = array (
     ),
     'jean85/pretty-package-versions' => 
     array (
-      'pretty_version' => '1.5.1',
-      'version' => '1.5.1.0',
+      'pretty_version' => '1.6.0',
+      'version' => '1.6.0.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'a917488320c20057da87f67d0d40543dd9427f7a',
+      'reference' => '1e0104b46f045868f11942aea058cd7186d6c303',
     ),
     'nette/finder' => 
     array (
@@ -264,7 +264,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '3784552b70e7413555a70ba8b11617b7a830242a',
+      'reference' => '760facb75b41f63be650686f1ef66599e57a18e5',
     ),
     'rector/rector-prefixed' => 
     array (
