@@ -8,6 +8,7 @@ use PhpParser\Node;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Stmt\ClassMethod;
 use Rector\AttributeAwarePhpDoc\Ast\PhpDoc\SymfonyRequiredTagNode;
+use Rector\CodingStyle\Naming\ClassNaming;
 use Rector\Core\Rector\AbstractRector;
 use Rector\NodeTypeResolver\Node\AttributeKey;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
@@ -18,6 +19,16 @@ use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
  */
 final class NormalizeAutowireMethodNamingRector extends AbstractRector
 {
+    /**
+     * @var ClassNaming
+     */
+    private $classNaming;
+
+    public function __construct(ClassNaming $classNaming)
+    {
+        $this->classNaming = $classNaming;
+    }
+
     public function getRuleDefinition(): RuleDefinition
     {
         return new RuleDefinition('Use autowire + class name suffix for method with @required annotation', [
@@ -61,10 +72,11 @@ CODE_SAMPLE
         if (! $phpDocInfo->hasByType(SymfonyRequiredTagNode::class)) {
             return null;
         }
-        $classShortName = $node->getAttribute(AttributeKey::CLASS_SHORT_NAME);
-        if ($classShortName === null) {
+        $className = $node->getAttribute(AttributeKey::CLASS_NAME);
+        if (! is_string($className)) {
             return null;
         }
+        $classShortName = $this->classNaming->getShortName($className);
         $expectedMethodName = 'autowire' . $classShortName;
         if ((string) $node->name === $expectedMethodName) {
             return null;
