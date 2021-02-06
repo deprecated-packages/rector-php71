@@ -123,6 +123,9 @@ CODE_SAMPLE
         if (! $currentClass instanceof Class_) {
             return true;
         }
+        if ($currentClass->isFinal()) {
+            return true;
+        }
         if ($currentClass->extends instanceof FullyQualified) {
             return true;
         }

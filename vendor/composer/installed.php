@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => 'ec66688a8c9d40e40f9bf526871c40f5e647bebf',
+    'reference' => '946b1ac84b49d71ebf5cbffc4de23403888e932a',
     'name' => 'rector/rector',
   ),
   'versions' => 
@@ -240,7 +240,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => 'ec66688a8c9d40e40f9bf526871c40f5e647bebf',
+      'reference' => '946b1ac84b49d71ebf5cbffc4de23403888e932a',
     ),
     'rector/rector-prefixed' => 
     array (
