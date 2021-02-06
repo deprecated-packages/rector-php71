@@ -39,7 +39,6 @@ use Rector\NodeNameResolver\NodeNameResolver;
 use Rector\NodeTypeResolver\Node\AttributeKey;
 use Rector\NodeTypeResolver\NodeTypeResolver;
 use Rector\PHPStanStaticTypeMapper\Utils\TypeUnwrapper;
-use Rector\StaticTypeMapper\ValueObject\Type\ShortenedObjectType;
 use ReflectionMethod;
 
 /**
@@ -305,11 +304,7 @@ final class NodeRepository
         if (! $propertyFetcheeType instanceof TypeWithClassName) {
             return [];
         }
-        if ($propertyFetcheeType instanceof ShortenedObjectType) {
-            $className = $propertyFetcheeType->getFullyQualifiedName();
-        } else {
-            $className = $propertyFetcheeType->getClassName();
-        }
+        $className = $this->nodeTypeResolver->getFullyQualifiedClassName($propertyFetcheeType);
         /** @var string $propertyName */
         $propertyName = $this->nodeNameResolver->getName($propertyFetch);
         return $this->parsedPropertyFetchNodeCollector->findPropertyFetchesByTypeAndName($className, $propertyName);
@@ -493,6 +488,24 @@ final class NodeRepository
             return null;
         }
         return $constructorClassMethod;
+    }
+
+    public function findPropertyByPropertyFetch(PropertyFetch $propertyFetch): ?Property
+    {
+        $propertyCallerType = $this->nodeTypeResolver->getStaticType($propertyFetch->var);
+        if (! $propertyCallerType instanceof TypeWithClassName) {
+            return null;
+        }
+        $className = $this->nodeTypeResolver->getFullyQualifiedClassName($propertyCallerType);
+        $class = $this->findClass($className);
+        if (! $class instanceof Class_) {
+            return null;
+        }
+        $propertyName = $this->nodeNameResolver->getName($propertyFetch->name);
+        if ($propertyName === null) {
+            return null;
+        }
+        return $class->getProperty($propertyName);
     }
 
     private function addMethod(ClassMethod $classMethod): void
