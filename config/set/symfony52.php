@@ -5,8 +5,10 @@ declare(strict_types=1);
 use PHPStan\Type\ObjectType;
 use Rector\Renaming\Rector\ClassConstFetch\RenameClassConstFetchRector;
 use Rector\Renaming\Rector\MethodCall\RenameMethodRector;
+use Rector\Renaming\Rector\PropertyFetch\RenamePropertyRector;
 use Rector\Renaming\ValueObject\MethodCallRename;
 use Rector\Renaming\ValueObject\RenameClassAndConstFetch;
+use Rector\Renaming\ValueObject\RenameProperty;
 use Rector\Symfony5\Rector\MethodCall\DefinitionAliasSetPrivateToSetPublicRector;
 use Rector\Symfony5\Rector\MethodCall\FormBuilderSetDataMapperRector;
 use Rector\Symfony5\Rector\MethodCall\ReflectionExtractorEnableMagicCallExtractorRector;
@@ -79,6 +81,12 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
             new AddParamTypeDeclaration('Symfony\Component\Notifier\Notification\ChatNotificationInterface', 'asChatMessage', 0, new ObjectType('Symfony\Component\Notifier\Recipient\RecipientInterface')),
             new AddParamTypeDeclaration('Symfony\Component\Notifier\Notification\EmailNotificationInterface', 'asEmailMessage', 0, new ObjectType('Symfony\Component\Notifier\Recipient\EmailRecipientInterface')),
             new AddParamTypeDeclaration('Symfony\Component\Notifier\Notification\SmsNotificationInterface', 'asSmsMessage', 0, new ObjectType('Symfony\Component\Notifier\Recipient\SmsRecipientInterface')),
+        ]),
+    ]]);
+    # https://github.com/symfony/symfony/blob/5.x/UPGRADE-5.2.md#security
+    $services->set(RenamePropertyRector::class)->call('configure', [[
+        RenamePropertyRector::RENAMED_PROPERTIES => ValueObjectInliner::inline([
+            new RenameProperty('Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices', 'providerKey', 'firewallName'),
         ]),
     ]]);
 };
