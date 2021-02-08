@@ -85,7 +85,7 @@ CODE_SAMPLE
         if (StaticInstanceOf::isOneOf($classLike, [Trait_::class, Interface_::class])) {
             return true;
         }
-        if ($this->isAnonymousClass($classLike)) {
+        if ($this->classNodeAnalyzer->isAnonymousClass($classLike)) {
             return true;
         }
         // skips interfaces by default too

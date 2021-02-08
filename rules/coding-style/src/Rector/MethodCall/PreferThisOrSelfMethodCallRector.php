@@ -8,7 +8,7 @@ use PhpParser\Node;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\StaticCall;
 use Rector\Core\Contract\Rector\ConfigurableRectorInterface;
-use Rector\Core\Exception\Rector\InvalidRectorConfigurationException;
+use Rector\Core\Exception\Configuration\InvalidConfigurationException;
 use Rector\Core\Rector\AbstractRector;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\ConfiguredCodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
@@ -162,6 +162,6 @@ CODE_SAMPLE
         if (in_array($preference, self::ALLOWED_OPTIONS, true)) {
             return;
         }
-        throw new InvalidRectorConfigurationException(sprintf('Preference configuration "%s" for "%s" is not valid. Use one of "%s"', $preference, self::class, implode('", "', self::ALLOWED_OPTIONS)));
+        throw new InvalidConfigurationException(sprintf('Preference configuration "%s" for "%s" is not valid. Use one of "%s"', $preference, self::class, implode('", "', self::ALLOWED_OPTIONS)));
     }
 }
