@@ -152,7 +152,7 @@ CODE_SAMPLE
         /** @var RouteInfo $routeInfo */
         foreach ($routeInfos as $routeInfo) {
             $classMethod = $this->resolveControllerClassMethod($routeInfo);
-            if (! $classMethod instanceof \PhpParser\Node\Stmt\ClassMethod) {
+            if (! $classMethod instanceof ClassMethod) {
                 continue;
             }
 

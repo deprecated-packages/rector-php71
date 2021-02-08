@@ -212,7 +212,7 @@ CODE_SAMPLE
                 continue;
             }
 
-            if (! $this->isSameObjectTypes($paramType, $abstractClassConstructorParamTypes)) {
+            if (! $this->nodeTypeResolver->isSameObjectTypes($paramType, $abstractClassConstructorParamTypes)) {
                 continue;
             }
 

@@ -157,7 +157,7 @@ CODE_SAMPLE
 
     private function matchReturnClassMethod(ClassMethod $classMethod, InferParamFromClassMethodReturn $inferParamFromClassMethodReturn): ?ClassMethod
     {
-        if (! $this->isInClassNamed($classMethod, $inferParamFromClassMethodReturn->getClass())) {
+        if (! $this->nodeNameResolver->isInClassNamed($classMethod, $inferParamFromClassMethodReturn->getClass())) {
             return null;
         }
         if (! $this->isName($classMethod->name, $inferParamFromClassMethodReturn->getParamMethod())) {

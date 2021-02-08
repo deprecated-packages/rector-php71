@@ -10,20 +10,15 @@ use PhpParser\Node\Stmt\ClassConst;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Function_;
 use PhpParser\Node\Stmt\Property;
-use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
-use PHPStan\Type\UnionType;
 use Rector\ChangesReporting\Collector\RectorChangeCollector;
 use Rector\Naming\Naming\PropertyNaming;
 use Rector\NodeRemoval\NodeRemover;
-use Rector\NodeTypeResolver\Node\AttributeKey;
 use Rector\PostRector\Collector\NodesToAddCollector;
 use Rector\PostRector\Collector\NodesToRemoveCollector;
-use Rector\PostRector\Collector\NodesToReplaceCollector;
 use Rector\PostRector\Collector\PropertyToAddCollector;
 use Rector\PostRector\Collector\UseNodesToAddCollector;
-use Rector\StaticTypeMapper\ValueObject\Type\AliasedObjectType;
-use Rector\StaticTypeMapper\ValueObject\Type\FullyQualifiedObjectType;
+use Rector\PostRector\DependencyInjection\PropertyAdder;
 
 /**
  * This could be part of @see AbstractRector, but decopuling to trait
@@ -52,11 +47,6 @@ trait NodeCommandersTrait
     private $propertyToAddCollector;
 
     /**
-     * @var NodesToReplaceCollector
-     */
-    private $nodesToReplaceCollector;
-
-    /**
      * @var RectorChangeCollector
      */
     private $rectorChangeCollector;
@@ -72,24 +62,23 @@ trait NodeCommandersTrait
     private $nodeRemover;
 
     /**
+     * @var PropertyAdder
+     */
+    private $propertyAdder;
+
+    /**
      * @required
      */
-    public function autowireNodeCommandersTrait(NodesToRemoveCollector $nodesToRemoveCollector, PropertyToAddCollector $propertyToAddCollector, UseNodesToAddCollector $useNodesToAddCollector, NodesToAddCollector $nodesToAddCollector, NodesToReplaceCollector $nodesToReplaceCollector, RectorChangeCollector $rectorChangeCollector, PropertyNaming $propertyNaming, NodeRemover $nodeRemover): void
+    public function autowireNodeCommandersTrait(NodesToRemoveCollector $nodesToRemoveCollector, PropertyToAddCollector $propertyToAddCollector, UseNodesToAddCollector $useNodesToAddCollector, NodesToAddCollector $nodesToAddCollector, RectorChangeCollector $rectorChangeCollector, PropertyNaming $propertyNaming, NodeRemover $nodeRemover, \Rector\PostRector\DependencyInjection\PropertyAdder $propertyAdder): void
     {
         $this->nodesToRemoveCollector = $nodesToRemoveCollector;
         $this->propertyToAddCollector = $propertyToAddCollector;
         $this->useNodesToAddCollector = $useNodesToAddCollector;
-        $this->nodesToReplaceCollector = $nodesToReplaceCollector;
         $this->nodesToAddCollector = $nodesToAddCollector;
         $this->rectorChangeCollector = $rectorChangeCollector;
         $this->propertyNaming = $propertyNaming;
         $this->nodeRemover = $nodeRemover;
-    }
-
-    protected function addUseType(ObjectType $objectType, Node $positionNode): void
-    {
-        assert($objectType instanceof FullyQualifiedObjectType || $objectType instanceof AliasedObjectType);
-        $this->useNodesToAddCollector->addUseImport($positionNode, $objectType);
+        $this->propertyAdder = $propertyAdder;
     }
 
     /**
@@ -106,9 +95,8 @@ trait NodeCommandersTrait
      */
     protected function addNodesBeforeNode(array $newNodes, Node $positionNode): void
     {
-        foreach ($newNodes as $newNode) {
-            $this->addNodeBeforeNode($newNode, $positionNode);
-        }
+        $this->nodesToAddCollector->addNodesBeforeNode($newNodes, $positionNode);
+        $this->rectorChangeCollector->notifyNodeFileInfo($positionNode);
     }
 
     protected function addNodeAfterNode(Node $newNode, Node $positionNode): void
@@ -125,31 +113,17 @@ trait NodeCommandersTrait
 
     protected function addPropertyToCollector(Property $property): void
     {
-        $classNode = $property->getAttribute(AttributeKey::CLASS_NODE);
-        if (! $classNode instanceof Class_) {
-            return;
-        }
-        $propertyType = $this->getObjectType($property);
-        // use first type - hard assumption @todo improve
-        if ($propertyType instanceof UnionType) {
-            $propertyType = $propertyType->getTypes()[0];
-        }
-        /** @var string $propertyName */
-        $propertyName = $this->getName($property);
-        $this->addConstructorDependencyToClass($classNode, $propertyType, $propertyName, $property->flags);
+        $this->propertyAdder->addPropertyToCollector($property);
     }
 
     protected function addServiceConstructorDependencyToClass(Class_ $class, string $className): void
     {
-        $serviceObjectType = new ObjectType($className);
-        $propertyName = $this->propertyNaming->fqnToVariableName($serviceObjectType);
-        $this->addConstructorDependencyToClass($class, $serviceObjectType, $propertyName);
+        $this->propertyAdder->addServiceConstructorDependencyToClass($class, $className);
     }
 
     protected function addConstructorDependencyToClass(Class_ $class, ?Type $propertyType, string $propertyName, int $propertyFlags = 0): void
     {
-        $this->propertyToAddCollector->addPropertyToClass($class, $propertyName, $propertyType, $propertyFlags);
-        $this->rectorChangeCollector->notifyNodeFileInfo($class);
+        $this->propertyAdder->addConstructorDependencyToClass($class, $propertyType, $propertyName, $propertyFlags);
     }
 
     protected function addConstantToClass(Class_ $class, ClassConst $classConst): void
@@ -187,9 +161,7 @@ trait NodeCommandersTrait
      */
     protected function removeNodes(array $nodes): void
     {
-        foreach ($nodes as $node) {
-            $this->removeNode($node);
-        }
+        $this->nodeRemover->removeNodes($nodes);
     }
 
     private function notifyNodeFileInfo(Node $node): void

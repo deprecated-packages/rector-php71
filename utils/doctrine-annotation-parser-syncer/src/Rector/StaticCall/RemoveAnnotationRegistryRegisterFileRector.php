@@ -41,7 +41,7 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        if (! $this->isInClassesNamed($node, [DocParser::class, AnnotationReader::class])) {
+        if (! $this->nodeNameResolver->isInClassNames($node, [DocParser::class, AnnotationReader::class])) {
             return null;
         }
         if (! $this->isStaticCallNamed($node, AnnotationRegistry::class, 'registerFile')) {

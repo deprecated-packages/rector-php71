@@ -72,7 +72,7 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        if (! $this->isStaticCallsNamed($node, 'PHPExcel_IOFactory', ['createReader', 'createWriter', 'identify'])) {
+        if (! $this->nodeNameResolver->isStaticCallsNamed($node, 'PHPExcel_IOFactory', ['createReader', 'createWriter', 'identify'])) {
             return null;
         }
         $firstArgumentValue = $this->valueResolver->getValue($node->args[0]->value);
