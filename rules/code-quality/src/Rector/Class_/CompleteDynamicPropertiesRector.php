@@ -106,7 +106,7 @@ CODE_SAMPLE
 
     private function shouldSkipClass(Class_ $class): bool
     {
-        if (! $this->isNonAnonymousClass($class)) {
+        if ($this->classNodeAnalyzer->isAnonymousClass($class)) {
             return true;
         }
         $className = $this->getName($class);

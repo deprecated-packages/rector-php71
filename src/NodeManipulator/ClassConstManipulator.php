@@ -11,7 +11,7 @@ use PhpParser\Node\Stmt\ClassConst;
 use PhpParser\Node\Stmt\Trait_;
 use Rector\Core\PhpParser\Node\BetterNodeFinder;
 use Rector\Core\PhpParser\Printer\BetterStandardPrinter;
-use Rector\NodeCollector\NodeCollector\ParsedNodeCollector;
+use Rector\NodeCollector\NodeCollector\NodeRepository;
 use Rector\NodeNameResolver\NodeNameResolver;
 use Rector\NodeTypeResolver\Node\AttributeKey;
 
@@ -33,22 +33,22 @@ final class ClassConstManipulator
     private $betterStandardPrinter;
 
     /**
-     * @var ParsedNodeCollector
-     */
-    private $parsedNodeCollector;
-
-    /**
      * @var ClassManipulator
      */
     private $classManipulator;
 
-    public function __construct(BetterNodeFinder $betterNodeFinder, BetterStandardPrinter $betterStandardPrinter, ClassManipulator $classManipulator, NodeNameResolver $nodeNameResolver, ParsedNodeCollector $parsedNodeCollector)
+    /**
+     * @var NodeRepository
+     */
+    private $nodeRepository;
+
+    public function __construct(BetterNodeFinder $betterNodeFinder, BetterStandardPrinter $betterStandardPrinter, ClassManipulator $classManipulator, NodeNameResolver $nodeNameResolver, NodeRepository $nodeRepository)
     {
         $this->nodeNameResolver = $nodeNameResolver;
         $this->betterNodeFinder = $betterNodeFinder;
         $this->betterStandardPrinter = $betterStandardPrinter;
-        $this->parsedNodeCollector = $parsedNodeCollector;
         $this->classManipulator = $classManipulator;
+        $this->nodeRepository = $nodeRepository;
     }
 
     /**
@@ -63,7 +63,7 @@ final class ClassConstManipulator
         $searchInNodes = [$classLike];
         $usedTraitNames = $this->classManipulator->getUsedTraits($classLike);
         foreach ($usedTraitNames as $name) {
-            $name = $this->parsedNodeCollector->findTrait((string) $name);
+            $name = $this->nodeRepository->findTrait((string) $name);
             if (! $name instanceof Trait_) {
                 continue;
             }

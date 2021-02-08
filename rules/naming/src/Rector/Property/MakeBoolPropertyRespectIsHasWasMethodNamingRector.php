@@ -86,7 +86,7 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        if (! $this->isPropertyBoolean($node)) {
+        if (! $this->nodeTypeResolver->isPropertyBoolean($node)) {
             return null;
         }
         $propertyRename = $this->propertyRenameFactory->create($node, $this->boolPropertyExpectedNameResolver);
