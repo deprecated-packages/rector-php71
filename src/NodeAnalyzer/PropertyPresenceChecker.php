@@ -7,7 +7,6 @@ namespace Rector\Core\NodeAnalyzer;
 use PhpParser\Node\Stmt\Class_;
 use Rector\NodeNameResolver\NodeNameResolver;
 use Rector\NodeTypeResolver\ClassExistenceStaticHelper;
-use Rector\NodeTypeResolver\Node\AttributeKey;
 use Rector\Php80\NodeAnalyzer\PromotedPropertyResolver;
 use ReflectionClass;
 use ReflectionProperty;
@@ -30,9 +29,12 @@ final class PropertyPresenceChecker
         $this->nodeNameResolver = $nodeNameResolver;
     }
 
-    public function hasClassPropertyByName(Class_ $class, string $propertyName): bool
+    /**
+     * Includes parent classes and traits
+     */
+    public function hasClassContextPropertyByName(Class_ $class, string $propertyName): bool
     {
-        $className = $class->getAttribute(AttributeKey::CLASS_NAME);
+        $className = $this->nodeNameResolver->getName($class);
         if ($className === null) {
             return false;
         }
