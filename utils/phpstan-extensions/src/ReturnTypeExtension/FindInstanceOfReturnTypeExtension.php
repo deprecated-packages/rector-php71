@@ -2,58 +2,54 @@
 
 declare(strict_types=1);
 
-namespace Rector\PHPStanExtensions\ReturnTypeExtension\NodeFinder;
+namespace Rector\PHPStanExtensions\ReturnTypeExtension;
 
-use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Name;
+use PhpParser\NodeFinder;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Reflection\ParametersAcceptorSelector;
+use PHPStan\Type\ArrayType;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
+use PHPStan\Type\MixedType;
 use PHPStan\Type\NullType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 use PHPStan\Type\UnionType;
-use Rector\Core\PhpParser\Node\BetterNodeFinder;
 
-final class FindFirstInstanceOfReturnTypeExtension implements DynamicMethodReturnTypeExtension
+/**
+ * Covers:
+ * - NodeFinder::findInstanceOf()
+ * - NodeFinder::findFirstInstanceOf()
+ */
+final class FindInstanceOfReturnTypeExtension implements DynamicMethodReturnTypeExtension
 {
     public function getClass(): string
     {
-        return BetterNodeFinder::class;
+        return NodeFinder::class;
     }
 
     public function isMethodSupported(MethodReflection $methodReflection): bool
     {
-        return in_array($methodReflection->getName(), ['findFirstInstanceOf', 'findFirstParentInstanceOf', 'findFirstAncestorInstanceOf'], true);
+        return in_array($methodReflection->getName(), ['findInstanceOf', 'findFirstInstanceOf'], true);
     }
 
     public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope): Type
     {
         $returnType = ParametersAcceptorSelector::selectSingle($methodReflection->getVariants())->getReturnType();
         $secondArgumentNode = $methodCall->args[1]->value;
-        // fallback
-        if ($this->shouldFallbackToResolvedType($secondArgumentNode)) {
+        if (! $secondArgumentNode instanceof ClassConstFetch) {
             return $returnType;
         }
-        /** @var ClassConstFetch $secondArgumentNode */
         if (! $secondArgumentNode->class instanceof Name) {
             return $returnType;
         }
         $class = $secondArgumentNode->class->toString();
-        return new UnionType([new NullType(), new ObjectType($class)]);
-    }
-
-    private function shouldFallbackToResolvedType(Expr $expr): bool
-    {
-        if (! $expr instanceof ClassConstFetch) {
-            return true;
+        if ($methodReflection->getName() === 'findFirstInstanceOf') {
+            return new UnionType([new ObjectType($class), new NullType()]);
         }
-        if (! $expr->class instanceof Name) {
-            return true;
-        }
-        return (string) $expr->name !== 'class';
+        return new ArrayType(new MixedType(), new ObjectType($class));
     }
 }

@@ -48,6 +48,7 @@ final class AnonymousFunctionFactory
      */
     public function create(ClassMethod $classMethod, Node $node): Closure
     {
+        /** @var Return_[] $classMethodReturns */
         $classMethodReturns = $this->betterNodeFinder->findInstanceOf((array) $classMethod->stmts, Return_::class);
         $anonymousFunction = new Closure();
         $newParams = $this->copyParams($classMethod->params);

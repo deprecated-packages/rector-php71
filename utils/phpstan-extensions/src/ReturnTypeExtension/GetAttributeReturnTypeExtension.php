@@ -25,13 +25,13 @@ use PHPStan\Type\StringType;
 use PHPStan\Type\Type;
 use PHPStan\Type\UnionType;
 use Rector\NodeTypeResolver\Node\AttributeKey;
-use Rector\PHPStanExtensions\Utils\PHPStanValueResolver;
+use Symplify\Astral\NodeValue\NodeValueResolver;
 use Symplify\SmartFileSystem\SmartFileInfo;
 
 final class GetAttributeReturnTypeExtension implements DynamicMethodReturnTypeExtension
 {
     /**
-     * @var string[]|string[][]
+     * @var array<string, string|string[]>>
      */
     private const ARGUMENT_KEY_TO_RETURN_TYPE = [
         AttributeKey::class . '::FILE_INFO' => SmartFileInfo::class,
@@ -55,13 +55,13 @@ final class GetAttributeReturnTypeExtension implements DynamicMethodReturnTypeEx
     ];
 
     /**
-     * @var PHPStanValueResolver
+     * @var NodeValueResolver
      */
-    private $phpStanValueResolver;
+    private $nodeValueResolver;
 
-    public function __construct(PHPStanValueResolver $phpStanValueResolver)
+    public function __construct(NodeValueResolver $nodeValueResolver)
     {
-        $this->phpStanValueResolver = $phpStanValueResolver;
+        $this->nodeValueResolver = $nodeValueResolver;
     }
 
     public function getClass(): string
@@ -77,7 +77,7 @@ final class GetAttributeReturnTypeExtension implements DynamicMethodReturnTypeEx
     public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope): Type
     {
         $returnType = ParametersAcceptorSelector::selectSingle($methodReflection->getVariants())->getReturnType();
-        $argumentValue = $this->resolveArgumentValue($methodCall->args[0]->value);
+        $argumentValue = $this->resolveArgumentValue($methodCall->args[0]->value, $scope);
         if ($argumentValue === null) {
             return $returnType;
         }
@@ -98,10 +98,10 @@ final class GetAttributeReturnTypeExtension implements DynamicMethodReturnTypeEx
         return $returnType;
     }
 
-    private function resolveArgumentValue(Expr $expr): ?string
+    private function resolveArgumentValue(Expr $expr, Scope $scope): ?string
     {
         if ($expr instanceof ClassConstFetch) {
-            return $this->phpStanValueResolver->resolveClassConstFetch($expr);
+            return $this->nodeValueResolver->resolve($expr, $scope->getFile());
         }
         return null;
     }

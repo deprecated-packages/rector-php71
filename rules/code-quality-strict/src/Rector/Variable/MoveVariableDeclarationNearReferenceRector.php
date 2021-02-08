@@ -172,6 +172,7 @@ CODE_SAMPLE
         if (! $node instanceof Node) {
             return false;
         }
+        /** @var ArrayDimFetch[] $arrayDimFetches */
         $arrayDimFetches = $this->betterNodeFinder->findInstanceOf($node, ArrayDimFetch::class);
         foreach ($arrayDimFetches as $arrayDimFetch) {
             /** @var Node|null $dim */

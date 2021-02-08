@@ -97,6 +97,9 @@ final class NodeValueResolver
         if ($constantName === null) {
             return null;
         }
+        if ($constantName === 'class') {
+            return $className;
+        }
         $reflectionClassConstant = new ReflectionClassConstant($className, $constantName);
         return $reflectionClassConstant->getValue();
     }

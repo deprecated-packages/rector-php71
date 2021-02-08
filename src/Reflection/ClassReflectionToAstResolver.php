@@ -46,7 +46,7 @@ final class ClassReflectionToAstResolver
         return $this->getClass($classReflection, $className);
     }
 
-    public function getClass(ClassReflection $classReflection, string $className): ?Class_
+    private function getClass(ClassReflection $classReflection, string $className): ?Class_
     {
         if ($classReflection->isBuiltin()) {
             return null;
@@ -55,6 +55,7 @@ final class ClassReflectionToAstResolver
         $fileName = $classReflection->getFileName();
         /** @var Node[] $contentNodes */
         $contentNodes = $this->parser->parse($this->smartFileSystem->readFile($fileName));
+        /** @var Class_[] $classes */
         $classes = $this->betterNodeFinder->findInstanceOf($contentNodes, Class_::class);
         if ($classes === []) {
             return null;
