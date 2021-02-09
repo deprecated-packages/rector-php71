@@ -9,6 +9,7 @@ use PHPStan\Type\Accessory\AccessoryNumericStringType;
 use PHPStan\Type\IntersectionType;
 use PHPStan\Type\StringType;
 use PHPStan\Type\Type;
+use PHPStan\Type\UnionType;
 use Rector\NodeTypeResolver\NodeTypeResolver;
 
 final class NodeTypeAnalyzer
@@ -37,9 +38,9 @@ final class NodeTypeAnalyzer
         if ($type instanceof AccessoryNumericStringType) {
             return true;
         }
-        if ($type instanceof IntersectionType) {
-            foreach ($type->getTypes() as $intersectionedType) {
-                if (! $this->isStringType($intersectionedType)) {
+        if ($type instanceof IntersectionType || $type instanceof UnionType) {
+            foreach ($type->getTypes() as $innerType) {
+                if (! $this->isStringType($innerType)) {
                     return false;
                 }
             }
