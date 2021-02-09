@@ -65,7 +65,7 @@ CODE_SAMPLE
             return null;
         }
         $movedFileWithContent = new MovedFileWithContent($smartFileInfo, $newRealPath);
-        $this->addMovedFile($movedFileWithContent);
+        $this->removedAndAddedFilesCollector->addMovedFile($movedFileWithContent);
         return null;
     }
 

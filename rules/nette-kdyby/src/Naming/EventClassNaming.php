@@ -57,7 +57,7 @@ final class EventClassNaming
 
     public function resolveEventFileLocationFromClassNameAndFileInfo(string $className, SmartFileInfo $smartFileInfo): string
     {
-        $shortClassName = $this->classNaming->getShortName($className);
+        $shortClassName = $this->nodeNameResolver->getShortName($className);
         return $smartFileInfo->getPath() . DIRECTORY_SEPARATOR . self::EVENT . DIRECTORY_SEPARATOR . $shortClassName . '.php';
     }
 

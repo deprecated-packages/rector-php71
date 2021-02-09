@@ -62,7 +62,7 @@ CODE_SAMPLE
         if (! $this->netteControlFactoryInterfaceAnalyzer->isComponentFactoryInterface($node)) {
             return null;
         }
-        $this->removeFile($smartFileInfo);
+        $this->removedAndAddedFilesCollector->removeFile($smartFileInfo);
         return null;
     }
 }

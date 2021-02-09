@@ -8,7 +8,6 @@ use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassLike;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
-use Rector\CodingStyle\Naming\ClassNaming;
 use Rector\Core\PhpParser\Node\BetterNodeFinder;
 use Rector\Core\PhpParser\Parser\Parser;
 use Rector\NodeNameResolver\NodeNameResolver;
@@ -28,20 +27,14 @@ final class BundleClassResolver
     private $betterNodeFinder;
 
     /**
-     * @var ClassNaming
-     */
-    private $classNaming;
-
-    /**
      * @var NodeNameResolver
      */
     private $nodeNameResolver;
 
-    public function __construct(BetterNodeFinder $betterNodeFinder, ClassNaming $classNaming, NodeNameResolver $nodeNameResolver, Parser $parser)
+    public function __construct(BetterNodeFinder $betterNodeFinder, NodeNameResolver $nodeNameResolver, Parser $parser)
     {
         $this->parser = $parser;
         $this->betterNodeFinder = $betterNodeFinder;
-        $this->classNaming = $classNaming;
         $this->nodeNameResolver = $nodeNameResolver;
     }
 
@@ -68,7 +61,7 @@ final class BundleClassResolver
         $bundleFile = $bundleFiles[0];
         $bundleClassName = $this->resolveClassNameFromFilePath($bundleFile);
         if ($bundleClassName !== null) {
-            return $this->classNaming->getShortName($bundleClassName);
+            return $this->nodeNameResolver->getShortName($bundleClassName);
         }
         return null;
     }

@@ -152,6 +152,6 @@ CODE_SAMPLE
         if (! $movedFileWithNodes instanceof MovedFileWithNodes) {
             return;
         }
-        $this->addMovedFile($movedFileWithNodes);
+        $this->removedAndAddedFilesCollector->addMovedFile($movedFileWithNodes);
     }
 }

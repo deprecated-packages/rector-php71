@@ -108,7 +108,7 @@ CODE_SAMPLE
         /** @var SmartFileInfo $smartFileInfo */
         $smartFileInfo = $node->getAttribute(AttributeKey::FILE_INFO);
         // 2. nothing to return - remove the file
-        $this->removeFile($smartFileInfo);
+        $this->removedAndAddedFilesCollector->removeFile($smartFileInfo);
         return null;
     }
 
@@ -174,7 +174,7 @@ CODE_SAMPLE
         }
         $fileDestination = $this->createClassLikeFileDestination($classLike, $smartFileInfo);
         $movedFileWithNodes = new MovedFileWithNodes($nodesToPrint, $fileDestination, $smartFileInfo);
-        $this->addMovedFile($movedFileWithNodes);
+        $this->removedAndAddedFilesCollector->addMovedFile($movedFileWithNodes);
     }
 
     private function createClassLikeFileDestination(ClassLike $classLike, SmartFileInfo $smartFileInfo): string

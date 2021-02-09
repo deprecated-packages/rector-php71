@@ -194,7 +194,7 @@ final class ClassRenamer
         /** @var string $name */
         $this->alreadyProcessedClasses[] = $name;
         $newName = $oldToNewClasses[$name];
-        $newClassNamePart = $this->classNaming->getShortName($newName);
+        $newClassNamePart = $this->nodeNameResolver->getShortName($newName);
         $newNamespacePart = $this->classNaming->getNamespace($newName);
         if ($this->isClassAboutToBeDuplicated($newName)) {
             return null;

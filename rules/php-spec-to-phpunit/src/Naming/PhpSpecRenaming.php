@@ -12,7 +12,6 @@ use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Namespace_;
-use Rector\CodingStyle\Naming\ClassNaming;
 use Rector\Core\Exception\ShouldNotHappenException;
 use Rector\Core\Util\StaticRectorStrings;
 use Rector\NodeNameResolver\NodeNameResolver;
@@ -36,16 +35,10 @@ final class PhpSpecRenaming
      */
     private $nodeNameResolver;
 
-    /**
-     * @var ClassNaming
-     */
-    private $classNaming;
-
-    public function __construct(NodeNameResolver $nodeNameResolver, StringFormatConverter $stringFormatConverter, ClassNaming $classNaming)
+    public function __construct(NodeNameResolver $nodeNameResolver, StringFormatConverter $stringFormatConverter)
     {
         $this->stringFormatConverter = $stringFormatConverter;
         $this->nodeNameResolver = $nodeNameResolver;
-        $this->classNaming = $classNaming;
     }
 
     public function renameMethod(ClassMethod $classMethod): void
@@ -85,7 +78,7 @@ final class PhpSpecRenaming
 
     public function renameClass(Class_ $class): void
     {
-        $classShortName = $this->classNaming->getShortName($class);
+        $classShortName = $this->nodeNameResolver->getShortName($class);
         // anonymous class?
         if ($classShortName === '') {
             throw new ShouldNotHappenException();
@@ -102,7 +95,7 @@ final class PhpSpecRenaming
         if ($class->name === null) {
             throw new ShouldNotHappenException();
         }
-        $shortClassName = $this->classNaming->getShortName($class);
+        $shortClassName = $this->nodeNameResolver->getShortName($class);
         $bareClassName = StaticRectorStrings::removeSuffixes($shortClassName, [self::SPEC, 'Test']);
         return lcfirst($bareClassName);
     }

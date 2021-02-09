@@ -109,7 +109,7 @@ CODE_SAMPLE
             }
 
             /** @var int $key */
-            $this->removeStmt($node, $key);
+            $this->nodeRemover->removeStmt($node, $key);
         }
         $node->stmts = array_merge($node->stmts, (array) $proccesed);
         return $node;

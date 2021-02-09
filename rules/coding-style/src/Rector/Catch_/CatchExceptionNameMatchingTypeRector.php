@@ -81,7 +81,7 @@ CODE_SAMPLE
             return null;
         }
         $type = $node->types[0];
-        $typeShortName = $this->getShortName($type);
+        $typeShortName = $this->nodeNameResolver->getShortName($type);
         $newVariableName = Strings::replace(lcfirst($typeShortName), self::STARTS_WITH_ABBREVIATION_REGEX, function (array $matches): string {
             $output = '';
             $output .= isset($matches[1]) ? strtolower($matches[1]) : '';

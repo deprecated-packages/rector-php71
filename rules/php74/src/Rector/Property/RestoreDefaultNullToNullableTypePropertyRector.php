@@ -99,7 +99,7 @@ CODE_SAMPLE
             if (! $node instanceof Assign) {
                 return null;
             }
-            if (! $this->isLocalPropertyFetchNamed($node->var, $propertyName)) {
+            if (! $this->nodeNameResolver->isLocalPropertyFetchNamed($node->var, $propertyName)) {
                 return null;
             }
             $isPropertyInitiated = true;

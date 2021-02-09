@@ -22,6 +22,7 @@ use Rector\Naming\PhpDoc\VarTagValueNodeRenamer;
 use Rector\Naming\ValueObject\VariableAndCallAssign;
 use Rector\Naming\VariableRenamer;
 use Rector\NodeTypeResolver\Node\AttributeKey;
+use Rector\PHPStanStaticTypeMapper\Utils\TypeUnwrapper;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
@@ -70,7 +71,12 @@ final class RenameVariableToMatchMethodCallReturnTypeRector extends AbstractRect
      */
     private $varTagValueNodeRenamer;
 
-    public function __construct(BreakingVariableRenameGuard $breakingVariableRenameGuard, ExpectedNameResolver $expectedNameResolver, FamilyRelationsAnalyzer $familyRelationsAnalyzer, NamingConventionAnalyzer $namingConventionAnalyzer, VarTagValueNodeRenamer $varTagValueNodeRenamer, VariableAndCallAssignMatcher $variableAndCallAssignMatcher, VariableRenamer $variableRenamer)
+    /**
+     * @var TypeUnwrapper
+     */
+    private $typeUnwrapper;
+
+    public function __construct(BreakingVariableRenameGuard $breakingVariableRenameGuard, ExpectedNameResolver $expectedNameResolver, FamilyRelationsAnalyzer $familyRelationsAnalyzer, NamingConventionAnalyzer $namingConventionAnalyzer, VarTagValueNodeRenamer $varTagValueNodeRenamer, VariableAndCallAssignMatcher $variableAndCallAssignMatcher, VariableRenamer $variableRenamer, TypeUnwrapper $typeUnwrapper)
     {
         $this->expectedNameResolver = $expectedNameResolver;
         $this->variableRenamer = $variableRenamer;
@@ -79,6 +85,7 @@ final class RenameVariableToMatchMethodCallReturnTypeRector extends AbstractRect
         $this->variableAndCallAssignMatcher = $variableAndCallAssignMatcher;
         $this->namingConventionAnalyzer = $namingConventionAnalyzer;
         $this->varTagValueNodeRenamer = $varTagValueNodeRenamer;
+        $this->typeUnwrapper = $typeUnwrapper;
     }
 
     public function getRuleDefinition(): RuleDefinition
@@ -153,28 +160,28 @@ CODE_SAMPLE
     }
 
     /**
-     * @param FuncCall|StaticCall|MethodCall $node
+     * @param FuncCall|StaticCall|MethodCall $callNode
      */
-    private function isMultipleCall(Node $node): bool
+    private function isMultipleCall(Node $callNode): bool
     {
-        $parentNode = $node->getAttribute(AttributeKey::PARENT_NODE);
+        $parentNode = $callNode->getAttribute(AttributeKey::PARENT_NODE);
         while ($parentNode) {
-            $countUsed = count($this->betterNodeFinder->find($parentNode, function (Node $n) use ($node): bool {
-                if (get_class($node) !== get_class($n)) {
+            $usedNodes = $this->betterNodeFinder->find($parentNode, function (Node $node) use ($callNode): bool {
+                if (get_class($callNode) !== get_class($node)) {
                     return false;
                 }
-                /** @var FuncCall|StaticCall|MethodCall $n */
-                $passedNode = clone $n;
                 /** @var FuncCall|StaticCall|MethodCall $node */
-                $usedNode = clone $node;
+                $passedNode = clone $node;
+                /** @var FuncCall|StaticCall|MethodCall $callNode */
+                $usedNode = clone $callNode;
                 /** @var FuncCall|StaticCall|MethodCall $passedNode */
                 $passedNode->args = [];
                 /** @var FuncCall|StaticCall|MethodCall $usedNode */
                 $usedNode->args = [];
                 return $this->areNodesEqual($passedNode, $usedNode);
-            }));
+            });
 
-            if ($countUsed > 1) {
+            if (count($usedNodes) > 1) {
                 return true;
             }
 
