@@ -17,6 +17,7 @@ use Rector\DeadCode\Rector\ClassMethod\RemoveDeadConstructorRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveDeadRecursiveClassMethodRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveDelegatingParentCallRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveEmptyClassMethodRector;
+use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedConstructorParamRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedParameterRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodRector;
 use Rector\DeadCode\Rector\Concat\RemoveConcatAutocastRector;
@@ -92,4 +93,5 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
     $services->set(RemoveDeadRecursiveClassMethodRector::class);
     $services->set(RemoveEmptyMethodCallRector::class);
     $services->set(RemoveDeadConditionAboveReturnRector::class);
+    $services->set(RemoveUnusedConstructorParamRector::class);
 };

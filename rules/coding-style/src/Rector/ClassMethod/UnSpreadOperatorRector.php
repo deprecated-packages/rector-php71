@@ -133,7 +133,8 @@ CODE_SAMPLE
             }
 
             $variadicArgs[] = $arg;
-            unset($methodCall->args[$position]);
+
+            $this->nodeRemover->removeArg($methodCall, $position);
         }
         return $variadicArgs;
     }

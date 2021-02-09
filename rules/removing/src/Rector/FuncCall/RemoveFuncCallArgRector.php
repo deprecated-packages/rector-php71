@@ -68,7 +68,7 @@ CODE_SAMPLE
                     continue;
                 }
 
-                unset($node->args[$position]);
+                $this->nodeRemover->removeArg($node, $position);
             }
         }
         return $node;

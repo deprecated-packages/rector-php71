@@ -89,9 +89,9 @@ CODE_SAMPLE
     {
         if ($argumentRemover->getValue() === null) {
             if ($node instanceof MethodCall || $node instanceof StaticCall) {
-                unset($node->args[$argumentRemover->getPosition()]);
+                $this->nodeRemover->removeArg($node, $argumentRemover->getPosition());
             } else {
-                unset($node->params[$argumentRemover->getPosition()]);
+                $this->nodeRemover->removeParam($node, $argumentRemover->getPosition());
             }
 
             return;
@@ -109,7 +109,7 @@ CODE_SAMPLE
             return;
         }
         if ($this->isArgumentValueMatch($node->args[$argumentRemover->getPosition()], $match)) {
-            unset($node->args[$argumentRemover->getPosition()]);
+            $this->nodeRemover->removeArg($node, $argumentRemover->getPosition());
         }
     }
 
