@@ -7,6 +7,8 @@ namespace Rector\BetterPhpDocParser\PhpDocNodeFactory\Doctrine\Class_;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 use Nette\Utils\Strings;
 use Rector\BetterPhpDocParser\Annotation\AnnotationItemsResolver;
+use Rector\BetterPhpDocParser\Printer\ArrayPartPhpDocTagPrinter;
+use Rector\BetterPhpDocParser\Printer\TagValueNodePrinter;
 use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\Doctrine\Class_\UniqueConstraintTagValueNode;
 
 final class UniqueConstraintPhpDocNodeFactory
@@ -22,9 +24,21 @@ final class UniqueConstraintPhpDocNodeFactory
      */
     private $annotationItemsResolver;
 
-    public function __construct(AnnotationItemsResolver $annotationItemsResolver)
+    /**
+     * @var ArrayPartPhpDocTagPrinter
+     */
+    private $arrayPartPhpDocTagPrinter;
+
+    /**
+     * @var TagValueNodePrinter
+     */
+    private $tagValueNodePrinter;
+
+    public function __construct(AnnotationItemsResolver $annotationItemsResolver, ArrayPartPhpDocTagPrinter $arrayPartPhpDocTagPrinter, TagValueNodePrinter $tagValueNodePrinter)
     {
         $this->annotationItemsResolver = $annotationItemsResolver;
+        $this->arrayPartPhpDocTagPrinter = $arrayPartPhpDocTagPrinter;
+        $this->tagValueNodePrinter = $tagValueNodePrinter;
     }
 
     /**
@@ -42,7 +56,7 @@ final class UniqueConstraintPhpDocNodeFactory
             $subAnnotationContent = $uniqueConstraintContents[$key];
 
             $items = $this->annotationItemsResolver->resolve($uniqueConstraint);
-            $uniqueConstraintTagValueNodes[] = new UniqueConstraintTagValueNode($items, $subAnnotationContent['content'], $subAnnotationContent['tag']);
+            $uniqueConstraintTagValueNodes[] = new UniqueConstraintTagValueNode($this->arrayPartPhpDocTagPrinter, $this->tagValueNodePrinter, $items, $subAnnotationContent['content'], $subAnnotationContent['tag']);
         }
         return $uniqueConstraintTagValueNodes;
     }

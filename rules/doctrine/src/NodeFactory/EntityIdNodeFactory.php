@@ -6,6 +6,8 @@ namespace Rector\Doctrine\NodeFactory;
 
 use PhpParser\Node\Stmt\Property;
 use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfoFactory;
+use Rector\BetterPhpDocParser\Printer\ArrayPartPhpDocTagPrinter;
+use Rector\BetterPhpDocParser\Printer\TagValueNodePrinter;
 use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\Doctrine\Property_\GeneratedValueTagValueNode;
 use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\Doctrine\Property_\IdTagValueNode;
 use Rector\Core\PhpParser\Node\NodeFactory;
@@ -28,11 +30,23 @@ final class EntityIdNodeFactory
      */
     private $phpDocInfoFactory;
 
-    public function __construct(NodeFactory $nodeFactory, PhpDocTagNodeFactory $phpDocTagNodeFactory, PhpDocInfoFactory $phpDocInfoFactory)
+    /**
+     * @var ArrayPartPhpDocTagPrinter
+     */
+    private $arrayPartPhpDocTagPrinter;
+
+    /**
+     * @var TagValueNodePrinter
+     */
+    private $tagValueNodePrinter;
+
+    public function __construct(NodeFactory $nodeFactory, PhpDocTagNodeFactory $phpDocTagNodeFactory, PhpDocInfoFactory $phpDocInfoFactory, ArrayPartPhpDocTagPrinter $arrayPartPhpDocTagPrinter, TagValueNodePrinter $tagValueNodePrinter)
     {
         $this->phpDocTagNodeFactory = $phpDocTagNodeFactory;
         $this->nodeFactory = $nodeFactory;
         $this->phpDocInfoFactory = $phpDocInfoFactory;
+        $this->arrayPartPhpDocTagPrinter = $arrayPartPhpDocTagPrinter;
+        $this->tagValueNodePrinter = $tagValueNodePrinter;
     }
 
     public function createIdProperty(): Property
@@ -51,10 +65,11 @@ final class EntityIdNodeFactory
         $attributeAwareVarTagValueNode = $this->phpDocTagNodeFactory->createVarTagIntValueNode();
         $phpDocInfo->addTagValueNode($attributeAwareVarTagValueNode);
         // add @ORM\Id
-        $phpDocInfo->addTagValueNodeWithShortName(new IdTagValueNode([]));
+        $idTagValueNode = new IdTagValueNode($this->arrayPartPhpDocTagPrinter, $this->tagValueNodePrinter);
+        $phpDocInfo->addTagValueNodeWithShortName($idTagValueNode);
         $idColumnTagValueNode = $this->phpDocTagNodeFactory->createIdColumnTagValueNode();
         $phpDocInfo->addTagValueNodeWithShortName($idColumnTagValueNode);
-        $generatedValueTagValueNode = new GeneratedValueTagValueNode([
+        $generatedValueTagValueNode = new GeneratedValueTagValueNode($this->arrayPartPhpDocTagPrinter, $this->tagValueNodePrinter, [
             'strategy' => 'AUTO',
         ]);
         $phpDocInfo->addTagValueNodeWithShortName($generatedValueTagValueNode);

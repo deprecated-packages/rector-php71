@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Rector\BetterPhpDocParser\ValueObject\PhpDocNode\Doctrine\Property_;
 
+use Rector\BetterPhpDocParser\Printer\ArrayPartPhpDocTagPrinter;
+use Rector\BetterPhpDocParser\Printer\TagValueNodePrinter;
 use Rector\BetterPhpDocParser\ValueObject\AroundSpaces;
 use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\Doctrine\AbstractDoctrineTagValueNode;
 use Rector\Core\Exception\ShouldNotHappenException;
@@ -57,21 +59,22 @@ final class JoinTableTagValueNode extends AbstractDoctrineTagValueNode implement
      * @param JoinColumnTagValueNode[] $joinColumns
      * @param JoinColumnTagValueNode[] $inverseJoinColumns
      */
-    public function __construct(?string $name, ?string $schema = null, array $joinColumns = [], array $inverseJoinColumns = [], ?string $originalContent = null, ?AroundSpaces $joinColumnsAroundSpaces = null, ?AroundSpaces $inverseJoinColumnsAroundSpaces = null)
+    public function __construct(ArrayPartPhpDocTagPrinter $arrayPartPhpDocTagPrinter, TagValueNodePrinter $tagValueNodePrinter, ?string $name, ?string $schema = null, array $joinColumns = [], array $inverseJoinColumns = [], ?string $originalContent = null, ?AroundSpaces $joinColumnsAroundSpaces = null, ?AroundSpaces $inverseJoinColumnsAroundSpaces = null)
     {
         $this->name = $name;
         $this->schema = $schema;
         $this->joinColumns = $joinColumns;
         $this->inverseJoinColumns = $inverseJoinColumns;
-        $this->resolveOriginalContentSpacingAndOrder($originalContent);
+        // $this->resolveOriginalContentSpacingAndOrder($originalContent);
         $this->inverseJoinColumnsAroundSpaces = $inverseJoinColumnsAroundSpaces;
         $this->joinColumnsAroundSpaces = $joinColumnsAroundSpaces;
+        parent::__construct($arrayPartPhpDocTagPrinter, $tagValueNodePrinter, [], $originalContent);
     }
 
     public function __toString(): string
     {
         $items = $this->createItems();
-        $items = $this->makeKeysExplicit($items);
+        $items = $this->tagValueNodePrinter->makeKeysExplicit($items, $this->tagValueNodeConfiguration);
 
         return $this->printContentItems($items);
     }

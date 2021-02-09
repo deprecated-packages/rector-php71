@@ -294,6 +294,14 @@ final class IfManipulator
         return ! $this->betterStandardPrinter->areNodesEqual($this->getIfCondVar($if), $node->var);
     }
 
+    public function isIfWithoutElseAndElseIfs(If_ $if): bool
+    {
+        if ($if->else !== null) {
+            return false;
+        }
+        return ! (bool) $if->elseifs;
+    }
+
     private function matchComparedAndReturnedNode(NotIdentical $notIdentical, Return_ $return): ?Expr
     {
         if ($this->betterStandardPrinter->areNodesEqual($notIdentical->left, $return->expr) && $this->valueResolver->isNull($notIdentical->right)) {
@@ -331,14 +339,6 @@ final class IfManipulator
             return false;
         }
         return is_a($stmts[0], $desiredType);
-    }
-
-    public function isIfWithoutElseAndElseIfs(If_ $if): bool
-    {
-        if ($if->else !== null) {
-            return false;
-        }
-        return ! (bool) $if->elseifs;
     }
 
     private function getIfCondVar(If_ $if): Node

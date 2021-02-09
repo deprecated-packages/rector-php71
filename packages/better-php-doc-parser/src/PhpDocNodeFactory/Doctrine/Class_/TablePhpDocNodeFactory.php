@@ -12,6 +12,8 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagValueNode;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
 use Rector\BetterPhpDocParser\Contract\SpecificPhpDocNodeFactoryInterface;
 use Rector\BetterPhpDocParser\PhpDocNodeFactory\AbstractPhpDocNodeFactory;
+use Rector\BetterPhpDocParser\Printer\ArrayPartPhpDocTagPrinter;
+use Rector\BetterPhpDocParser\Printer\TagValueNodePrinter;
 use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\Doctrine\Class_\TableTagValueNode;
 use Rector\Core\Exception\ShouldNotHappenException;
 
@@ -33,10 +35,22 @@ final class TablePhpDocNodeFactory extends AbstractPhpDocNodeFactory implements 
      */
     private $uniqueConstraintPhpDocNodeFactory;
 
-    public function __construct(IndexPhpDocNodeFactory $indexPhpDocNodeFactory, UniqueConstraintPhpDocNodeFactory $uniqueConstraintPhpDocNodeFactory)
+    /**
+     * @var ArrayPartPhpDocTagPrinter
+     */
+    private $arrayPartPhpDocTagPrinter;
+
+    /**
+     * @var TagValueNodePrinter
+     */
+    private $tagValueNodePrinter;
+
+    public function __construct(ArrayPartPhpDocTagPrinter $arrayPartPhpDocTagPrinter, TagValueNodePrinter $tagValueNodePrinter, IndexPhpDocNodeFactory $indexPhpDocNodeFactory, UniqueConstraintPhpDocNodeFactory $uniqueConstraintPhpDocNodeFactory)
     {
         $this->indexPhpDocNodeFactory = $indexPhpDocNodeFactory;
         $this->uniqueConstraintPhpDocNodeFactory = $uniqueConstraintPhpDocNodeFactory;
+        $this->arrayPartPhpDocTagPrinter = $arrayPartPhpDocTagPrinter;
+        $this->tagValueNodePrinter = $tagValueNodePrinter;
     }
 
     /**
@@ -65,6 +79,6 @@ final class TablePhpDocNodeFactory extends AbstractPhpDocNodeFactory implements 
         $uniqueConstraintAroundSpaces = $this->matchCurlyBracketAroundSpaces($uniqueConstraintsContent);
         $uniqueConstraintTagValueNodes = $this->uniqueConstraintPhpDocNodeFactory->createUniqueConstraintTagValueNodes($table->uniqueConstraints, $uniqueConstraintsContent);
         $haveUniqueConstraintsFinalComma = (bool) Strings::match($uniqueConstraintsContent, self::SPACE_BEFORE_CLOSING_BRACKET_REGEX);
-        return new TableTagValueNode($table->name, $table->schema, $indexTagValueNodes, $uniqueConstraintTagValueNodes, $table->options, $annotationContent, $haveIndexesFinalComma, $haveUniqueConstraintsFinalComma, $indexesAroundSpaces, $uniqueConstraintAroundSpaces);
+        return new TableTagValueNode($this->arrayPartPhpDocTagPrinter, $this->tagValueNodePrinter, $table->name, $table->schema, $indexTagValueNodes, $uniqueConstraintTagValueNodes, $table->options, $annotationContent, $haveIndexesFinalComma, $haveUniqueConstraintsFinalComma, $indexesAroundSpaces, $uniqueConstraintAroundSpaces);
     }
 }
