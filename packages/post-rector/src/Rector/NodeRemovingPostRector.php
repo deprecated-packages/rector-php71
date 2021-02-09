@@ -102,9 +102,6 @@ final class NodeRemovingPostRector extends NodeVisitorAbstract implements PostRe
 
     private function isChainMethodCallNodeToBeRemoved(MethodCall $mainMethodCall, MethodCall $toBeRemovedMethodCall): bool
     {
-        if (! $mainMethodCall instanceof MethodCall) {
-            return false;
-        }
         if (! $mainMethodCall->var instanceof MethodCall) {
             return false;
         }

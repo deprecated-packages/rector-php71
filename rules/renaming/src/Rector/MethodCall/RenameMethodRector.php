@@ -116,9 +116,6 @@ CODE_SAMPLE
 
     private function shouldSkipForAlreadyExistingClassMethod(ClassMethod $classMethod, MethodCallRenameInterface $methodCallRename): bool
     {
-        if (! $classMethod instanceof ClassMethod) {
-            return false;
-        }
         $classLike = $classMethod->getAttribute(AttributeKey::CLASS_NODE);
         if (! $classLike instanceof ClassLike) {
             return false;
