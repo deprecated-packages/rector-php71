@@ -307,6 +307,13 @@ final class IfManipulator
         ]);
     }
 
+    public function createIfExpr(Expr $expr, Stmt $stmt): If_
+    {
+        return new If_($expr, [
+            'stmts' => [$stmt],
+        ]);
+    }
+
     private function matchComparedAndReturnedNode(NotIdentical $notIdentical, Return_ $return): ?Expr
     {
         if ($this->betterStandardPrinter->areNodesEqual($notIdentical->left, $return->expr) && $this->valueResolver->isNull($notIdentical->right)) {
