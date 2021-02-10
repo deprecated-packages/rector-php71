@@ -125,6 +125,12 @@ CODE_SAMPLE
 
     private function shouldSkipForExactClassMethodForClassMethod(ClassMethod $classMethod, string $type): bool
     {
+        $className = $classMethod->getAttribute(AttributeKey::CLASS_NAME);
+        $methodCalls = $this->nodeRepository->findMethodCallsOnClass($className);
+        $name = $this->getName($classMethod->name);
+        if (isset($methodCalls[$name])) {
+            return false;
+        }
         return $classMethod->getAttribute(AttributeKey::CLASS_NAME) === $type;
     }
 }
