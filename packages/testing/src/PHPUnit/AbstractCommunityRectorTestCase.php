@@ -58,10 +58,10 @@ abstract class AbstractCommunityRectorTestCase extends AbstractKernelTestCase im
         $this->parameterProvider = $this->getService(ParameterProvider::class);
     }
 
-    protected function doTestFileInfo(SmartFileInfo $fixtureFileInfo): void
+    protected function doTestFileInfo(SmartFileInfo $fixtureFileInfo, bool $shouldAutoload = true): void
     {
         self::$fixtureGuard->ensureFileInfoHasDifferentBeforeAndAfterContent($fixtureFileInfo);
-        $inputFileInfoAndExpectedFileInfo = StaticFixtureSplitter::splitFileInfoToLocalInputAndExpectedFileInfos($fixtureFileInfo);
+        $inputFileInfoAndExpectedFileInfo = StaticFixtureSplitter::splitFileInfoToLocalInputAndExpectedFileInfos($fixtureFileInfo, $shouldAutoload);
         $inputFileInfo = $inputFileInfoAndExpectedFileInfo->getInputFileInfo();
         // needed for PHPStan, because the analyzed file is just create in /temp
         /** @var NodeScopeResolver $nodeScopeResolver */
