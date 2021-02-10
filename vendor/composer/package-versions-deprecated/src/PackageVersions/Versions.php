@@ -100,8 +100,8 @@ final class Versions
   'symplify/symfony-php-config' => '9.1.4@f84de1db571536693d1d76ac43b298b24411fb7d',
   'symplify/symplify-kernel' => '9.1.4@82dafcbf123553387a8e96409b4d79fd4e78e271',
   'webmozart/assert' => '1.9.1@bafc69caeb4d49c39fd0779086c03a3738cbb389',
-  'rector/rector-prefixed' => 'dev-master@8d5706d5accbf300d24617b500315f935cbcd25d',
-  'rector/rector' => 'dev-master@8d5706d5accbf300d24617b500315f935cbcd25d',
+  'rector/rector-prefixed' => 'dev-master@45caffd59191c7a842af15b80937617ccd68350a',
+  'rector/rector' => 'dev-master@45caffd59191c7a842af15b80937617ccd68350a',
 );
 
     private function __construct()
