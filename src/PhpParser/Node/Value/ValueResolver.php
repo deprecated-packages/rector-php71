@@ -20,6 +20,8 @@ use Rector\Core\NodeAnalyzer\ConstFetchAnalyzer;
 use Rector\NodeNameResolver\NodeNameResolver;
 use Rector\NodeTypeResolver\Node\AttributeKey;
 use Rector\NodeTypeResolver\NodeTypeResolver;
+use ReflectionClass;
+use Symplify\PackageBuilder\Reflection\ClassLikeExistenceChecker;
 use Symplify\SmartFileSystem\SmartFileInfo;
 
 /**
@@ -47,11 +49,17 @@ final class ValueResolver
      */
     private $constFetchAnalyzer;
 
-    public function __construct(NodeNameResolver $nodeNameResolver, NodeTypeResolver $nodeTypeResolver, ConstFetchAnalyzer $constFetchAnalyzer)
+    /**
+     * @var ClassLikeExistenceChecker
+     */
+    private $classLikeExistenceChecker;
+
+    public function __construct(NodeNameResolver $nodeNameResolver, NodeTypeResolver $nodeTypeResolver, ConstFetchAnalyzer $constFetchAnalyzer, ClassLikeExistenceChecker $classLikeExistenceChecker)
     {
         $this->nodeNameResolver = $nodeNameResolver;
         $this->nodeTypeResolver = $nodeTypeResolver;
         $this->constFetchAnalyzer = $constFetchAnalyzer;
+        $this->classLikeExistenceChecker = $classLikeExistenceChecker;
     }
 
     /**
@@ -248,6 +256,13 @@ final class ValueResolver
         $classConstantReference = $class . '::' . $constant;
         if (defined($classConstantReference)) {
             return constant($classConstantReference);
+        }
+        if ($this->classLikeExistenceChecker->doesClassLikeExist($class)) {
+            $reflectionClass = new ReflectionClass($class);
+            $reflectionClassHasConstant = $reflectionClass->hasConstant($constant);
+            if ($reflectionClassHasConstant) {
+                return $reflectionClass->getConstant($constant);
+            }
         }
         // fallback to constant reference itself, to avoid fatal error
         return $classConstantReference;
