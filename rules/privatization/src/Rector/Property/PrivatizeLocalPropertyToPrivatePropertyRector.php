@@ -69,7 +69,6 @@ class SomeClass
 }
 CODE_SAMPLE
 ),
-
         ]);
     }
 
@@ -97,7 +96,7 @@ CODE_SAMPLE
         $usedPropertyFetchClassNames = array_unique($usedPropertyFetchClassNames);
         $propertyClassName = $node->getAttribute(AttributeKey::CLASS_NAME);
         // has external usage
-        if ([$propertyClassName] !== $usedPropertyFetchClassNames) {
+        if ($usedPropertyFetchClassNames !== [] && [$propertyClassName] !== $usedPropertyFetchClassNames) {
             return null;
         }
         $this->visibilityManipulator->makePrivate($node);
@@ -135,7 +134,13 @@ CODE_SAMPLE
         if ($this->classNodeAnalyzer->isAnonymousClass($classLike)) {
             return true;
         }
-        return $this->isObjectTypes($classLike, ['PHPUnit\Framework\TestCase', 'PHP_CodeSniffer\Sniffs\Sniff']);
+        if ($this->isObjectTypes($classLike, ['PHPUnit\Framework\TestCase', 'PHP_CodeSniffer\Sniffs\Sniff'])) {
+            return true;
+        }
+        if (! $classLike->isAbstract()) {
+            return false;
+        }
+        return $this->isOpenSourceProjectType();
     }
 
     private function shouldSkipProperty(Property $property): bool
