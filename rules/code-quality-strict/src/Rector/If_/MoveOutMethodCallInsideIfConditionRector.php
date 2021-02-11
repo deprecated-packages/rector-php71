@@ -111,6 +111,10 @@ CODE_SAMPLE
 
     private function moveOutMethodCall(MethodCall $methodCall, If_ $if): ?If_
     {
+        $hasParentAssign = (bool) $this->betterNodeFinder->findParentType($methodCall, Assign::class);
+        if ($hasParentAssign) {
+            return null;
+        }
         $variableName = $this->methodCallToVariableNameResolver->resolveVariableName($methodCall);
         if ($variableName === null) {
             return null;
