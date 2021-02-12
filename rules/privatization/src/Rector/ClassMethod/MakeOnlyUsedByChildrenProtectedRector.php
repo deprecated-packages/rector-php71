@@ -129,6 +129,9 @@ CODE_SAMPLE
         if ($currentClass->extends instanceof FullyQualified) {
             return true;
         }
+        if ($currentClass->isAbstract() && $this->isOpenSourceProjectType()) {
+            return true;
+        }
         $className = $classMethod->getAttribute(AttributeKey::CLASS_NAME);
         if ($className === null) {
             return true;
