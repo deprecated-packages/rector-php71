@@ -56,7 +56,7 @@ final class MagicNetteFactoryInterfaceFormControlTypeResolver implements FormCon
             return [];
         }
         // skip constructor, handled elsewhere
-        if ($this->nodeNameResolver->isName($node, MethodName::CONSTRUCT)) {
+        if ($this->nodeNameResolver->isName($node->name, MethodName::CONSTRUCT)) {
             return [];
         }
         $classMethod = $this->nodeRepository->findClassMethodByMethodCall($node);

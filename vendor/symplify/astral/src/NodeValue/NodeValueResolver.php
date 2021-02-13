@@ -107,10 +107,10 @@ final class NodeValueResolver
     private function resolveMagicConst(MagicConst $magicConst): ?string
     {
         if ($magicConst instanceof Dir) {
-            return dirname($this->currentFilePath, 2);
+            return dirname($this->currentFilePath);
         }
         if ($magicConst instanceof File) {
-            return dirname($this->currentFilePath);
+            return $this->currentFilePath;
         }
         return null;
     }
