@@ -113,7 +113,7 @@ final class ClassDependencyManipulator
     public function addStmtsToConstructorIfNotThereYet(Class_ $class, array $stmts): void
     {
         $classMethod = $class->getMethod(MethodName::CONSTRUCT);
-        if ($classMethod === null) {
+        if (! $classMethod instanceof ClassMethod) {
             $classMethod = $this->nodeFactory->createPublicMethod(MethodName::CONSTRUCT);
 
             // keep parent constructor call
