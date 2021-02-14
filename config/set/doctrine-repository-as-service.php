@@ -8,6 +8,8 @@ use Rector\Doctrine\Rector\ClassMethod\ServiceEntityRepositoryParentCallToDIRect
 use Rector\Doctrine\Rector\MethodCall\ReplaceParentRepositoryCallsByRepositoryPropertyRector;
 use Rector\DoctrineCodeQuality\Rector\Class_\MoveRepositoryFromParentToConstructorRector;
 use Rector\Removing\Rector\Class_\RemoveParentRector;
+use Rector\Renaming\Rector\PropertyFetch\RenamePropertyRector;
+use Rector\Renaming\ValueObject\RenameProperty;
 use Rector\Transform\Rector\MethodCall\MethodCallToPropertyFetchRector;
 use Rector\Transform\Rector\MethodCall\ReplaceParentCallByPropertyCallRector;
 use Rector\Transform\ValueObject\ReplaceParentCallByPropertyCall;
@@ -29,6 +31,11 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
     // covers "extends ServiceEntityRepository"
     // @see https://github.com/doctrine/DoctrineBundle/pull/727/files
     $services->set(ServiceEntityRepositoryParentCallToDIRector::class);
+    $services->set(RenamePropertyRector::class)->call('configure', [[
+        RenamePropertyRector::RENAMED_PROPERTIES => ValueObjectInliner::inline([
+            new RenameProperty('Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository', '_em', 'entityManager'),
+        ]),
+    ]]);
     $services->set(RemoveAnnotationRector::class)->call('configure', [[
         RemoveAnnotationRector::ANNOTATIONS_TO_REMOVE => ['method'],
     ]]);
