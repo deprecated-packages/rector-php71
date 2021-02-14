@@ -40,7 +40,8 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
         ArgumentRemoverRector::REMOVED_ARGUMENTS => ValueObjectInliner::inline([
             new ArgumentRemover('Illuminate\Foundation\Application', 'register', 1, [
                 'name' => 'options',
-            ]), ]),
+            ]),
+        ]),
     ]]);
     $services->set(AddParentBootToModelClassMethodRector::class);
     $services->set(ChangeQueryWhereDateValueWithCarbonRector::class);

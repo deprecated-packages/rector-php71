@@ -29,11 +29,9 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
     $services->set(ImproveDoctrineCollectionDocTypeInEntityRector::class);
     $services->set(RemoveRedundantDefaultPropertyAnnotationValuesRector::class);
     $services->set(RemoveRedundantDefaultClassAnnotationValuesRector::class);
-    $services->set(ReplaceStringWithClassConstantRector::class)->call('configure', [
-        [
-            ReplaceStringWithClassConstantRector::REPLACE_STRING_WITH_CLASS_CONSTANT => ValueObjectInliner::inline([
-                new ReplaceStringWithClassConstant('Doctrine\ORM\QueryBuilder', 'orderBy', 1, 'Doctrine\Common\Collections\Criteria'),
-            ]),
-        ],
-    ]);
+    $services->set(ReplaceStringWithClassConstantRector::class)->call('configure', [[
+        ReplaceStringWithClassConstantRector::REPLACE_STRING_WITH_CLASS_CONSTANT => ValueObjectInliner::inline([
+            new ReplaceStringWithClassConstant('Doctrine\ORM\QueryBuilder', 'orderBy', 1, 'Doctrine\Common\Collections\Criteria'),
+        ]),
+    ]]);
 };
