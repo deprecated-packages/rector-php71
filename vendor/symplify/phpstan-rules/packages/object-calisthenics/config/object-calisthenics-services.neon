@@ -1,0 +1,7 @@
+includes:
+    - ../../../config/services/services.neon
+
+services:
+    - Symplify\PHPStanRules\ObjectCalisthenics\Marker\IndentationMarker
+    - Symplify\PHPStanRules\ObjectCalisthenics\NodeVisitor\IndentationNodeVisitor
+    - Symplify\PHPStanRules\ObjectCalisthenics\NodeTraverserFactory\IndentationNodeTraverserFactory

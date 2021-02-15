@@ -1,0 +1,13 @@
+services:
+    -
+        class: Symplify\PHPStanRules\Rules\ExclusiveDependencyRule
+        tags: [phpstan.rules.rule]
+        arguments:
+            allowedExclusiveDependencyInTypes:
+                # "EntityManager" dependency can be used only in "*Repository" class
+                'Doctrine\ORM\EntityManager': ['*Repository']
+                'Doctrine\ORM\EntityManagerInterface': ['*Repository']
+
+    -
+        class: Symplify\PHPStanRules\Rules\NoGetRepositoryOutsideConstructorRule
+        tags: [phpstan.rules.rule]

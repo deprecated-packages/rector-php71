@@ -1,0 +1,23 @@
+includes:
+    # 1. basic static sets
+    - static-rules.neon
+
+    # 2. prepared sets
+    - nette-rules.neon
+    - generic-rules.neon
+    - array-rules.neon
+    - code-complexity-rules.neon
+    - forbidden-static-rules.neon
+    - doctrine-rules.neon
+    - size-rules.neon
+    - regex-rules.neon
+    - symfony-rules.neon
+    - test-rules.neon
+    - services-rules.neon
+    - naming-rules.neon
+    - string-to-constant-rules.neon
+
+    # 3. custom symplify configuratoin
+    - configurable-rules.neon
+
+    - services/services.neon
