@@ -49,6 +49,7 @@ return static function (ContainerConfigurator $containerConfigurator) : void {
         SetList::PHP_72,
         SetList::PHP_73,
         SetList::EARLY_RETURN,
+        SetList::TYPE_DECLARATION_STRICT,
     ]);
     $parameters->set(Option::PATHS, [
         __DIR__ . '/src',
