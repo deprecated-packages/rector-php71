@@ -25,6 +25,7 @@ return array(
     '37a3dc5111fe8f707ab4c132ef1dbc62' => $vendorDir . '/guzzlehttp/guzzle/src/functions_include.php',
     '6124b4c8570aa390c21fafd04a26c69f' => $vendorDir . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
     'b686b8e46447868025a15ce5d0cb2634' => $vendorDir . '/symfony/polyfill-php74/bootstrap.php',
+    'b69d4ce4bbbd9d7392eb92bd661cd740' => $baseDir . '/rules/type-declaration/tests/Rector/ClassMethod/ReturnTypeFromStrictTypedCallRector/Source/external_bool_function.php',
     '3723632d98fc07164cc21d70a0808697' => $baseDir . '/rules/restoration/tests/Rector/Use_/RestoreFullyQualifiedNameRector/Source/ShortClassOnly.php',
     'ba0629814525e8be7ba6d252e274bf91' => $baseDir . '/rules/coding-style/tests/Rector/Namespace_/ImportFullyQualifiedNamesRector/Source/AnotherClass.php',
     '047a81cbfb3d5c29ad152d02af7ea0b7' => $baseDir . '/rules/coding-style/tests/Rector/Namespace_/ImportFullyQualifiedNamesRector/Source/Foo.php',
