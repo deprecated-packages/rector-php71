@@ -23,6 +23,18 @@ final class ConfigurableCallValuesCollectingPhpFileLoader extends PhpFileLoader
         parent::__construct($containerBuilder, $fileLocator);
     }
 
+    /**
+     * @param mixed $resource
+     * @param null|string $type
+     */
+    public function load($resource, $type = null): void
+    {
+        // this call collects root values
+        $this->collectConfigureCallsFromJustImportedConfigurableRectorDefinitions();
+        parent::load($resource, $type);
+        $this->collectConfigureCallsFromJustImportedConfigurableRectorDefinitions();
+    }
+
     public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null, $exclude = null): void
     {
         // this call collects root values
