@@ -88,7 +88,7 @@ CODE_SAMPLE
         if ($this->hasUuidReturnType($node)) {
             return null;
         }
-        $node->returnType = new FullyQualified(UuidInterface::class);
+        $node->returnType = new FullyQualified('Ramsey\Uuid\UuidInterface');
         return $node;
     }
 

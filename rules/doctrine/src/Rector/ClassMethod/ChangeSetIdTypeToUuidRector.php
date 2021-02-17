@@ -98,7 +98,7 @@ CODE_SAMPLE
                 return null;
             }
         }
-        $node->params[0]->type = new FullyQualified(UuidInterface::class);
+        $node->params[0]->type = new FullyQualified('Ramsey\Uuid\UuidInterface');
         return $node;
     }
 

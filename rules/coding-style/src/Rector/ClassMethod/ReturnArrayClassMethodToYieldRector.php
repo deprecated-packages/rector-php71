@@ -168,7 +168,7 @@ CODE_SAMPLE
         }
         $this->removeReturnTag($classMethod);
         // change return typehint
-        $classMethod->returnType = new FullyQualified(Iterator::class);
+        $classMethod->returnType = new FullyQualified('Iterator');
         foreach ((array) $classMethod->stmts as $key => $classMethodStmt) {
             if (! $classMethodStmt instanceof Return_) {
                 continue;
