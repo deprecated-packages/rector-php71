@@ -6,6 +6,7 @@ namespace Rector\Naming\Guard;
 
 use DateTimeInterface;
 use Nette\Utils\Strings;
+use PhpParser\Node;
 use PhpParser\Node\Expr\Closure;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\FunctionLike;
@@ -128,7 +129,15 @@ final class BreakingVariableRenameGuard
         if ($this->isRamseyUuidInterface($param)) {
             return true;
         }
-        return $this->isDateTimeAtNamingConvention($param);
+        if ($this->isDateTimeAtNamingConvention($param)) {
+            return true;
+        }
+        return (bool) $this->betterNodeFinder->find((array) $classMethod->stmts, function (Node $node) use ($expectedName): bool {
+            if (! $node instanceof Variable) {
+                return false;
+            }
+            return $this->nodeNameResolver->isName($node, $expectedName);
+        });
     }
 
     private function isVariableAlreadyDefined(Variable $variable, string $currentVariableName): bool
