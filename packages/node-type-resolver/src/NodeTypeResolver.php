@@ -46,7 +46,7 @@ use Rector\TypeDeclaration\PHPStan\Type\ObjectTypeSpecifier;
 final class NodeTypeResolver
 {
     /**
-     * @var array<class-string, NodeTypeResolverInterface>
+     * @var array<class-string<Node>, NodeTypeResolverInterface>
      */
     private $nodeTypeResolvers = [];
 
@@ -402,9 +402,7 @@ final class NodeTypeResolver
         $scope = $expr->getAttribute(AttributeKey::SCOPE);
         if ($scope instanceof Scope) {
             $arrayType = $scope->getType($expr);
-            if ($arrayType !== null) {
-                return $this->removeNonEmptyArrayFromIntersectionWithArrayType($arrayType);
-            }
+            return $this->removeNonEmptyArrayFromIntersectionWithArrayType($arrayType);
         }
         return new ArrayType(new MixedType(), new MixedType());
     }
