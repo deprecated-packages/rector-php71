@@ -67,7 +67,7 @@ final class PropertyAdder
         $this->addConstructorDependencyToClass($classNode, $propertyType, $propertyName, $property->flags);
     }
 
-    public function addConstructorDependencyToClass(Class_ $class, ?Type $propertyType, string $propertyName, int $propertyFlags = 0): void
+    public function addConstructorDependencyToClass(Class_ $class, Type $propertyType, string $propertyName, int $propertyFlags = 0): void
     {
         $this->propertyToAddCollector->addPropertyToClass($class, $propertyName, $propertyType, $propertyFlags);
         $this->rectorChangeCollector->notifyNodeFileInfo($class);

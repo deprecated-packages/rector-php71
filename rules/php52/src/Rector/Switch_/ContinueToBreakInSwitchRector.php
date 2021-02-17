@@ -53,7 +53,6 @@ function some_run($value)
 }
 CODE_SAMPLE
 ),
-
         ]);
     }
 

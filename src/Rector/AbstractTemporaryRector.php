@@ -532,7 +532,7 @@ abstract class AbstractTemporaryRector extends NodeVisitorAbstract implements Ph
         $this->propertyAdder->addServiceConstructorDependencyToClass($class, $className);
     }
 
-    protected function addConstructorDependencyToClass(Class_ $class, ?Type $propertyType, string $propertyName, int $propertyFlags = 0): void
+    protected function addConstructorDependencyToClass(Class_ $class, Type $propertyType, string $propertyName, int $propertyFlags = 0): void
     {
         $this->propertyAdder->addConstructorDependencyToClass($class, $propertyType, $propertyName, $propertyFlags);
     }
