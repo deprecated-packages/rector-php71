@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => 'c609697f14c0c2ddbccfae177ff014d9fce5df05',
+    'reference' => 'fd6f48c5768ffb7835bcbc31cfe34f2a1fba6a1a',
     'name' => 'rector/rector',
   ),
   'versions' => 
@@ -353,12 +353,12 @@
     ),
     'phpstan/phpstan' => 
     array (
-      'pretty_version' => '0.12.76',
-      'version' => '0.12.76.0',
+      'pretty_version' => '0.12.77',
+      'version' => '0.12.77.0',
       'aliases' => 
       array (
       ),
-      'reference' => '7aaaf9a759a29795e8f46d48041af1c1f1b23d38',
+      'reference' => '1f10b8c8d118d01e7b492f9707999d456be5812c',
     ),
     'phpstan/phpstan-nette' => 
     array (
@@ -560,7 +560,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => 'c609697f14c0c2ddbccfae177ff014d9fce5df05',
+      'reference' => 'fd6f48c5768ffb7835bcbc31cfe34f2a1fba6a1a',
     ),
     'rector/rector-prefixed' => 
     array (
