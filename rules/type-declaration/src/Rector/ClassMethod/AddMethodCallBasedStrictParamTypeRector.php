@@ -15,7 +15,6 @@ use PHPStan\Type\Type;
 use Rector\Core\Rector\AbstractRector;
 use Rector\NodeCollector\ValueObject\ArrayCallable;
 use Rector\NodeTypeResolver\PHPStan\Type\TypeFactory;
-use Rector\TypeDeclaration\NodeTypeAnalyzer\ParamTypeCompatibilityChecker;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
@@ -31,15 +30,9 @@ final class AddMethodCallBasedStrictParamTypeRector extends AbstractRector
      */
     private $typeFactory;
 
-    /**
-     * @var ParamTypeCompatibilityChecker
-     */
-    private $paramTypeCompatibilityChecker;
-
-    public function __construct(TypeFactory $typeFactory, ParamTypeCompatibilityChecker $paramTypeCompatibilityChecker)
+    public function __construct(TypeFactory $typeFactory)
     {
         $this->typeFactory = $typeFactory;
-        $this->paramTypeCompatibilityChecker = $paramTypeCompatibilityChecker;
     }
 
     public function getRuleDefinition(): RuleDefinition
@@ -135,10 +128,7 @@ CODE_SAMPLE
             }
 
             foreach ($call->args as $position => $arg) {
-                $argValueType = $this->getStaticType($arg->value);
-                if (! $this->paramTypeCompatibilityChecker->isCompatibleWithParamStrictTyped($arg, $argValueType)) {
-                    continue;
-                }
+                $argValueType = $this->nodeTypeResolver->getNativeType($arg->value);
 
                 // "self" in another object is not correct, this make it independent
                 $argValueType = $this->correctSelfType($argValueType);

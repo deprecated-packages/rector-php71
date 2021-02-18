@@ -157,6 +157,15 @@ final class NodeTypeResolver
             ->yes();
     }
 
+    public function getNativeType(Expr $expr): Type
+    {
+        $scope = $expr->getAttribute(AttributeKey::SCOPE);
+        if (! $scope instanceof Scope) {
+            return new MixedType();
+        }
+        return $scope->getNativeType($expr);
+    }
+
     /**
      * @deprecated
      * Use @see NodeTypeResolver::resolve() instead

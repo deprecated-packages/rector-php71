@@ -13,7 +13,8 @@ use PhpParser\Node\Expr\StaticPropertyFetch;
 use PhpParser\Node\Expr\Variable;
 use PHPStan\Type\ObjectType;
 use Rector\Core\Contract\Rector\ConfigurableRectorInterface;
-use Rector\Core\NodeManipulator\PropertyFetchManipulator;
+use Rector\Core\NodeAnalyzer\PropertyFetchAnalyzer;
+use Rector\Core\NodeManipulator\MagicPropertyFetchAnalyzer;
 use Rector\Core\Rector\AbstractRector;
 use Rector\Core\Util\StaticInstanceOf;
 use Rector\NodeTypeResolver\Node\AttributeKey;
@@ -36,13 +37,19 @@ final class GetAndSetToMethodCallRector extends AbstractRector implements Config
     private $typeToMethodCalls = [];
 
     /**
-     * @var PropertyFetchManipulator
+     * @var PropertyFetchAnalyzer
      */
-    private $propertyFetchManipulator;
+    private $propertyFetchAnalyzer;
 
-    public function __construct(PropertyFetchManipulator $propertyFetchManipulator)
+    /**
+     * @var MagicPropertyFetchAnalyzer
+     */
+    private $magicPropertyFetchAnalyzer;
+
+    public function __construct(PropertyFetchAnalyzer $propertyFetchAnalyzer, MagicPropertyFetchAnalyzer $magicPropertyFetchAnalyzer)
     {
-        $this->propertyFetchManipulator = $propertyFetchManipulator;
+        $this->propertyFetchAnalyzer = $propertyFetchAnalyzer;
+        $this->magicPropertyFetchAnalyzer = $magicPropertyFetchAnalyzer;
     }
 
     public function getRuleDefinition(): RuleDefinition
@@ -148,10 +155,10 @@ CODE_SAMPLE
         if (! $this->isObjectType($propertyFetch->var, $objectType)) {
             return true;
         }
-        if (! $this->propertyFetchManipulator->isMagicOnType($propertyFetch, $objectType)) {
+        if (! $this->magicPropertyFetchAnalyzer->isMagicOnType($propertyFetch, $objectType)) {
             return true;
         }
-        return $this->propertyFetchManipulator->isPropertyToSelf($propertyFetch);
+        return $this->propertyFetchAnalyzer->isPropertyToSelf($propertyFetch);
     }
 
     private function createMethodCallNodeFromAssignNode(PropertyFetch $propertyFetch, Expr $expr, string $method): MethodCall
