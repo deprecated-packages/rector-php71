@@ -57,7 +57,7 @@ final class SomeClass
 {
     private $value;
 
-    public function __construct($value)
+    public function __construct(stdClass $value)
     {
         $this->value = $value;
     }
@@ -75,7 +75,7 @@ final class SomeClass
 {
     private $value;
 
-    public function __construct($value)
+    public function __construct(stdClass $value)
     {
         $this->value = $value;
     }
