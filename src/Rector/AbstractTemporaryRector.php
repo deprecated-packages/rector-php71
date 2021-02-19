@@ -406,15 +406,6 @@ abstract class AbstractTemporaryRector extends NodeVisitorAbstract implements Ph
         return $currentExpression->getAttribute(AttributeKey::NEXT_NODE);
     }
 
-    /**
-     * @param Expr[]|null[] $nodes
-     * @param mixed[] $expectedValues
-     */
-    protected function areValues(array $nodes, array $expectedValues): bool
-    {
-        return $this->valueResolver->areValues($nodes, $expectedValues);
-    }
-
     protected function isAtLeastPhpVersion(int $version): bool
     {
         return $this->phpVersionProvider->isAtLeastPhpVersion($version);
@@ -465,14 +456,8 @@ abstract class AbstractTemporaryRector extends NodeVisitorAbstract implements Ph
 
     protected function isOpenSourceProjectType(): bool
     {
-        $projectType = $this->parameterProvider->provideParameter(Option::PROJECT_TYPE);
-
-        return in_array(
-            $projectType,
-            // make it typo proof
-            [ProjectType::OPEN_SOURCE, ProjectType::OPEN_SOURCE_UNDESCORED],
-            true
-        );
+        $projectType = $this->parameterProvider->provideStringParameter(Option::PROJECT_TYPE);
+        return $projectType === ProjectType::OPEN_SOURCE;
     }
 
     /**
