@@ -22,13 +22,14 @@ use Rector\Core\PhpParser\Node\BetterNodeFinder;
 use Rector\Core\PhpParser\Printer\BetterStandardPrinter;
 use Rector\NodeNameResolver\NodeNameResolver;
 use Rector\NodeTypeResolver\Node\AttributeKey;
+use Symplify\PackageBuilder\Php\TypeChecker;
 
 final class AssignManipulator
 {
     /**
-     * @var string[]
+     * @var array<class-string<Node>>
      */
-    private const MODIFYING_NODES = [
+    private const MODIFYING_NODE_TYPES = [
         AssignOp::class,
         PreDec::class,
         PostDec::class,
@@ -56,12 +57,18 @@ final class AssignManipulator
      */
     private $propertyFetchAnalyzer;
 
-    public function __construct(BetterStandardPrinter $betterStandardPrinter, NodeNameResolver $nodeNameResolver, BetterNodeFinder $betterNodeFinder, PropertyFetchAnalyzer $propertyFetchAnalyzer)
+    /**
+     * @var TypeChecker
+     */
+    private $typeChecker;
+
+    public function __construct(BetterStandardPrinter $betterStandardPrinter, NodeNameResolver $nodeNameResolver, BetterNodeFinder $betterNodeFinder, PropertyFetchAnalyzer $propertyFetchAnalyzer, TypeChecker $typeChecker)
     {
         $this->nodeNameResolver = $nodeNameResolver;
         $this->betterStandardPrinter = $betterStandardPrinter;
         $this->betterNodeFinder = $betterNodeFinder;
         $this->propertyFetchAnalyzer = $propertyFetchAnalyzer;
+        $this->typeChecker = $typeChecker;
     }
 
     /**
@@ -85,7 +92,7 @@ final class AssignManipulator
         if ($parent instanceof Assign && $this->betterStandardPrinter->areNodesEqual($parent->var, $node)) {
             return true;
         }
-        if ($parent !== null && $this->isValueModifyingNode($parent)) {
+        if ($parent !== null && $this->typeChecker->isInstanceOf($parent, self::MODIFYING_NODE_TYPES)) {
             return true;
         }
         // traverse up to array dim fetches
@@ -129,17 +136,5 @@ final class AssignManipulator
             }
             return $this->isLeftPartOfAssign($node);
         });
-    }
-
-    private function isValueModifyingNode(Node $node): bool
-    {
-        foreach (self::MODIFYING_NODES as $modifyingNode) {
-            if (! is_a($node, $modifyingNode)) {
-                continue;
-            }
-
-            return true;
-        }
-        return false;
     }
 }
