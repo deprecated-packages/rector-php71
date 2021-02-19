@@ -10,7 +10,7 @@ use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\NodeTraverser;
-use Rector\Core\PhpParser\Printer\BetterStandardPrinter;
+use Rector\Core\PhpParser\Comparing\NodeComparator;
 use Rector\NodeTypeResolver\NodeTypeResolver;
 use Symplify\Astral\NodeTraverser\SimpleCallableNodeTraverser;
 
@@ -27,15 +27,15 @@ final class OnFormVariableMethodCallsCollector
     private $nodeTypeResolver;
 
     /**
-     * @var BetterStandardPrinter
+     * @var NodeComparator
      */
-    private $betterStandardPrinter;
+    private $nodeComparator;
 
-    public function __construct(BetterStandardPrinter $betterStandardPrinter, SimpleCallableNodeTraverser $simpleCallableNodeTraverser, NodeTypeResolver $nodeTypeResolver)
+    public function __construct(SimpleCallableNodeTraverser $simpleCallableNodeTraverser, NodeTypeResolver $nodeTypeResolver, NodeComparator $nodeComparator)
     {
         $this->simpleCallableNodeTraverser = $simpleCallableNodeTraverser;
         $this->nodeTypeResolver = $nodeTypeResolver;
-        $this->betterStandardPrinter = $betterStandardPrinter;
+        $this->nodeComparator = $nodeComparator;
     }
 
     /**
@@ -80,7 +80,7 @@ final class OnFormVariableMethodCallsCollector
             if (! $node instanceof MethodCall) {
                 return null;
             }
-            if (! $this->betterStandardPrinter->areNodesEqual($node->var, $expr)) {
+            if (! $this->nodeComparator->areNodesEqual($node->var, $expr)) {
                 return null;
             }
             $onFormVariableMethodCalls[] = $node;

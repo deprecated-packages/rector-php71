@@ -21,7 +21,7 @@ use PHPStan\Type\NullType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 use PHPStan\Type\UnionType;
-use Rector\Core\PhpParser\Printer\BetterStandardPrinter;
+use Rector\Core\PhpParser\Comparing\NodeComparator;
 use Rector\NodeNameResolver\NodeNameResolver;
 use Rector\NodeTypeResolver\Node\AttributeKey;
 use Rector\StaticTypeMapper\StaticTypeMapper;
@@ -39,20 +39,20 @@ final class ReturnTypeAlreadyAddedChecker
     private $staticTypeMapper;
 
     /**
-     * @var BetterStandardPrinter
+     * @var NodeComparator
      */
-    private $betterStandardPrinter;
+    private $nodeComparator;
 
     /**
      * @var NodeNameResolver
      */
     private $nodeNameResolver;
 
-    public function __construct(BetterStandardPrinter $betterStandardPrinter, NodeNameResolver $nodeNameResolver, StaticTypeMapper $staticTypeMapper)
+    public function __construct(NodeNameResolver $nodeNameResolver, StaticTypeMapper $staticTypeMapper, NodeComparator $nodeComparator)
     {
         $this->staticTypeMapper = $staticTypeMapper;
-        $this->betterStandardPrinter = $betterStandardPrinter;
         $this->nodeNameResolver = $nodeNameResolver;
+        $this->nodeComparator = $nodeComparator;
     }
 
     /**
@@ -66,7 +66,7 @@ final class ReturnTypeAlreadyAddedChecker
             return false;
         }
         $returnNode = $this->staticTypeMapper->mapPHPStanTypeToPhpParserNode($returnType);
-        if ($this->betterStandardPrinter->areNodesEqual($nodeReturnType, $returnNode)) {
+        if ($this->nodeComparator->areNodesEqual($nodeReturnType, $returnNode)) {
             return true;
         }
         // is array <=> iterable <=> Iterator co-type? → skip
@@ -88,7 +88,7 @@ final class ReturnTypeAlreadyAddedChecker
             return false;
         }
         $className = $functionLike->getAttribute(AttributeKey::CLASS_NAME);
-        return ltrim($this->betterStandardPrinter->printWithoutComments($returnNode), '\\') === $className;
+        return ltrim($this->nodeComparator->printWithoutComments($returnNode), '\\') === $className;
     }
 
     /**

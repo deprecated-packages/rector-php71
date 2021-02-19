@@ -101,7 +101,7 @@ CODE_SAMPLE
         }
         return (bool) $this->betterNodeFinder->findFirst([$return->expr], function (Node $node) use ($referencedValues): bool {
             foreach ($referencedValues as $referencedValue) {
-                if ($this->areNodesEqual($node, $referencedValue)) {
+                if ($this->nodeComparator->areNodesEqual($node, $referencedValue)) {
                     return true;
                 }
             }

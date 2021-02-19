@@ -50,7 +50,7 @@ final class SubstrMatchAndRefactor extends AbstractMatchAndRefactor implements S
         $strlenFuncCall = $substrFuncCall->args[2]->value;
         $needleExpr = $strlenFuncCall->args[0]->value;
         $comparedNeedleExpr = $strStartsWith->getNeedleExpr();
-        if (! $this->betterStandardPrinter->areNodesEqual($needleExpr, $comparedNeedleExpr)) {
+        if (! $this->nodeComparator->areNodesEqual($needleExpr, $comparedNeedleExpr)) {
             return null;
         }
         return $this->createStrStartsWith($strStartsWith);

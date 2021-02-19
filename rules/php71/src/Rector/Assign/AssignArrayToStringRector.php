@@ -130,7 +130,7 @@ CODE_SAMPLE
             if (! $node instanceof Assign) {
                 return false;
             }
-            if (! $this->areNodesEqual($node->var, $expr)) {
+            if (! $this->nodeComparator->areNodesEqual($node->var, $expr)) {
                 return false;
             }
             // we look for variable assign = string

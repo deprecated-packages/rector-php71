@@ -75,7 +75,7 @@ CODE_SAMPLE
         if (! $onlyCatchStmt instanceof Throw_) {
             return null;
         }
-        if (! $this->areNodesEqual($onlyCatch->var, $onlyCatchStmt->expr)) {
+        if (! $this->nodeComparator->areNodesEqual($onlyCatch->var, $onlyCatchStmt->expr)) {
             return null;
         }
         $this->addNodesAfterNode($node->stmts, $node);

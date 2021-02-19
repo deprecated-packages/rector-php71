@@ -122,7 +122,7 @@ CODE_SAMPLE
             if (! $node instanceof Assign) {
                 return false;
             }
-            return $this->areNodesEqual($node->var, $expr);
+            return $this->nodeComparator->areNodesEqual($node->var, $expr);
         });
     }
 

@@ -68,7 +68,7 @@ CODE_SAMPLE
                 $this->addNodeAfterNode(new Catch_([$catchType], $catch->var, $catch->stmts), $node->catches[$key]);
             }
         }
-        if ($this->areNodesEqual($originalCatches, $node->catches)) {
+        if ($this->nodeComparator->areNodesEqual($originalCatches, $node->catches)) {
             return null;
         }
         return $node;

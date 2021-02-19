@@ -90,7 +90,7 @@ CODE_SAMPLE
             if ($node === $instanceof->expr) {
                 return false;
             }
-            return $this->areNodesEqual($node, $instanceof->expr);
+            return $this->nodeComparator->areNodesEqual($node, $instanceof->expr);
         });
         if (! $previousVar instanceof Node) {
             return null;

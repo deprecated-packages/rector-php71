@@ -7,25 +7,25 @@ namespace Rector\CodingStyle\Node;
 use PhpParser\Node;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\BinaryOp\Concat;
-use Rector\Core\PhpParser\Printer\BetterStandardPrinter;
+use Rector\Core\PhpParser\Comparing\NodeComparator;
 use Symplify\Astral\NodeTraverser\SimpleCallableNodeTraverser;
 
 final class ConcatManipulator
 {
     /**
-     * @var BetterStandardPrinter
+     * @var NodeComparator
      */
-    private $betterStandardPrinter;
+    private $nodeComparator;
 
     /**
      * @var SimpleCallableNodeTraverser
      */
     private $simpleCallableNodeTraverser;
 
-    public function __construct(BetterStandardPrinter $betterStandardPrinter, SimpleCallableNodeTraverser $simpleCallableNodeTraverser)
+    public function __construct(SimpleCallableNodeTraverser $simpleCallableNodeTraverser, NodeComparator $nodeComparator)
     {
-        $this->betterStandardPrinter = $betterStandardPrinter;
         $this->simpleCallableNodeTraverser = $simpleCallableNodeTraverser;
+        $this->nodeComparator = $nodeComparator;
     }
 
     public function getFirstConcatItem(Concat $concat): Node
@@ -49,7 +49,7 @@ final class ConcatManipulator
             if (! $node instanceof Concat) {
                 return null;
             }
-            if (! $this->betterStandardPrinter->areNodesEqual($node->left, $firstConcatItem)) {
+            if (! $this->nodeComparator->areNodesEqual($node->left, $firstConcatItem)) {
                 return null;
             }
             return $node->right;

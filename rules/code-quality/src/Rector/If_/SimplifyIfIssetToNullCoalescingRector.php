@@ -96,10 +96,10 @@ CODE_SAMPLE
         if (! $this->isName($firstAssign->expr, 'array_merge')) {
             return null;
         }
-        if (! $this->areNodesEqual($firstAssign->expr->args[0]->value, $valueNode)) {
+        if (! $this->nodeComparator->areNodesEqual($firstAssign->expr->args[0]->value, $valueNode)) {
             return null;
         }
-        if (! $this->areNodesEqual($secondAssign->expr, $firstAssign->expr->args[1]->value)) {
+        if (! $this->nodeComparator->areNodesEqual($secondAssign->expr, $firstAssign->expr->args[1]->value)) {
             return null;
         }
         $args = [new Arg(new Coalesce($valueNode, new Array_([]))), new Arg($secondAssign->expr)];
@@ -131,7 +131,7 @@ CODE_SAMPLE
         if (! $ifStmt->expr instanceof Assign) {
             return true;
         }
-        if (! $this->areNodesEqual($if->cond->vars[0], $ifStmt->expr->var)) {
+        if (! $this->nodeComparator->areNodesEqual($if->cond->vars[0], $ifStmt->expr->var)) {
             return true;
         }
         $firstElseStmt = $if->else->stmts[0];
@@ -141,7 +141,7 @@ CODE_SAMPLE
         if (! $firstElseStmt->expr instanceof Assign) {
             return false;
         }
-        return ! $this->areNodesEqual($if->cond->vars[0], $firstElseStmt->expr->var);
+        return ! $this->nodeComparator->areNodesEqual($if->cond->vars[0], $firstElseStmt->expr->var);
     }
 
     /**

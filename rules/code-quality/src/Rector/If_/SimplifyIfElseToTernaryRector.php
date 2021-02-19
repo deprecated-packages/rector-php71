@@ -82,7 +82,7 @@ CODE_SAMPLE
         if (! $elseAssignVar instanceof Expr) {
             return null;
         }
-        if (! $this->areNodesEqual($ifAssignVar, $elseAssignVar)) {
+        if (! $this->nodeComparator->areNodesEqual($ifAssignVar, $elseAssignVar)) {
             return null;
         }
         $ternaryIf = $this->resolveOnlyStmtAssignExpr($node->stmts);

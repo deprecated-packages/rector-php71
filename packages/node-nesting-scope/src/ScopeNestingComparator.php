@@ -10,8 +10,8 @@ use PhpParser\Node\FunctionLike;
 use PhpParser\Node\Stmt\Else_;
 use PhpParser\Node\Stmt\If_;
 use PhpParser\Node\Stmt\Return_;
+use Rector\Core\PhpParser\Comparing\NodeComparator;
 use Rector\Core\PhpParser\Node\BetterNodeFinder;
-use Rector\Core\PhpParser\Printer\BetterStandardPrinter;
 use Rector\NodeNestingScope\ValueObject\ControlStructure;
 
 final class ScopeNestingComparator
@@ -22,32 +22,32 @@ final class ScopeNestingComparator
     private $betterNodeFinder;
 
     /**
-     * @var BetterStandardPrinter
+     * @var NodeComparator
      */
-    private $betterStandardPrinter;
+    private $nodeComparator;
 
     /**
      * @var Expr[]
      */
     private $doubleIfBranchExprs = [];
 
-    public function __construct(BetterNodeFinder $betterNodeFinder, BetterStandardPrinter $betterStandardPrinter)
+    public function __construct(BetterNodeFinder $betterNodeFinder, NodeComparator $nodeComparator)
     {
         $this->betterNodeFinder = $betterNodeFinder;
-        $this->betterStandardPrinter = $betterStandardPrinter;
+        $this->nodeComparator = $nodeComparator;
     }
 
     public function areReturnScopeNested(Return_ $return, Node $secondNodeScopeNode): bool
     {
         $firstNodeScopeNode = $this->betterNodeFinder->findParentTypes($return, ControlStructure::RETURN_ISOLATING_SCOPE_NODE_TYPES);
-        return $this->betterStandardPrinter->areNodesEqual($firstNodeScopeNode, $secondNodeScopeNode);
+        return $this->nodeComparator->areNodesEqual($firstNodeScopeNode, $secondNodeScopeNode);
     }
 
     public function areScopeNestingEqual(Node $firstNode, Node $secondNode): bool
     {
         $firstNodeScopeNode = $this->findParentControlStructure($firstNode);
         $secondNodeScopeNode = $this->findParentControlStructure($secondNode);
-        return $this->betterStandardPrinter->areNodesEqual($firstNodeScopeNode, $secondNodeScopeNode);
+        return $this->nodeComparator->areNodesEqual($firstNodeScopeNode, $secondNodeScopeNode);
     }
 
     public function isNodeConditionallyScoped(Expr $expr): bool
@@ -60,7 +60,7 @@ final class ScopeNestingComparator
         if ($this->isInBothIfElseBranch($foundParent, $expr)) {
             return false;
         }
-        if ($foundParent instanceof Else_ && $this->betterStandardPrinter->areNodesEqual($expr, $this->doubleIfBranchExprs)) {
+        if ($foundParent instanceof Else_ && $this->nodeComparator->areNodesEqual($expr, $this->doubleIfBranchExprs)) {
             return false;
         }
         return ! $foundParent instanceof FunctionLike;
@@ -69,19 +69,19 @@ final class ScopeNestingComparator
     public function isInBothIfElseBranch(Node $foundParentNode, Expr $seekedExpr): bool
     {
         if ($foundParentNode instanceof Else_) {
-            return $this->betterStandardPrinter->isNodeEqual($seekedExpr, $this->doubleIfBranchExprs);
+            return $this->nodeComparator->isNodeEqual($seekedExpr, $this->doubleIfBranchExprs);
         }
         if (! $foundParentNode instanceof If_) {
             return false;
         }
         $foundIfNode = $this->betterNodeFinder->find($foundParentNode->stmts, function ($node) use ($seekedExpr): bool {
-            return $this->betterStandardPrinter->areNodesEqual($node, $seekedExpr);
+            return $this->nodeComparator->areNodesEqual($node, $seekedExpr);
         });
         if ($foundParentNode->else === null) {
             return false;
         }
         $foundElseNode = $this->betterNodeFinder->find($foundParentNode->else, function ($node) use ($seekedExpr): bool {
-            return $this->betterStandardPrinter->areNodesEqual($node, $seekedExpr);
+            return $this->nodeComparator->areNodesEqual($node, $seekedExpr);
         });
         if ($foundIfNode && $foundElseNode) {
             $this->doubleIfBranchExprs[] = $seekedExpr;

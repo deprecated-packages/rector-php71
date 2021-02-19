@@ -214,7 +214,7 @@ CODE_SAMPLE
             if (! $node->expr instanceof FuncCall) {
                 return false;
             }
-            if (! $this->areNodesEqual($node->var, $variable)) {
+            if (! $this->nodeComparator->areNodesEqual($node->var, $variable)) {
                 return false;
             }
             return $this->isName($node->expr, 'mysqli_connect');

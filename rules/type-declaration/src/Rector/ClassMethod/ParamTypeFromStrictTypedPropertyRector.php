@@ -109,7 +109,7 @@ CODE_SAMPLE
             if (! $node instanceof Assign) {
                 return null;
             }
-            if (! $this->areNodesEqual($node->expr, $param)) {
+            if (! $this->nodeComparator->areNodesEqual($node->expr, $param)) {
                 return null;
             }
             if (! $node->var instanceof PropertyFetch) {

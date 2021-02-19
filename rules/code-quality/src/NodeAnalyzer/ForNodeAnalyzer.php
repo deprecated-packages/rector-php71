@@ -18,8 +18,8 @@ use PhpParser\Node\Stmt\For_;
 use PhpParser\Node\Stmt\Unset_;
 use Rector\Core\Exception\ShouldNotHappenException;
 use Rector\Core\NodeManipulator\AssignManipulator;
+use Rector\Core\PhpParser\Comparing\NodeComparator;
 use Rector\Core\PhpParser\Node\BetterNodeFinder;
-use Rector\Core\PhpParser\Printer\BetterStandardPrinter;
 use Rector\Core\Util\StaticInstanceOf;
 use Rector\NodeNameResolver\NodeNameResolver;
 use Rector\NodeTypeResolver\Node\AttributeKey;
@@ -42,21 +42,21 @@ final class ForNodeAnalyzer
     private $betterNodeFinder;
 
     /**
-     * @var BetterStandardPrinter
+     * @var NodeComparator
      */
-    private $betterStandardPrinter;
+    private $nodeComparator;
 
     /**
      * @var AssignManipulator
      */
     private $assignManipulator;
 
-    public function __construct(NodeNameResolver $nodeNameResolver, BetterNodeFinder $betterNodeFinder, BetterStandardPrinter $betterStandardPrinter, AssignManipulator $assignManipulator)
+    public function __construct(NodeNameResolver $nodeNameResolver, BetterNodeFinder $betterNodeFinder, AssignManipulator $assignManipulator, NodeComparator $nodeComparator)
     {
         $this->nodeNameResolver = $nodeNameResolver;
         $this->betterNodeFinder = $betterNodeFinder;
-        $this->betterStandardPrinter = $betterStandardPrinter;
         $this->assignManipulator = $assignManipulator;
+        $this->nodeComparator = $nodeComparator;
     }
 
     /**
@@ -106,7 +106,7 @@ final class ForNodeAnalyzer
     public function isCountValueVariableUsedInsideForStatements(For_ $for, ?Expr $expr): bool
     {
         return (bool) $this->betterNodeFinder->findFirst($for->stmts, function (Node $node) use ($expr): bool {
-            return $this->betterStandardPrinter->areNodesEqual($node, $expr);
+            return $this->nodeComparator->areNodesEqual($node, $expr);
         });
     }
 

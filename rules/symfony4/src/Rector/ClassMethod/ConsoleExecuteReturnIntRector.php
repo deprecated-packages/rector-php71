@@ -97,7 +97,7 @@ CODE_SAMPLE
                 return NodeTraverser::DONT_TRAVERSE_CHILDREN;
             }
             $parentNode = $node->getAttribute(AttributeKey::PARENT_NODE);
-            if ($parentNode instanceof Return_ && $this->areNodesEqual($parentNode->expr, $node) && $node instanceof Int_) {
+            if ($parentNode instanceof Return_ && $this->nodeComparator->areNodesEqual($parentNode->expr, $node) && $node instanceof Int_) {
                 $hasReturn = true;
                 return null;
             }
@@ -109,7 +109,7 @@ CODE_SAMPLE
             }
             // is there return without nesting?
             $parentNode = $node->getAttribute(AttributeKey::PARENT_NODE);
-            if ($this->areNodesEqual($parentNode, $classMethod)) {
+            if ($this->nodeComparator->areNodesEqual($parentNode, $classMethod)) {
                 $hasReturn = true;
             }
             $this->setReturnTo0InsteadOfNull($node);

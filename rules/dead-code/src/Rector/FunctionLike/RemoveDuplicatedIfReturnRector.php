@@ -12,6 +12,7 @@ use PhpParser\Node\Stmt\If_;
 use PhpParser\Node\Stmt\Return_;
 use PhpParser\NodeTraverser;
 use Rector\Core\NodeManipulator\IfManipulator;
+use Rector\Core\PhpParser\Comparing\NodeComparator;
 use Rector\Core\Rector\AbstractRector;
 use Rector\DeadCode\NodeCollector\ModifiedVariableNamesCollector;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
@@ -34,10 +35,11 @@ final class RemoveDuplicatedIfReturnRector extends AbstractRector
      */
     private $modifiedVariableNamesCollector;
 
-    public function __construct(IfManipulator $ifManipulator, ModifiedVariableNamesCollector $modifiedVariableNamesCollector)
+    public function __construct(IfManipulator $ifManipulator, ModifiedVariableNamesCollector $modifiedVariableNamesCollector, NodeComparator $nodeComparator)
     {
         $this->ifManipulator = $ifManipulator;
         $this->modifiedVariableNamesCollector = $modifiedVariableNamesCollector;
+        $this->nodeComparator = $nodeComparator;
     }
 
     public function getRuleDefinition(): RuleDefinition
@@ -125,7 +127,7 @@ CODE_SAMPLE
             }
 
             /** @var If_ $stmt */
-            $hash = $this->betterStandardPrinter->printWithoutComments($stmt);
+            $hash = $this->nodeComparator->printWithoutComments($stmt);
             $ifWithOnlyReturnsByHash[$hash][] = $stmt;
         }
         return $this->filterOutSingleItemStmts($ifWithOnlyReturnsByHash);

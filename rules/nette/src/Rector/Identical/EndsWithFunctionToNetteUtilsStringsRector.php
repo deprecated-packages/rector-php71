@@ -69,7 +69,7 @@ CODE_SAMPLE
         }
         /** @var FuncCall $strlenFuncCall */
         $strlenFuncCall = $unaryMinus->expr;
-        if ($this->areNodesEqual($strlenFuncCall->args[0]->value, $variable)) {
+        if ($this->nodeComparator->areNodesEqual($strlenFuncCall->args[0]->value, $variable)) {
             return new ContentExprAndNeedleExpr($node->args[0]->value, $strlenFuncCall->args[0]->value);
         }
         return null;

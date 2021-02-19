@@ -9,18 +9,18 @@ use PhpParser\Node\Expr\ArrayDimFetch;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Foreach_;
-use Rector\Core\PhpParser\Printer\BetterStandardPrinter;
+use Rector\Core\PhpParser\Comparing\NodeComparator;
 
 final class ForeachNodeAnalyzer
 {
     /**
-     * @var BetterStandardPrinter
+     * @var NodeComparator
      */
-    private $betterStandardPrinter;
+    private $nodeComparator;
 
-    public function __construct(BetterStandardPrinter $betterStandardPrinter)
+    public function __construct(NodeComparator $nodeComparator)
     {
-        $this->betterStandardPrinter = $betterStandardPrinter;
+        $this->nodeComparator = $nodeComparator;
     }
 
     /**
@@ -47,7 +47,7 @@ final class ForeachNodeAnalyzer
         if ($onlyStatement->var->dim !== null) {
             return null;
         }
-        if (! $this->betterStandardPrinter->areNodesEqual($foreach->valueVar, $onlyStatement->expr)) {
+        if (! $this->nodeComparator->areNodesEqual($foreach->valueVar, $onlyStatement->expr)) {
             return null;
         }
         return $onlyStatement->var->var;

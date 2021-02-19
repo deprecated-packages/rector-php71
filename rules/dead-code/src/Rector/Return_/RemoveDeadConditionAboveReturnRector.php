@@ -82,7 +82,7 @@ CODE_SAMPLE
         if (! $stmt instanceof Return_) {
             return null;
         }
-        if (! $this->areNodesEqual($stmt, $node)) {
+        if (! $this->nodeComparator->areNodesEqual($stmt, $node)) {
             return null;
         }
         $this->removeNode($previousNode);

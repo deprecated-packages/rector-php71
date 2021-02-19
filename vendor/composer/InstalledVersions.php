@@ -30,7 +30,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '0b17b916371d07cb1e9d32dc0237a9cc6fe4eb20',
+    'reference' => '362ebbea46592bd5e2eb5ec8534a6cbe38f302dc',
     'name' => 'rector/rector',
   ),
   'versions' => 
@@ -368,12 +368,12 @@ private static $installed = array (
     ),
     'phpstan/phpdoc-parser' => 
     array (
-      'pretty_version' => '0.4.10',
-      'version' => '0.4.10.0',
+      'pretty_version' => '0.4.11',
+      'version' => '0.4.11.0',
       'aliases' => 
       array (
       ),
-      'reference' => '5c1eb9aac80cb236f1b7fbe52e691afe4cc9f430',
+      'reference' => '2ce4c6623376d2613cf02e055ea1a926d906cef7',
     ),
     'phpstan/phpstan' => 
     array (
@@ -584,7 +584,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '0b17b916371d07cb1e9d32dc0237a9cc6fe4eb20',
+      'reference' => '362ebbea46592bd5e2eb5ec8534a6cbe38f302dc',
     ),
     'rector/rector-prefixed' => 
     array (

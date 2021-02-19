@@ -132,7 +132,7 @@ CODE_SAMPLE
             if (! $node instanceof Foreach_) {
                 return false;
             }
-            return $this->areNodesEqual($node->expr, $assignedExpr);
+            return $this->nodeComparator->areNodesEqual($node->expr, $assignedExpr);
         });
     }
 
@@ -149,7 +149,7 @@ CODE_SAMPLE
             $this->tokenManipulator->removeIsArray([$node], $singleToken);
             // drop if "If_" node not needed
             if ($node instanceof If_ && $node->else !== null) {
-                if (! $this->areNodesEqual($node->stmts, $node->else->stmts)) {
+                if (! $this->nodeComparator->areNodesEqual($node->stmts, $node->else->stmts)) {
                     return null;
                 }
 

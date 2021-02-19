@@ -80,7 +80,7 @@ CODE_SAMPLE
             if (! $node instanceof Variable) {
                 return false;
             }
-            return $this->areNodesEqual($node, $variable);
+            return $this->nodeComparator->areNodesEqual($node, $variable);
         });
     }
 }

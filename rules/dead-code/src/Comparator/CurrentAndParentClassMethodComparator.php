@@ -11,7 +11,7 @@ use PhpParser\Node\Stmt\ClassMethod;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
 use Rector\Core\Exception\ShouldNotHappenException;
-use Rector\Core\PhpParser\Printer\BetterStandardPrinter;
+use Rector\Core\PhpParser\Comparing\NodeComparator;
 use Rector\DeadCode\Comparator\Parameter\ParameterDefaultsComparator;
 use Rector\DeadCode\Comparator\Parameter\ParameterTypeComparator;
 use Rector\NodeCollector\NodeCollector\NodeRepository;
@@ -27,9 +27,9 @@ final class CurrentAndParentClassMethodComparator
     private $nodeNameResolver;
 
     /**
-     * @var BetterStandardPrinter
+     * @var NodeComparator
      */
-    private $betterStandardPrinter;
+    private $nodeComparator;
 
     /**
      * @var NodeRepository
@@ -51,14 +51,14 @@ final class CurrentAndParentClassMethodComparator
      */
     private $parameterTypeComparator;
 
-    public function __construct(NodeNameResolver $nodeNameResolver, BetterStandardPrinter $betterStandardPrinter, NodeRepository $nodeRepository, MethodReflectionProvider $methodReflectionProvider, ParameterDefaultsComparator $parameterDefaultsComparator, ParameterTypeComparator $parameterTypeComparator)
+    public function __construct(NodeNameResolver $nodeNameResolver, NodeRepository $nodeRepository, MethodReflectionProvider $methodReflectionProvider, ParameterDefaultsComparator $parameterDefaultsComparator, ParameterTypeComparator $parameterTypeComparator, NodeComparator $nodeComparator)
     {
         $this->nodeNameResolver = $nodeNameResolver;
-        $this->betterStandardPrinter = $betterStandardPrinter;
         $this->nodeRepository = $nodeRepository;
         $this->methodReflectionProvider = $methodReflectionProvider;
         $this->parameterDefaultsComparator = $parameterDefaultsComparator;
         $this->parameterTypeComparator = $parameterTypeComparator;
+        $this->nodeComparator = $nodeComparator;
     }
 
     public function isParentCallMatching(ClassMethod $classMethod, StaticCall $staticCall): bool
@@ -102,7 +102,7 @@ final class CurrentAndParentClassMethodComparator
 
             // this only compares variable name, but those can be differnt, so its kinda useless
             $param = $currentClassMethodParams[$key];
-            if (! $this->betterStandardPrinter->areNodesEqual($param->var, $arg->value)) {
+            if (! $this->nodeComparator->areNodesEqual($param->var, $arg->value)) {
                 return false;
             }
         }

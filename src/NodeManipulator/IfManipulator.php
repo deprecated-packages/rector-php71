@@ -19,19 +19,14 @@ use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Foreach_;
 use PhpParser\Node\Stmt\If_;
 use PhpParser\Node\Stmt\Return_;
+use Rector\Core\PhpParser\Comparing\NodeComparator;
 use Rector\Core\PhpParser\Node\BetterNodeFinder;
 use Rector\Core\PhpParser\Node\Value\ValueResolver;
-use Rector\Core\PhpParser\Printer\BetterStandardPrinter;
 use Rector\EarlyReturn\NodeTransformer\ConditionInverter;
 use Rector\NodeNameResolver\NodeNameResolver;
 
 final class IfManipulator
 {
-    /**
-     * @var BetterStandardPrinter
-     */
-    private $betterStandardPrinter;
-
     /**
      * @var StmtsManipulator
      */
@@ -57,14 +52,19 @@ final class IfManipulator
      */
     private $conditionInverter;
 
-    public function __construct(BetterNodeFinder $betterNodeFinder, BetterStandardPrinter $betterStandardPrinter, NodeNameResolver $nodeNameResolver, StmtsManipulator $stmtsManipulator, ValueResolver $valueResolver, ConditionInverter $conditionInverter)
+    /**
+     * @var NodeComparator
+     */
+    private $nodeComparator;
+
+    public function __construct(BetterNodeFinder $betterNodeFinder, NodeNameResolver $nodeNameResolver, StmtsManipulator $stmtsManipulator, ValueResolver $valueResolver, ConditionInverter $conditionInverter, NodeComparator $nodeComparator)
     {
-        $this->betterStandardPrinter = $betterStandardPrinter;
         $this->stmtsManipulator = $stmtsManipulator;
         $this->nodeNameResolver = $nodeNameResolver;
         $this->betterNodeFinder = $betterNodeFinder;
         $this->valueResolver = $valueResolver;
         $this->conditionInverter = $conditionInverter;
+        $this->nodeComparator = $nodeComparator;
     }
 
     /**
@@ -142,10 +142,10 @@ final class IfManipulator
         if (! $if->cond instanceof Identical) {
             return null;
         }
-        if ($this->betterStandardPrinter->areNodesEqual($if->cond->left, $insideIfNode->expr)) {
+        if ($this->nodeComparator->areNodesEqual($if->cond->left, $insideIfNode->expr)) {
             return $if->cond->right;
         }
-        if ($this->betterStandardPrinter->areNodesEqual($if->cond->right, $insideIfNode->expr)) {
+        if ($this->nodeComparator->areNodesEqual($if->cond->right, $insideIfNode->expr)) {
             return $if->cond->left;
         }
         return null;
@@ -193,10 +193,10 @@ final class IfManipulator
         if (! $lastIfStmt->var instanceof Variable) {
             return false;
         }
-        if (! $this->betterStandardPrinter->areNodesEqual($lastIfStmt->var, $lastElseStmt->var)) {
+        if (! $this->nodeComparator->areNodesEqual($lastIfStmt->var, $lastElseStmt->var)) {
             return false;
         }
-        return $this->betterStandardPrinter->areNodesEqual($desiredExpr, $lastElseStmt->var);
+        return $this->nodeComparator->areNodesEqual($desiredExpr, $lastElseStmt->var);
     }
 
     /**
@@ -277,7 +277,7 @@ final class IfManipulator
         if (! $if->cond instanceof Identical) {
             return false;
         }
-        return $this->betterStandardPrinter->areNodesEqual($this->getIfCondVar($if), $assign->var);
+        return $this->nodeComparator->areNodesEqual($this->getIfCondVar($if), $assign->var);
     }
 
     public function isIfCondUsingAssignNotIdenticalVariable(If_ $if, Node $node): bool
@@ -288,7 +288,7 @@ final class IfManipulator
         if (! $if->cond instanceof NotIdentical) {
             return false;
         }
-        return ! $this->betterStandardPrinter->areNodesEqual($this->getIfCondVar($if), $node->var);
+        return ! $this->nodeComparator->areNodesEqual($this->getIfCondVar($if), $node->var);
     }
 
     public function isIfWithoutElseAndElseIfs(If_ $if): bool
@@ -316,10 +316,10 @@ final class IfManipulator
 
     private function matchComparedAndReturnedNode(NotIdentical $notIdentical, Return_ $return): ?Expr
     {
-        if ($this->betterStandardPrinter->areNodesEqual($notIdentical->left, $return->expr) && $this->valueResolver->isNull($notIdentical->right)) {
+        if ($this->nodeComparator->areNodesEqual($notIdentical->left, $return->expr) && $this->valueResolver->isNull($notIdentical->right)) {
             return $notIdentical->left;
         }
-        if (! $this->betterStandardPrinter->areNodesEqual($notIdentical->right, $return->expr)) {
+        if (! $this->nodeComparator->areNodesEqual($notIdentical->right, $return->expr)) {
             return null;
         }
         if ($this->valueResolver->isNull($notIdentical->left)) {
@@ -330,7 +330,7 @@ final class IfManipulator
 
     private function isNotIdenticalNullCompare(NotIdentical $notIdentical): bool
     {
-        if ($this->betterStandardPrinter->areNodesEqual($notIdentical->left, $notIdentical->right)) {
+        if ($this->nodeComparator->areNodesEqual($notIdentical->left, $notIdentical->right)) {
             return false;
         }
         return $this->valueResolver->isNull($notIdentical->right) || $this->valueResolver->isNull($notIdentical->left);

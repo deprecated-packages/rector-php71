@@ -54,7 +54,7 @@ CODE_SAMPLE
         if (! $this->isAtLeastPhpVersion(PhpVersionFeature::ELVIS_OPERATOR)) {
             return null;
         }
-        if (! $this->areNodesEqual($node->cond, $node->if)) {
+        if (! $this->nodeComparator->areNodesEqual($node->cond, $node->if)) {
             return null;
         }
         $node->setAttribute(AttributeKey::ORIGINAL_NODE, null);

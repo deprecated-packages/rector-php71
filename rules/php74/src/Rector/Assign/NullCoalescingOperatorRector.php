@@ -53,7 +53,7 @@ CODE_SAMPLE
         if (! $node->expr instanceof Coalesce) {
             return null;
         }
-        if (! $this->areNodesEqual($node->var, $node->expr->left)) {
+        if (! $this->nodeComparator->areNodesEqual($node->var, $node->expr->left)) {
             return null;
         }
         return new AssignCoalesce($node->var, $node->expr->right);

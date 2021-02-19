@@ -98,14 +98,14 @@ CODE_SAMPLE
             if (! $parent instanceof Assign) {
                 return false;
             }
-            return $this->areNodesEqual($node, $assignVariable);
+            return $this->nodeComparator->areNodesEqual($node, $assignVariable);
         });
         if ($this->shouldSkipNextPrev($nextForeach, $variablePrevious)) {
             return null;
         }
         // ensure the variable only used once in foreach
         $usedVariable = $this->betterNodeFinder->find($node->stmts, function (Node $node) use ($assignVariable): bool {
-            return $this->areNodesEqual($node, $assignVariable);
+            return $this->nodeComparator->areNodesEqual($node, $assignVariable);
         });
         if (count($usedVariable) > 1) {
             return null;
@@ -129,6 +129,6 @@ CODE_SAMPLE
         if (! $expr instanceof Expr) {
             return true;
         }
-        return ! $this->areNodesEqual($return->expr, $expr);
+        return ! $this->nodeComparator->areNodesEqual($return->expr, $expr);
     }
 }

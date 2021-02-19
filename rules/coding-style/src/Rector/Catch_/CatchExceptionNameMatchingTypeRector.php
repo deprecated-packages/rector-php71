@@ -94,7 +94,7 @@ CODE_SAMPLE
         }
         $newVariable = new Variable($newVariableName);
         $isFoundInPrevious = (bool) $this->betterNodeFinder->findFirstPrevious($node, function (Node $n) use ($newVariable): bool {
-            return $this->areNodesEqual($n, $newVariable);
+            return $this->nodeComparator->areNodesEqual($n, $newVariable);
         });
         if ($isFoundInPrevious) {
             return null;

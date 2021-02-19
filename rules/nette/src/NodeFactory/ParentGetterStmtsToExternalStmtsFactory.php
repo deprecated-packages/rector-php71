@@ -10,7 +10,7 @@ use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Return_;
-use Rector\Core\PhpParser\Printer\BetterStandardPrinter;
+use Rector\Core\PhpParser\Comparing\NodeComparator;
 use Rector\NodeTypeResolver\NodeTypeResolver;
 use Symplify\Astral\NodeTraverser\SimpleCallableNodeTraverser;
 
@@ -27,15 +27,15 @@ final class ParentGetterStmtsToExternalStmtsFactory
     private $simpleCallableNodeTraverser;
 
     /**
-     * @var BetterStandardPrinter
+     * @var NodeComparator
      */
-    private $betterStandardPrinter;
+    private $nodeComparator;
 
-    public function __construct(NodeTypeResolver $nodeTypeResolver, SimpleCallableNodeTraverser $simpleCallableNodeTraverser, BetterStandardPrinter $betterStandardPrinter)
+    public function __construct(NodeTypeResolver $nodeTypeResolver, SimpleCallableNodeTraverser $simpleCallableNodeTraverser, NodeComparator $nodeComparator)
     {
         $this->nodeTypeResolver = $nodeTypeResolver;
         $this->simpleCallableNodeTraverser = $simpleCallableNodeTraverser;
-        $this->betterStandardPrinter = $betterStandardPrinter;
+        $this->nodeComparator = $nodeComparator;
     }
 
     /**
@@ -73,7 +73,7 @@ final class ParentGetterStmtsToExternalStmtsFactory
         }
         // stmts without assign
         $this->simpleCallableNodeTraverser->traverseNodesWithCallable($getUserStmts, function (Node $node) use ($userExpression): ?MethodCall {
-            if (! $this->betterStandardPrinter->areNodesEqual($node, $userExpression)) {
+            if (! $this->nodeComparator->areNodesEqual($node, $userExpression)) {
                 return null;
             }
             return new MethodCall(new Variable('this'), 'getUser');
