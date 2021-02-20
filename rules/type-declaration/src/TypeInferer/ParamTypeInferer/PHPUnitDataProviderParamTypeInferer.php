@@ -101,15 +101,13 @@ final class PHPUnitDataProviderParamTypeInferer implements ParamTypeInfererInter
                 continue;
             }
 
-            $arrayTypes = $this->nodeTypeResolver->resolve($classMethodReturn->expr);
+            $type = $this->getTypeFromClassMethodReturn($classMethodReturn->expr);
 
-            // impossible to resolve
-            if (! $arrayTypes instanceof ConstantArrayType) {
-                return new MixedType();
+            if (! $type instanceof ConstantArrayType) {
+                return $type;
             }
 
-            // nest to 1 item
-            foreach ($arrayTypes->getValueTypes() as $position => $valueType) {
+            foreach ($type->getValueTypes() as $position => $valueType) {
                 if ($position !== $parameterPosition) {
                     continue;
                 }
@@ -120,7 +118,24 @@ final class PHPUnitDataProviderParamTypeInferer implements ParamTypeInfererInter
         if ($paramOnPositionTypes === []) {
             return new MixedType();
         }
-        return $this->typeFactory->createMixedPassedOrUnionType($paramOnPositionTypes);
+        $p = $this->typeFactory->createMixedPassedOrUnionType($paramOnPositionTypes);
+        return $p;
+    }
+
+    private function getTypeFromClassMethodReturn(Array_ $classMethodReturnArrayNode): Type
+    {
+        $arrayTypes = $this->nodeTypeResolver->resolve($classMethodReturnArrayNode);
+        // impossible to resolve
+        if (! $arrayTypes instanceof ConstantArrayType) {
+            return new MixedType();
+        }
+        // nest to 1 item
+        $arrayTypes = $arrayTypes->getValueTypes()[0];
+        // impossible to resolve
+        if (! $arrayTypes instanceof ConstantArrayType) {
+            return new MixedType();
+        }
+        return $arrayTypes;
     }
 
     private function getFunctionLikePhpDocInfo(Param $param): PhpDocInfo
