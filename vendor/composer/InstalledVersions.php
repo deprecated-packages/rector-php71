@@ -30,7 +30,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '3cb9fc28b3dea9f0750db7403ed7c55c164c9d9f',
+    'reference' => '9f4353c2af7b3799d4ba4057775f50e9e33c6b0d',
     'name' => 'rector/rector',
   ),
   'versions' => 
@@ -584,7 +584,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '3cb9fc28b3dea9f0750db7403ed7c55c164c9d9f',
+      'reference' => '9f4353c2af7b3799d4ba4057775f50e9e33c6b0d',
     ),
     'rector/rector-prefixed' => 
     array (
