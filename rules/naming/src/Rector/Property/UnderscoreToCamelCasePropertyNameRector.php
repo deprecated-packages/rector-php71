@@ -93,7 +93,7 @@ CODE_SAMPLE
             return null;
         }
         $property = $this->underscoreCamelCasePropertyRenamer->rename($propertyRename);
-        if (! $property instanceof \PhpParser\Node\Stmt\Property) {
+        if (! $property instanceof Property) {
             return null;
         }
         return $node;

@@ -92,7 +92,7 @@ CODE_SAMPLE
             return null;
         }
         $rootMethodCall = $this->fluentChainMethodCallNodeAnalyzer->resolveRootMethodCall($node);
-        if (! $rootMethodCall instanceof \PhpParser\Node\Expr\MethodCall) {
+        if (! $rootMethodCall instanceof MethodCall) {
             return null;
         }
         $new = $this->newFluentChainMethodCallNodeAnalyzer->matchNewInFluentSetterMethodCall($rootMethodCall);

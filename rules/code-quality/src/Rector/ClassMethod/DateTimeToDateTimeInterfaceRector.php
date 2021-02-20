@@ -182,7 +182,7 @@ CODE_SAMPLE
             return true;
         }
         $parentNode = $methodCall->getAttribute(AttributeKey::PARENT_NODE);
-        if (! $parentNode instanceof \PhpParser\Node) {
+        if (! $parentNode instanceof Node) {
             return true;
         }
         return $parentNode instanceof Assign;

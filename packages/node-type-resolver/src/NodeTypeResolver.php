@@ -35,6 +35,7 @@ use Rector\Core\NodeAnalyzer\ClassAnalyzer;
 use Rector\Core\Util\StaticInstanceOf;
 use Rector\NodeTypeResolver\Contract\NodeTypeResolverInterface;
 use Rector\NodeTypeResolver\Node\AttributeKey;
+use Rector\NodeTypeResolver\NodeTypeCorrector\GenericClassStringTypeCorrector;
 use Rector\NodeTypeResolver\NodeTypeCorrector\ParentClassLikeTypeCorrector;
 use Rector\NodeTypeResolver\TypeAnalyzer\ArrayTypeAnalyzer;
 use Rector\PHPStanStaticTypeMapper\Utils\TypeUnwrapper;
@@ -76,9 +77,14 @@ final class NodeTypeResolver
     private $classAnalyzer;
 
     /**
+     * @var GenericClassStringTypeCorrector
+     */
+    private $genericClassStringTypeCorrector;
+
+    /**
      * @param NodeTypeResolverInterface[] $nodeTypeResolvers
      */
-    public function __construct(ObjectTypeSpecifier $objectTypeSpecifier, ParentClassLikeTypeCorrector $parentClassLikeTypeCorrector, TypeUnwrapper $typeUnwrapper, ClassAnalyzer $classAnalyzer, array $nodeTypeResolvers)
+    public function __construct(ObjectTypeSpecifier $objectTypeSpecifier, ParentClassLikeTypeCorrector $parentClassLikeTypeCorrector, TypeUnwrapper $typeUnwrapper, ClassAnalyzer $classAnalyzer, GenericClassStringTypeCorrector $genericClassStringTypeCorrector, array $nodeTypeResolvers)
     {
         foreach ($nodeTypeResolvers as $nodeTypeResolver) {
             $this->addNodeTypeResolver($nodeTypeResolver);
@@ -87,6 +93,7 @@ final class NodeTypeResolver
         $this->parentClassLikeTypeCorrector = $parentClassLikeTypeCorrector;
         $this->typeUnwrapper = $typeUnwrapper;
         $this->classAnalyzer = $classAnalyzer;
+        $this->genericClassStringTypeCorrector = $genericClassStringTypeCorrector;
     }
 
     /**
@@ -177,7 +184,7 @@ final class NodeTypeResolver
             return $this->resolveArrayType($node);
         }
         if ($node instanceof Arg) {
-            $node = $node->value;
+            throw new ShouldNotHappenException('Arg cannot have type, use $arg->value instead');
         }
         if (StaticInstanceOf::isOneOf($node, [Param::class, Scalar::class])) {
             return $this->resolve($node);
@@ -271,7 +278,7 @@ final class NodeTypeResolver
             return true;
         }
         $defaultNodeValue = $property->props[0]->default;
-        if (! $defaultNodeValue instanceof \PhpParser\Node\Expr) {
+        if (! $defaultNodeValue instanceof Expr) {
             return false;
         }
         return $this->isStaticType($defaultNodeValue, BooleanType::class);
@@ -411,6 +418,8 @@ final class NodeTypeResolver
         $scope = $expr->getAttribute(AttributeKey::SCOPE);
         if ($scope instanceof Scope) {
             $arrayType = $scope->getType($expr);
+            $arrayType = $this->genericClassStringTypeCorrector->correct($arrayType);
+
             return $this->removeNonEmptyArrayFromIntersectionWithArrayType($arrayType);
         }
         return new ArrayType(new MixedType(), new MixedType());

@@ -20,6 +20,8 @@ use Rector\Symfony3\NodeFactory\BuilderFormNodeFactory;
 use Rector\Symfony3\NodeFactory\ConfigureOptionsNodeFactory;
 use ReflectionClass;
 use ReflectionMethod;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
@@ -36,7 +38,7 @@ use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 final class FormTypeInstanceToClassConstRector extends AbstractFormAddRector
 {
     /**
-     * @var string[]
+     * @var class-string<AbstractController>[]|class-string<Controller>[]
      */
     private const CONTROLLER_TYPES = [
         'Symfony\Bundle\FrameworkBundle\Controller\Controller',
@@ -126,7 +128,7 @@ CODE_SAMPLE
         if ($argValue->args !== []) {
             $methodCall = $this->moveArgumentsToOptions($methodCall, $position, $optionsPosition, $argValue->class->toString(), $argValue->args);
 
-            if (! $methodCall instanceof \PhpParser\Node\Expr\MethodCall) {
+            if (! $methodCall instanceof MethodCall) {
                 return null;
             }
         }
