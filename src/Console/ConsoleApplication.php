@@ -19,7 +19,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symplify\PackageBuilder\Console\Command\CommandNaming;
-use Symplify\SmartFileSystem\SmartFileInfo;
 use Throwable;
 
 final class ConsoleApplication extends Application
@@ -28,11 +27,6 @@ final class ConsoleApplication extends Application
      * @var string
      */
     private const NAME = 'Rector';
-
-    /**
-     * @var Configuration
-     */
-    private $configuration;
 
     /**
      * @var NoRectorsLoadedReporter
@@ -55,7 +49,6 @@ final class ConsoleApplication extends Application
             $command->setName($commandName);
         }
         $this->addCommands($commands);
-        $this->configuration = $configuration;
         $this->noRectorsLoadedReporter = $noRectorsLoadedReporter;
     }
 
@@ -80,15 +73,6 @@ final class ConsoleApplication extends Application
         if ($this->shouldPrintMetaInformation($input)) {
             $output->writeln($this->getLongVersion());
             $shouldFollowByNewline = true;
-
-            $configFilePath = $this->configuration->getConfigFilePath();
-            if ($configFilePath) {
-                $configFileInfo = new SmartFileInfo($configFilePath);
-                $relativeConfigPath = $configFileInfo->getRelativeFilePathFromDirectory(getcwd());
-
-                $output->writeln('Config file: ' . $relativeConfigPath);
-                $shouldFollowByNewline = true;
-            }
         }
         if ($shouldFollowByNewline) {
             $output->write(PHP_EOL);
