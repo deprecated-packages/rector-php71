@@ -36,7 +36,7 @@ final class Versions
   'composer/package-versions-deprecated' => '1.11.99.1@7413f0b55a051e89485c5cb9f765fe24bb02a7b6',
   'composer/semver' => '3.2.4@a02fdf930a3c1c3ed3a49b5f63859c0c20e10464',
   'composer/xdebug-handler' => '1.4.5@f28d44c286812c714741478d968104c5e604a1d4',
-  'doctrine/annotations' => '1.11.1@ce77a7ba1770462cd705a91a151b6c3746f9c6ad',
+  'doctrine/annotations' => '1.12.0@ebec9b1708c95d7602245c8172773f6b4e0c3be1',
   'doctrine/inflector' => '2.0.3@9cf661f4eb38f7c881cac67c75ea9b00bf97b210',
   'doctrine/lexer' => '1.2.1@e864bbf5904cb8f5bb334f99209b48018522f042',
   'jean85/pretty-package-versions' => '1.6.0@1e0104b46f045868f11942aea058cd7186d6c303',
@@ -46,7 +46,7 @@ final class Versions
   'nette/utils' => 'v3.2.1@2bc2f58079c920c2ecbb6935645abf6f2f5f94ba',
   'nikic/php-parser' => 'v4.10.4@c6d052fc58cb876152f89f532b95a8d7907e7f0e',
   'phpstan/phpdoc-parser' => '0.4.11@2ce4c6623376d2613cf02e055ea1a926d906cef7',
-  'phpstan/phpstan' => '0.12.77@1f10b8c8d118d01e7b492f9707999d456be5812c',
+  'phpstan/phpstan' => '0.12.78@eecce8d2ee3cac6769f37b4cb1998b2715f82984',
   'phpstan/phpstan-phpunit' => '0.12.17@432575b41cf2d4f44e460234acaf56119ed97d36',
   'psr/cache' => '1.0.1@d11b50ad223250cf17b86e38383413f5a6764bf8',
   'psr/container' => '1.0.0@b7ce3b176482dbbc1245ebf52b181af44c2cf55f',
@@ -163,8 +163,8 @@ final class Versions
   'symplify/phpstan-rules' => '9.1.9@c786d63aba72ad42b030ab682116b632ec95e0ea',
   'theseer/tokenizer' => '1.2.0@75a63c33a8577608444246075ea0af0d052e452a',
   'tracy/tracy' => 'v2.8.3@342674bbf72365e8456de9855a8cd839ca695933',
-  'rector/rector-prefixed' => 'dev-master@26cc82a2234dab78e50bd708b8248ddc9cdbeaab',
-  'rector/rector' => 'dev-master@26cc82a2234dab78e50bd708b8248ddc9cdbeaab',
+  'rector/rector-prefixed' => 'dev-master@3cb9fc28b3dea9f0750db7403ed7c55c164c9d9f',
+  'rector/rector' => 'dev-master@3cb9fc28b3dea9f0750db7403ed7c55c164c9d9f',
 );
 
     private function __construct()

@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => '26cc82a2234dab78e50bd708b8248ddc9cdbeaab',
+    'reference' => '3cb9fc28b3dea9f0750db7403ed7c55c164c9d9f',
     'name' => 'rector/rector',
   ),
   'versions' => 
@@ -40,12 +40,12 @@
     ),
     'doctrine/annotations' => 
     array (
-      'pretty_version' => '1.11.1',
-      'version' => '1.11.1.0',
+      'pretty_version' => '1.12.0',
+      'version' => '1.12.0.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'ce77a7ba1770462cd705a91a151b6c3746f9c6ad',
+      'reference' => 'ebec9b1708c95d7602245c8172773f6b4e0c3be1',
     ),
     'doctrine/inflector' => 
     array (
@@ -353,12 +353,12 @@
     ),
     'phpstan/phpstan' => 
     array (
-      'pretty_version' => '0.12.77',
-      'version' => '0.12.77.0',
+      'pretty_version' => '0.12.78',
+      'version' => '0.12.78.0',
       'aliases' => 
       array (
       ),
-      'reference' => '1f10b8c8d118d01e7b492f9707999d456be5812c',
+      'reference' => 'eecce8d2ee3cac6769f37b4cb1998b2715f82984',
     ),
     'phpstan/phpstan-nette' => 
     array (
@@ -560,7 +560,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => '26cc82a2234dab78e50bd708b8248ddc9cdbeaab',
+      'reference' => '3cb9fc28b3dea9f0750db7403ed7c55c164c9d9f',
     ),
     'rector/rector-prefixed' => 
     array (
