@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit4aa21a4a0c840b637f2189c712d82aa6
+class ComposerStaticInit08cddca2336ed44c86ef2b9e9681d31f
 {
     public static $files = array (
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
@@ -241,8 +241,6 @@ class ComposerStaticInit4aa21a4a0c840b637f2189c712d82aa6
             'Rector\\Laravel\\' => 15,
             'Rector\\Generics\\Tests\\' => 22,
             'Rector\\Generics\\' => 16,
-            'Rector\\Generic\\Tests\\' => 21,
-            'Rector\\Generic\\' => 15,
             'Rector\\FileSystemRector\\' => 24,
             'Rector\\FamilyTree\\' => 18,
             'Rector\\EarlyReturn\\Tests\\' => 25,
@@ -299,6 +297,8 @@ class ComposerStaticInit4aa21a4a0c840b637f2189c712d82aa6
             'Rector\\Autodiscovery\\Tests\\' => 27,
             'Rector\\Autodiscovery\\' => 21,
             'Rector\\AttributeAwarePhpDoc\\' => 28,
+            'Rector\\Arguments\\Tests\\' => 23,
+            'Rector\\Arguments\\' => 17,
         ),
         'P' => 
         array (
@@ -1068,14 +1068,6 @@ class ComposerStaticInit4aa21a4a0c840b637f2189c712d82aa6
         array (
             0 => __DIR__ . '/../..' . '/rules/generics/src',
         ),
-        'Rector\\Generic\\Tests\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/rules/generic/tests',
-        ),
-        'Rector\\Generic\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/rules/generic/src',
-        ),
         'Rector\\FileSystemRector\\' => 
         array (
             0 => __DIR__ . '/../..' . '/packages/file-system-rector/src',
@@ -1299,6 +1291,14 @@ class ComposerStaticInit4aa21a4a0c840b637f2189c712d82aa6
         'Rector\\AttributeAwarePhpDoc\\' => 
         array (
             0 => __DIR__ . '/../..' . '/packages/attribute-aware-php-doc/src',
+        ),
+        'Rector\\Arguments\\Tests\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/rules/arguments/tests',
+        ),
+        'Rector\\Arguments\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/rules/arguments/src',
         ),
         'Psr\\SimpleCache\\' => 
         array (
@@ -2426,9 +2426,9 @@ class ComposerStaticInit4aa21a4a0c840b637f2189c712d82aa6
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit4aa21a4a0c840b637f2189c712d82aa6::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit4aa21a4a0c840b637f2189c712d82aa6::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit4aa21a4a0c840b637f2189c712d82aa6::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit08cddca2336ed44c86ef2b9e9681d31f::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit08cddca2336ed44c86ef2b9e9681d31f::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit08cddca2336ed44c86ef2b9e9681d31f::$classMap;
 
         }, null, ClassLoader::class);
     }
