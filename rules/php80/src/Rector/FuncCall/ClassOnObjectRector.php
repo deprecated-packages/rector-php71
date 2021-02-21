@@ -62,7 +62,7 @@ CODE_SAMPLE
         if (! $this->isAtLeastPhpVersion(PhpVersionFeature::CLASS_ON_OBJECT)) {
             return null;
         }
-        if (! $this->isFuncCallName($node, 'get_class')) {
+        if (! $this->nodeNameResolver->isFuncCallName($node, 'get_class')) {
             return null;
         }
         if (! isset($node->args[0])) {

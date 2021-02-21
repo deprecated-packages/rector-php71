@@ -54,7 +54,7 @@ final class SimplifyEmptyArrayCheckRector extends AbstractRector
             $node,
             // is_array(...)
             function (Node $node): bool {
-                return $this->isFuncCallName($node, 'is_array');
+                return $this->nodeNameResolver->isFuncCallName($node, 'is_array');
             },
             Empty_::class
         );

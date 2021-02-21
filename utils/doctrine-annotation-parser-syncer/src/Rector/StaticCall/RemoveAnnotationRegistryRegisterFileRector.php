@@ -44,7 +44,7 @@ CODE_SAMPLE
         if (! $this->nodeNameResolver->isInClassNames($node, [DocParser::class, AnnotationReader::class])) {
             return null;
         }
-        if (! $this->isStaticCallNamed($node, AnnotationRegistry::class, 'registerFile')) {
+        if (! $this->nodeNameResolver->isStaticCallNamed($node, AnnotationRegistry::class, 'registerFile')) {
             return null;
         }
         $this->removeNode($node);

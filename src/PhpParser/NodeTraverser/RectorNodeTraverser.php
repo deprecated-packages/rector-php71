@@ -95,9 +95,6 @@ final class RectorNodeTraverser extends NodeTraverser
             $fileWithoutNamespace = new FileWithoutNamespace($nodes);
             $fileWithoutNamespace->setAttribute(AttributeKey::FILE_INFO, $this->currentFileInfoProvider->getSmartFileInfo());
 
-            $firstNode = $nodes[0];
-            $fileWithoutNamespace->setAttribute(AttributeKey::DECLARES, $firstNode->getAttribute(AttributeKey::DECLARES));
-
             return parent::traverse([$fileWithoutNamespace]);
         }
         return parent::traverse($nodes);

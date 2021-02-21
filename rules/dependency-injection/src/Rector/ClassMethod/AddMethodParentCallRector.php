@@ -126,7 +126,7 @@ CODE_SAMPLE
     private function hasParentCallOfMethod(ClassMethod $classMethod, string $method): bool
     {
         return (bool) $this->betterNodeFinder->findFirst((array) $classMethod->stmts, function (Node $node) use ($method): bool {
-            return $this->isStaticCallNamed($node, 'parent', $method);
+            return $this->nodeNameResolver->isStaticCallNamed($node, 'parent', $method);
         });
     }
 }

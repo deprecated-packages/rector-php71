@@ -56,7 +56,7 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        if (! $this->isStaticCallNamed($node, 'PHPExcel_Settings', 'setChartRenderer')) {
+        if (! $this->nodeNameResolver->isStaticCallNamed($node, 'PHPExcel_Settings', 'setChartRenderer')) {
             return null;
         }
         if (count($node->args) === 1) {

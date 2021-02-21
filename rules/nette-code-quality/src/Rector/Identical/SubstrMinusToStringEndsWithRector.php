@@ -55,10 +55,10 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        if (! $this->isFuncCallName($node->left, self::SUBSTR) && ! $this->isFuncCallName($node->right, self::SUBSTR)) {
+        if (! $this->nodeNameResolver->isFuncCallName($node->left, self::SUBSTR) && ! $this->nodeNameResolver->isFuncCallName($node->right, self::SUBSTR)) {
             return null;
         }
-        $substr = $this->isFuncCallName($node->left, self::SUBSTR)
+        $substr = $this->nodeNameResolver->isFuncCallName($node->left, self::SUBSTR)
             ? $node->left
             : $node->right;
         if (! $substr->args[1]->value instanceof UnaryMinus) {
@@ -69,7 +69,7 @@ CODE_SAMPLE
         if (! $unaryMinus->expr instanceof LNumber) {
             return null;
         }
-        $string = $this->isFuncCallName($node->left, self::SUBSTR)
+        $string = $this->nodeNameResolver->isFuncCallName($node->left, self::SUBSTR)
             ? $node->right
             : $node->left;
         $wordLength = $unaryMinus->expr->value;

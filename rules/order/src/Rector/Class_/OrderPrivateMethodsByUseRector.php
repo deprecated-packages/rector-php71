@@ -127,7 +127,7 @@ CODE_SAMPLE
             if (! $node instanceof MethodCall) {
                 return null;
             }
-            if (! $this->isVariableName($node->var, 'this')) {
+            if (! $this->nodeNameResolver->isVariableName($node->var, 'this')) {
                 return null;
             }
             $methodName = $this->getName($node->name);

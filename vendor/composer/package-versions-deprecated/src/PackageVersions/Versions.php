@@ -36,7 +36,7 @@ final class Versions
   'composer/package-versions-deprecated' => '1.11.99.1@7413f0b55a051e89485c5cb9f765fe24bb02a7b6',
   'composer/semver' => '3.2.4@a02fdf930a3c1c3ed3a49b5f63859c0c20e10464',
   'composer/xdebug-handler' => '1.4.5@f28d44c286812c714741478d968104c5e604a1d4',
-  'doctrine/annotations' => '1.12.0@ebec9b1708c95d7602245c8172773f6b4e0c3be1',
+  'doctrine/annotations' => '1.12.1@b17c5014ef81d212ac539f07a1001832df1b6d3b',
   'doctrine/inflector' => '2.0.3@9cf661f4eb38f7c881cac67c75ea9b00bf97b210',
   'doctrine/lexer' => '1.2.1@e864bbf5904cb8f5bb334f99209b48018522f042',
   'jean85/pretty-package-versions' => '1.6.0@1e0104b46f045868f11942aea058cd7186d6c303',
@@ -163,8 +163,8 @@ final class Versions
   'symplify/phpstan-rules' => '9.1.9@c786d63aba72ad42b030ab682116b632ec95e0ea',
   'theseer/tokenizer' => '1.2.0@75a63c33a8577608444246075ea0af0d052e452a',
   'tracy/tracy' => 'v2.8.3@342674bbf72365e8456de9855a8cd839ca695933',
-  'rector/rector-prefixed' => 'dev-master@db5f557947aa633601f42ab3f02e3780ff960922',
-  'rector/rector' => 'dev-master@db5f557947aa633601f42ab3f02e3780ff960922',
+  'rector/rector-prefixed' => 'dev-master@72d6f1ab861f73ae63963397838e5cc8c27feb21',
+  'rector/rector' => 'dev-master@72d6f1ab861f73ae63963397838e5cc8c27feb21',
 );
 
     private function __construct()

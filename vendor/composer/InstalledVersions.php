@@ -30,7 +30,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => 'db5f557947aa633601f42ab3f02e3780ff960922',
+    'reference' => '72d6f1ab861f73ae63963397838e5cc8c27feb21',
     'name' => 'rector/rector',
   ),
   'versions' => 
@@ -64,12 +64,12 @@ private static $installed = array (
     ),
     'doctrine/annotations' => 
     array (
-      'pretty_version' => '1.12.0',
-      'version' => '1.12.0.0',
+      'pretty_version' => '1.12.1',
+      'version' => '1.12.1.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'ebec9b1708c95d7602245c8172773f6b4e0c3be1',
+      'reference' => 'b17c5014ef81d212ac539f07a1001832df1b6d3b',
     ),
     'doctrine/inflector' => 
     array (
@@ -584,7 +584,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => 'db5f557947aa633601f42ab3f02e3780ff960922',
+      'reference' => '72d6f1ab861f73ae63963397838e5cc8c27feb21',
     ),
     'rector/rector-prefixed' => 
     array (

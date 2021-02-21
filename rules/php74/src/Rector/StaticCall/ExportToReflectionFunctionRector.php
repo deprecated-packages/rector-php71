@@ -53,7 +53,7 @@ CODE_SAMPLE
         if (! $node->class instanceof Name) {
             return null;
         }
-        if (! $this->isStaticCallNamed($node, 'ReflectionFunction', 'export')) {
+        if (! $this->nodeNameResolver->isStaticCallNamed($node, 'ReflectionFunction', 'export')) {
             return null;
         }
         $new = new New_($node->class, [new Arg($node->args[0]->value)]);

@@ -55,7 +55,7 @@ CODE_SAMPLE
 
     public function matchContentAndNeedleOfSubstrOfVariableLength(Node $node, Variable $variable): ?ContentExprAndNeedleExpr
     {
-        if (! $this->isFuncCallName($node, 'substr')) {
+        if (! $this->nodeNameResolver->isFuncCallName($node, 'substr')) {
             return null;
         }
         /** @var FuncCall $node */

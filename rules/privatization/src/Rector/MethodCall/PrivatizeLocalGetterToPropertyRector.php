@@ -73,7 +73,7 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        if (! $this->isVariableName($node->var, 'this')) {
+        if (! $this->nodeNameResolver->isVariableName($node->var, 'this')) {
             return null;
         }
         $classLike = $node->getAttribute(AttributeKey::CLASS_NODE);

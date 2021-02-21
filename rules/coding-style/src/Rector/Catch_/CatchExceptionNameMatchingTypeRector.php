@@ -110,7 +110,7 @@ CODE_SAMPLE
             if (! $node instanceof Variable) {
                 return;
             }
-            if (! $this->isVariableName($node, $oldVariableName)) {
+            if (! $this->nodeNameResolver->isVariableName($node, $oldVariableName)) {
                 return;
             }
             $node->name = $newVariableName;

@@ -84,7 +84,7 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        if (! $this->isVariableName($node->var, 'this')) {
+        if (! $this->nodeNameResolver->isVariableName($node->var, 'this')) {
             return null;
         }
         $methodName = $this->getName($node->name);

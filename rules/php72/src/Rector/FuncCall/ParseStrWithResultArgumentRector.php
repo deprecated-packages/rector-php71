@@ -67,7 +67,7 @@ CODE_SAMPLE
             return null;
         }
         $this->traverseNodesWithCallable($nextExpression, function (Node $node) use ($resultVariable): ?Variable {
-            if ($this->isFuncCallName($node, 'get_defined_vars')) {
+            if ($this->nodeNameResolver->isFuncCallName($node, 'get_defined_vars')) {
                 return $resultVariable;
             }
             return null;

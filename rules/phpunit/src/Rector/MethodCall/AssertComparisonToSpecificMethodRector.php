@@ -146,6 +146,6 @@ final class AssertComparisonToSpecificMethodRector extends AbstractRector
         if (is_subclass_of($expr, Scalar::class)) {
             return true;
         }
-        return $this->isVariableName($expr, 'exp*');
+        return $this->nodeNameResolver->isVariableName($expr, 'exp*');
     }
 }

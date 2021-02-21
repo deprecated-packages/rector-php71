@@ -202,7 +202,7 @@ CODE_SAMPLE
                 $this->keyValueName = $this->getName($initExpr->var);
             }
 
-            if ($this->isFuncCallName($initExpr->expr, self::COUNT)) {
+            if ($this->nodeNameResolver->isFuncCallName($initExpr->expr, self::COUNT)) {
                 $this->countValueVariable = $initExpr->var;
                 $this->countValueName = $this->getName($initExpr->var);
                 $this->iteratedExpr = $initExpr->expr->args[0]->value;
@@ -227,7 +227,7 @@ CODE_SAMPLE
             return false;
         }
         // count($values)
-        if ($this->isFuncCallName($condExprs[0]->right, self::COUNT)) {
+        if ($this->nodeNameResolver->isFuncCallName($condExprs[0]->right, self::COUNT)) {
             /** @var FuncCall $countFuncCall */
             $countFuncCall = $condExprs[0]->right;
             $this->iteratedExpr = $countFuncCall->args[0]->value;
@@ -262,7 +262,7 @@ CODE_SAMPLE
             if ($node->dim === null) {
                 return null;
             }
-            if (! $this->isVariableName($node->dim, $this->keyValueName)) {
+            if (! $this->nodeNameResolver->isVariableName($node->dim, $this->keyValueName)) {
                 return null;
             }
             return $singleValue;
