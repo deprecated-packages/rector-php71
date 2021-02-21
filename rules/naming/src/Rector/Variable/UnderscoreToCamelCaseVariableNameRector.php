@@ -114,6 +114,9 @@ CODE_SAMPLE
         if ($parent instanceof Param) {
             return $this->renameParam($parent);
         }
+        if ($this->isName($node, $camelCaseName)) {
+            return null;
+        }
         $node->name = $camelCaseName;
         return $node;
     }
@@ -128,8 +131,9 @@ CODE_SAMPLE
         if (! $renamedParam instanceof Param) {
             return null;
         }
-        /** @var Variable $variable */
-        $variable = $renamedParam->var;
-        return $variable;
+        if (! $renamedParam->var instanceof Variable) {
+            return null;
+        }
+        return $renamedParam->var;
     }
 }

@@ -6,6 +6,9 @@ namespace Rector\CodingStyle\Rector\ClassConst;
 
 use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassConst;
+use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\Type\ArrayType;
 use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\MixedType;
@@ -95,11 +98,33 @@ CODE_SAMPLE
             if ($currentVarType instanceof ArrayType && $currentVarType->getItemType() instanceof MixedType) {
                 return null;
             }
+
+            if ($this->hasTwoAndMoreGenericClassStringTypes($constType)) {
+                return null;
+            }
         }
         if ($this->typeComparator->isSubtype($constType, $phpDocInfo->getVarType())) {
             return null;
         }
         $this->phpDocTypeChanger->changeVarType($phpDocInfo, $constType);
         return $node;
+    }
+
+    private function hasTwoAndMoreGenericClassStringTypes(ConstantArrayType $constantArrayType): bool
+    {
+        $typeNode = $this->staticTypeMapper->mapPHPStanTypeToPHPStanPhpDocTypeNode($constantArrayType);
+        if (! $typeNode instanceof ArrayTypeNode) {
+            return false;
+        }
+        if (! $typeNode->type instanceof UnionTypeNode) {
+            return false;
+        }
+        $genericTypeNodeCount = 0;
+        foreach ($typeNode->type->types as $unionedTypeNode) {
+            if ($unionedTypeNode instanceof GenericTypeNode) {
+                ++$genericTypeNodeCount;
+            }
+        }
+        return $genericTypeNodeCount > 1;
     }
 }
