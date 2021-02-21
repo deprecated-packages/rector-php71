@@ -163,8 +163,8 @@ final class Versions
   'symplify/phpstan-rules' => '9.1.9@c786d63aba72ad42b030ab682116b632ec95e0ea',
   'theseer/tokenizer' => '1.2.0@75a63c33a8577608444246075ea0af0d052e452a',
   'tracy/tracy' => 'v2.8.3@342674bbf72365e8456de9855a8cd839ca695933',
-  'rector/rector-prefixed' => 'dev-master@f1f14c25d81fdb2b2a569a8c60fa3c142c5a168d',
-  'rector/rector' => 'dev-master@f1f14c25d81fdb2b2a569a8c60fa3c142c5a168d',
+  'rector/rector-prefixed' => 'dev-master@2205766dbc8839f7d8548a427d689045f86a316a',
+  'rector/rector' => 'dev-master@2205766dbc8839f7d8548a427d689045f86a316a',
 );
 
     private function __construct()

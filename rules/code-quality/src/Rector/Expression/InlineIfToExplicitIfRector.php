@@ -105,6 +105,7 @@ CODE_SAMPLE
             : $this->binaryOpManipulator->inverseNode($booleanExpr->left);
         $if = new If_($expr);
         $if->stmts[] = new Expression($booleanExpr->right);
+        $this->mirrorComments($if, $expression);
         return $if;
     }
 }
