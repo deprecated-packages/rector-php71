@@ -36,9 +36,9 @@ final class ImplodeAnalyzer
             return false;
         }
         $firstArgumentValue = $expr->args[0]->value;
-        if ($firstArgumentValue instanceof String_ && $firstArgumentValue->value !== '","') {
-            return false;
+        if (! $firstArgumentValue instanceof String_) {
+            return true;
         }
-        return true;
+        return $firstArgumentValue->value === '","';
     }
 }

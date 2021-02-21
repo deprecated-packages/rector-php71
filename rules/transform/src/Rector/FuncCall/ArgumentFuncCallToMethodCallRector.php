@@ -239,9 +239,12 @@ CODE_SAMPLE
         if ($arrayFuncCallToMethodCall->getArrayMethod() && $this->arrayTypeAnalyzer->isArrayType($funcCall->args[0]->value)) {
             return new MethodCall($propertyFetch, $arrayFuncCallToMethodCall->getArrayMethod(), $funcCall->args);
         }
-        if ($arrayFuncCallToMethodCall->getNonArrayMethod() && ! $this->arrayTypeAnalyzer->isArrayType($funcCall->args[0]->value)) {
-            return new MethodCall($propertyFetch, $arrayFuncCallToMethodCall->getNonArrayMethod(), $funcCall->args);
+        if ($arrayFuncCallToMethodCall->getNonArrayMethod() === '') {
+            return null;
         }
-        return null;
+        if ($this->arrayTypeAnalyzer->isArrayType($funcCall->args[0]->value)) {
+            return null;
+        }
+        return new MethodCall($propertyFetch, $arrayFuncCallToMethodCall->getNonArrayMethod(), $funcCall->args);
     }
 }

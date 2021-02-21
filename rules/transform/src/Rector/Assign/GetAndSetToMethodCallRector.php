@@ -32,6 +32,11 @@ final class GetAndSetToMethodCallRector extends AbstractRector implements Config
     public const TYPE_TO_METHOD_CALLS = 'type_to_method_calls';
 
     /**
+     * @var string
+     */
+    private const GET = 'get';
+
+    /**
      * @var string[][]
      */
     private $typeToMethodCalls = [];
@@ -81,7 +86,7 @@ CODE_SAMPLE
 , [
                 self::TYPE_TO_METHOD_CALLS => [
                     'SomeContainer' => [
-                        'get' => 'getService',
+                        self::GET => 'getService',
                     ],
                 ],
             ]),
@@ -140,12 +145,13 @@ CODE_SAMPLE
 
             // setter, skip
             $parentNode = $propertyFetch->getAttribute(AttributeKey::PARENT_NODE);
-
-            if ($parentNode instanceof Assign && $parentNode->var === $propertyFetch) {
-                continue;
+            if (! $parentNode instanceof Assign) {
+                return $this->createMethodCallNodeFromPropertyFetchNode($propertyFetch, $transformation[self::GET]);
             }
-
-            return $this->createMethodCallNodeFromPropertyFetchNode($propertyFetch, $transformation['get']);
+            if ($parentNode->var !== $propertyFetch) {
+                return $this->createMethodCallNodeFromPropertyFetchNode($propertyFetch, $transformation[self::GET]);
+            }
+            continue;
         }
         return null;
     }

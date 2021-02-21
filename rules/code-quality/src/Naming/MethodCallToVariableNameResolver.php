@@ -84,10 +84,16 @@ final class MethodCallToVariableNameResolver
             return $this->getStringVarName($argValue, $methodCallVarName, $fallbackVarName);
         }
         $argumentName = $this->nodeNameResolver->getName($argValue);
-        if ($argValue instanceof Variable && $argumentName !== null && $variableName !== null) {
-            return $argumentName . ucfirst($variableName);
+        if (! $argValue instanceof Variable) {
+            return $fallbackVarName;
         }
-        return $fallbackVarName;
+        if ($argumentName === null) {
+            return $fallbackVarName;
+        }
+        if ($variableName === null) {
+            return $fallbackVarName;
+        }
+        return $argumentName . ucfirst($variableName);
     }
 
     private function getFallbackVarName(string $methodCallVarName, string $methodCallName): string
@@ -114,10 +120,13 @@ final class MethodCallToVariableNameResolver
     private function getStringVarName(String_ $string, string $methodCallVarName, string $fallbackVarName): string
     {
         $normalizeStringVariableName = $this->normalizeStringVariableName($string->value . ucfirst($fallbackVarName));
-        if (Strings::match($normalizeStringVariableName, self::START_ALPHA_REGEX) && $normalizeStringVariableName !== $methodCallVarName) {
-            return $normalizeStringVariableName;
+        if (! Strings::match($normalizeStringVariableName, self::START_ALPHA_REGEX)) {
+            return $fallbackVarName;
         }
-        return $fallbackVarName;
+        if ($normalizeStringVariableName === $methodCallVarName) {
+            return $fallbackVarName;
+        }
+        return $normalizeStringVariableName;
     }
 
     private function normalizeStringVariableName(string $string): string

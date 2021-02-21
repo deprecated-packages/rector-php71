@@ -155,10 +155,13 @@ CODE_SAMPLE
             }
             return $binaryOp->right;
         }
-        if ($this->valueResolver->isValue($binaryOp->right, 0) && $this->isNumberType($binaryOp->left)) {
-            return $binaryOp->left;
+        if (! $this->valueResolver->isValue($binaryOp->right, 0)) {
+            return null;
         }
-        return null;
+        if (! $this->isNumberType($binaryOp->left)) {
+            return null;
+        }
+        return $binaryOp->left;
     }
 
     /**
@@ -169,9 +172,12 @@ CODE_SAMPLE
         if ($binaryOp instanceof Mul && $this->valueResolver->isValue($binaryOp->left, 1) && $this->isNumberType($binaryOp->right)) {
             return $binaryOp->right;
         }
-        if ($this->valueResolver->isValue($binaryOp->right, 1) && $this->isNumberType($binaryOp->left)) {
-            return $binaryOp->left;
+        if (! $this->valueResolver->isValue($binaryOp->right, 1)) {
+            return null;
         }
-        return null;
+        if (! $this->isNumberType($binaryOp->left)) {
+            return null;
+        }
+        return $binaryOp->left;
     }
 }
