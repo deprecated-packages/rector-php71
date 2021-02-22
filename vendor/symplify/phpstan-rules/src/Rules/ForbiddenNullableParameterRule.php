@@ -5,16 +5,21 @@ declare(strict_types=1);
 namespace Symplify\PHPStanRules\Rules;
 
 use PhpParser\Node;
+use PhpParser\Node\Expr\Closure;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
 use PhpParser\Node\NullableType;
 use PhpParser\Node\Param;
+use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Stmt\Function_;
 use PhpParser\Node\UnionType;
 use PHPStan\Analyser\Scope;
 use Symplify\Astral\Naming\SimpleNameResolver;
-use Symplify\PackageBuilder\Php\TypeChecker;
+use Symplify\PHPStanRules\ParentGuard\ParentClassMethodGuard;
+use Symplify\PHPStanRules\TypeAnalyzer\ForbiddenAllowedTypeAnalyzer;
+use Symplify\PHPStanRules\TypeResolver\NullableTypeResolver;
 use Symplify\RuleDocGenerator\Contract\ConfigurableRuleInterface;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\ConfiguredCodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
@@ -30,31 +35,53 @@ final class ForbiddenNullableParameterRule extends AbstractSymplifyRule implemen
     public const ERROR_MESSAGE = 'Parameter "%s" cannot be nullable';
 
     /**
-     * @var string[]
-     */
-    private $forbidddenTypes = [];
-
-    /**
      * @var SimpleNameResolver
      */
     private $simpleNameResolver;
 
     /**
-     * @var TypeChecker
+     * @var class-string[]
      */
-    private $typeChecker;
+    private $forbiddenTypes = [];
 
     /**
-     * @param string[] $forbidddenTypes
+     * @var class-string[]
+     */
+    private $allowedTypes = [];
+
+    /**
+     * @var NullableTypeResolver
+     */
+    private $nullableTypeResolver;
+
+    /**
+     * @var ParentClassMethodGuard
+     */
+    private $parentClassMethodGuard;
+
+    /**
+     * @var ForbiddenAllowedTypeAnalyzer
+     */
+    private $forbiddenAllowedTypeAnalyzer;
+
+    /**
+     * @param class-string[] $forbiddenTypes
+     * @param class-string[] $allowedTypes
      */
     public function __construct(
         SimpleNameResolver $simpleNameResolver,
-        TypeChecker $typeChecker,
-        array $forbidddenTypes
+        NullableTypeResolver $nullableTypeResolver,
+        ParentClassMethodGuard $parentClassMethodGuard,
+        ForbiddenAllowedTypeAnalyzer $forbiddenAllowedTypeAnalyzer,
+        array $forbiddenTypes = [],
+        array $allowedTypes = []
     ) {
-        $this->forbidddenTypes = $forbidddenTypes;
         $this->simpleNameResolver = $simpleNameResolver;
-        $this->typeChecker = $typeChecker;
+        $this->forbiddenTypes = $forbiddenTypes;
+        $this->allowedTypes = $allowedTypes;
+        $this->nullableTypeResolver = $nullableTypeResolver;
+        $this->parentClassMethodGuard = $parentClassMethodGuard;
+        $this->forbiddenAllowedTypeAnalyzer = $forbiddenAllowedTypeAnalyzer;
     }
 
     /**
@@ -62,31 +89,40 @@ final class ForbiddenNullableParameterRule extends AbstractSymplifyRule implemen
      */
     public function getNodeTypes(): array
     {
-        return [ClassMethod::class];
+        return [ClassMethod::class, Function_::class, Closure::class];
     }
 
     /**
-     * @param ClassMethod $node
+     * @param ClassMethod|Function_|Closure $node
      * @return string[]
      */
     public function process(Node $node, Scope $scope): array
     {
+        if ($this->parentClassMethodGuard->isFunctionLikeProtected($node, $scope)) {
+            return [];
+        }
+
         $errorMessages = [];
         foreach ($node->params as $param) {
-            if ($param->type === null) {
+            $paramType = $this->matchNullableParamType($param);
+            if ($paramType === null) {
                 continue;
             }
 
-            if (! $this->isNullableParam($param)) {
+            $normalType = $this->nullableTypeResolver->resolveNormalType($paramType);
+            if ($normalType === null) {
                 continue;
             }
 
-            $nullableType = $param->type;
-            if (! $this->isForbiddenType($nullableType)) {
+            if ($this->forbiddenAllowedTypeAnalyzer->shouldSkip(
+                $normalType,
+                $this->forbiddenTypes,
+                $this->allowedTypes
+            )) {
                 continue;
             }
 
-            $paramName = (string) $param->var->name;
+            $paramName = $this->simpleNameResolver->getName($param->var);
             $errorMessages[] = sprintf(self::ERROR_MESSAGE, $paramName);
         }
 
@@ -120,34 +156,28 @@ class SomeClass
 CODE_SAMPLE
                 ,
                 [
-                    'forbidddenTypes' => [Node::class],
+                    'forbiddenTypes' => [Node::class],
+                    'allowedTypes' => [String_::class],
                 ]
             ),
         ]);
     }
 
     /**
-     * @param Identifier|Name|NullableType|UnionType $typeNode
+     * @return Identifier|Name|NullableType|UnionType
      */
-    private function isForbiddenType(Node $typeNode): bool
+    private function matchNullableParamType(Param $param): ?Node
     {
-        if ($typeNode instanceof UnionType) {
-            // not supported type
-            return false;
+        $paramType = $param->type;
+        if ($paramType === null) {
+            return null;
         }
 
-        $typeName = null;
-        if ($typeNode instanceof NullableType) {
-            $typeName = $this->simpleNameResolver->getName($typeNode->type);
-        } else {
-            $typeName = $this->simpleNameResolver->getName($typeNode);
+        if (! $this->isNullableParam($param)) {
+            return null;
         }
 
-        if ($typeName === null) {
-            return false;
-        }
-
-        return $this-> typeChecker->isInstanceOf($typeName, $this->forbidddenTypes);
+        return $paramType;
     }
 
     private function isNullableParam(Param $param): bool
@@ -164,6 +194,6 @@ CODE_SAMPLE
             return false;
         }
 
-        return $param->default->name->toLowerString() === 'null';
+        return $this->simpleNameResolver->isName($param->default, 'null');
     }
 }

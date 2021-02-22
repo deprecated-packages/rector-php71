@@ -23,7 +23,7 @@ final class DefinitionFinder
         $containerBuilderDefinitions = $containerBuilder->getDefinitions();
         foreach ($containerBuilderDefinitions as $name => $definition) {
             $class = $definition->getClass() ?: $name;
-            if (! $this->isClassExists($class)) {
+            if (! $this->doesClassExists($class)) {
                 continue;
             }
 
@@ -48,7 +48,7 @@ final class DefinitionFinder
         $containerBuilderDefinitions = $containerBuilder->getDefinitions();
         foreach ($containerBuilderDefinitions as $name => $definition) {
             $class = $definition->getClass() ?: $name;
-            if (! $this->isClassExists($class)) {
+            if (! $this->doesClassExists($class)) {
                 continue;
             }
 
@@ -59,12 +59,9 @@ final class DefinitionFinder
         return null;
     }
 
-    private function isClassExists(?string $class): bool
+    private function doesClassExists(string $class): bool
     {
         try {
-            if (! is_string($class)) {
-                return false;
-            }
             return class_exists($class);
         } catch (Throwable $throwable) {
             return false;

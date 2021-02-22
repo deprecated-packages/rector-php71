@@ -10,9 +10,8 @@ use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Scalar\String_;
 use PHPStan\Analyser\Scope;
-use PHPStan\Type\TypeWithClassName;
 use Symplify\Astral\Naming\SimpleNameResolver;
-use Symplify\PHPStanRules\Exception\ShouldNotHappenException;
+use Symplify\PHPStanRules\TypeAnalyzer\ObjectTypeAnalyzer;
 use Symplify\RuleDocGenerator\Contract\ConfigurableRuleInterface;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\ConfiguredCodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
@@ -35,7 +34,7 @@ final class RequireStringArgumentInMethodCallRule extends AbstractSymplifyRule i
     /**
      * @var array<string, array<string, array<int>>>
      */
-    private $stringArgByMethodByType = [];
+    private $stringArgPositionByMethodByType = [];
 
     /**
      * @var SimpleNameResolver
@@ -43,12 +42,21 @@ final class RequireStringArgumentInMethodCallRule extends AbstractSymplifyRule i
     private $simpleNameResolver;
 
     /**
-     * @param array<string, array<string, array<int>>> $stringArgByMethodByType
+     * @var ObjectTypeAnalyzer
      */
-    public function __construct(SimpleNameResolver $simpleNameResolver, array $stringArgByMethodByType = [])
-    {
-        $this->stringArgByMethodByType = $stringArgByMethodByType;
+    private $objectTypeAnalyzer;
+
+    /**
+     * @param array<string, array<string, array<int>>> $stringArgPositionByMethodByType
+     */
+    public function __construct(
+        SimpleNameResolver $simpleNameResolver,
+        ObjectTypeAnalyzer $objectTypeAnalyzer,
+        array $stringArgPositionByMethodByType = []
+    ) {
+        $this->stringArgPositionByMethodByType = $stringArgPositionByMethodByType;
         $this->simpleNameResolver = $simpleNameResolver;
+        $this->objectTypeAnalyzer = $objectTypeAnalyzer;
     }
 
     /**
@@ -72,9 +80,9 @@ final class RequireStringArgumentInMethodCallRule extends AbstractSymplifyRule i
 
         $errorMessages = [];
 
-        foreach ($this->stringArgByMethodByType as $type => $positionsByMethods) {
+        foreach ($this->stringArgPositionByMethodByType as $type => $positionsByMethods) {
             $positions = $this->matchPositions($node, $scope, $type, $positionsByMethods, $methodCallName);
-            if ($positions === null) {
+            if ($positions === []) {
                 continue;
             }
 
@@ -115,7 +123,7 @@ class AnotherClass
 CODE_SAMPLE
                 ,
                 [
-                    'stringArgByMethodByType' => [
+                    'stringArgPositionByMethodByType' => [
                         'SomeClass' => [
                             'someMethod' => [0],
                         ],
@@ -127,6 +135,7 @@ CODE_SAMPLE
 
     /**
      * @param array<string, array<int>> $positionsByMethods
+     * @return int[]
      */
     private function matchPositions(
         MethodCall $methodCall,
@@ -134,12 +143,12 @@ CODE_SAMPLE
         string $desiredType,
         array $positionsByMethods,
         string $methodName
-    ): ?array {
+    ): array {
         if (! $this->isNodeVarType($methodCall, $scope, $desiredType)) {
-            return null;
+            return [];
         }
 
-        return $positionsByMethods[$methodName] ?? null;
+        return $positionsByMethods[$methodName] ?? [];
     }
 
     /**
@@ -163,20 +172,7 @@ CODE_SAMPLE
 
     private function isNodeVarType(MethodCall $methodCall, Scope $scope, string $desiredType): bool
     {
-        if (trait_exists($desiredType)) {
-            $message = sprintf(
-                'Do not use trait "%s" as type to match, it breaks the matching. Use specific class that is in this trait',
-                $desiredType
-            );
-
-            throw new ShouldNotHappenException($message);
-        }
-
         $methodVarType = $scope->getType($methodCall->var);
-        if (! $methodVarType instanceof TypeWithClassName) {
-            return false;
-        }
-
-        return is_a($methodVarType->getClassName(), $desiredType, true);
+        return $this->objectTypeAnalyzer->isObjectOrUnionOfObjectType($methodVarType, $desiredType);
     }
 }

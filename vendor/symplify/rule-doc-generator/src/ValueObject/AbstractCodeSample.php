@@ -21,6 +21,8 @@ abstract class AbstractCodeSample implements CodeSampleInterface
 
     public function __construct(string $badCode, string $goodCode)
     {
+        $badCode = trim($badCode);
+        $goodCode = trim($goodCode);
         if ($badCode === '') {
             throw new ShouldNotHappenException('Bad sample good code cannot be empty');
         }
