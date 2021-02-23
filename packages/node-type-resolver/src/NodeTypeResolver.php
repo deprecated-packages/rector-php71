@@ -27,6 +27,7 @@ use PHPStan\Type\NullType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\ObjectWithoutClassType;
 use PHPStan\Type\Type;
+use PHPStan\Type\TypeCombinator;
 use PHPStan\Type\TypeUtils;
 use PHPStan\Type\TypeWithClassName;
 use PHPStan\Type\UnionType;
@@ -39,7 +40,7 @@ use Rector\NodeTypeResolver\NodeTypeCorrector\GenericClassStringTypeCorrector;
 use Rector\NodeTypeResolver\NodeTypeCorrector\ParentClassLikeTypeCorrector;
 use Rector\NodeTypeResolver\TypeAnalyzer\ArrayTypeAnalyzer;
 use Rector\PHPStanStaticTypeMapper\Utils\TypeUnwrapper;
-use Rector\StaticTypeMapper\TypeFactory\TypeFactoryStaticHelper;
+use Rector\StaticTypeMapper\TypeFactory\UnionTypeFactory;
 use Rector\StaticTypeMapper\ValueObject\Type\FullyQualifiedObjectType;
 use Rector\StaticTypeMapper\ValueObject\Type\ShortenedObjectType;
 use Rector\TypeDeclaration\PHPStan\Type\ObjectTypeSpecifier;
@@ -82,9 +83,14 @@ final class NodeTypeResolver
     private $genericClassStringTypeCorrector;
 
     /**
+     * @var UnionTypeFactory
+     */
+    private $unionTypeFactory;
+
+    /**
      * @param NodeTypeResolverInterface[] $nodeTypeResolvers
      */
-    public function __construct(ObjectTypeSpecifier $objectTypeSpecifier, ParentClassLikeTypeCorrector $parentClassLikeTypeCorrector, TypeUnwrapper $typeUnwrapper, ClassAnalyzer $classAnalyzer, GenericClassStringTypeCorrector $genericClassStringTypeCorrector, array $nodeTypeResolvers)
+    public function __construct(ObjectTypeSpecifier $objectTypeSpecifier, ParentClassLikeTypeCorrector $parentClassLikeTypeCorrector, TypeUnwrapper $typeUnwrapper, ClassAnalyzer $classAnalyzer, GenericClassStringTypeCorrector $genericClassStringTypeCorrector, UnionTypeFactory $unionTypeFactory, array $nodeTypeResolvers)
     {
         foreach ($nodeTypeResolvers as $nodeTypeResolver) {
             $this->addNodeTypeResolver($nodeTypeResolver);
@@ -94,6 +100,7 @@ final class NodeTypeResolver
         $this->typeUnwrapper = $typeUnwrapper;
         $this->classAnalyzer = $classAnalyzer;
         $this->genericClassStringTypeCorrector = $genericClassStringTypeCorrector;
+        $this->unionTypeFactory = $unionTypeFactory;
     }
 
     /**
@@ -157,11 +164,7 @@ final class NodeTypeResolver
     public function isNullableType(Node $node): bool
     {
         $nodeType = $this->resolve($node);
-        if (! $nodeType instanceof UnionType) {
-            return false;
-        }
-        return $nodeType->isSuperTypeOf(new NullType())
-            ->yes();
+        return TypeCombinator::containsNull($nodeType);
     }
 
     public function getNativeType(Expr $expr): Type
@@ -422,7 +425,6 @@ final class NodeTypeResolver
         if ($scope instanceof Scope) {
             $arrayType = $scope->getType($expr);
             $arrayType = $this->genericClassStringTypeCorrector->correct($arrayType);
-
             return $this->removeNonEmptyArrayFromIntersectionWithArrayType($arrayType);
         }
         return new ArrayType(new MixedType(), new MixedType());
@@ -445,7 +447,7 @@ final class NodeTypeResolver
             $types[] = new FullyQualifiedObjectType($parentClass);
         }
         if (count($types) > 1) {
-            $unionType = TypeFactoryStaticHelper::createUnionObjectType($types);
+            $unionType = $this->unionTypeFactory->createUnionObjectType($types);
             return new ObjectWithoutClassType($unionType);
         }
         if (count($types) === 1) {

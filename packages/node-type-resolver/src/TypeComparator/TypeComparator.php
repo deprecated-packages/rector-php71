@@ -2,20 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Rector\NodeTypeResolver\PHPStan;
+namespace Rector\NodeTypeResolver\TypeComparator;
 
 use PhpParser\Node;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\Type\ArrayType;
-use PHPStan\Type\BooleanType;
-use PHPStan\Type\Constant\ConstantArrayType;
-use PHPStan\Type\FloatType;
-use PHPStan\Type\IntegerType;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\ObjectType;
-use PHPStan\Type\StringType;
 use PHPStan\Type\Type;
 use Rector\NodeTypeResolver\NodeTypeResolver;
+use Rector\NodeTypeResolver\PHPStan\TypeHasher;
 use Rector\StaticTypeMapper\StaticTypeMapper;
 use Rector\StaticTypeMapper\ValueObject\Type\AliasedObjectType;
 use Rector\TypeDeclaration\TypeNormalizer;
@@ -42,17 +38,29 @@ final class TypeComparator
      */
     private $nodeTypeResolver;
 
-    public function __construct(TypeHasher $typeHasher, TypeNormalizer $typeNormalizer, StaticTypeMapper $staticTypeMapper, NodeTypeResolver $nodeTypeResolver)
+    /**
+     * @var ArrayTypeComparator
+     */
+    private $arrayTypeComparator;
+
+    /**
+     * @var ScalarTypeComparator
+     */
+    private $scalarTypeComparator;
+
+    public function __construct(TypeHasher $typeHasher, TypeNormalizer $typeNormalizer, StaticTypeMapper $staticTypeMapper, NodeTypeResolver $nodeTypeResolver, ArrayTypeComparator $arrayTypeComparator, ScalarTypeComparator $scalarTypeComparator)
     {
         $this->typeHasher = $typeHasher;
         $this->typeNormalizer = $typeNormalizer;
         $this->staticTypeMapper = $staticTypeMapper;
         $this->nodeTypeResolver = $nodeTypeResolver;
+        $this->arrayTypeComparator = $arrayTypeComparator;
+        $this->scalarTypeComparator = $scalarTypeComparator;
     }
 
     public function areTypesEqual(Type $firstType, Type $secondType): bool
     {
-        if ($this->areBothSameScalarType($firstType, $secondType)) {
+        if ($this->scalarTypeComparator->areEqualScalar($firstType, $secondType)) {
             return true;
         }
         // aliases and types
@@ -83,29 +91,11 @@ final class TypeComparator
             return $mainType->isSuperTypeOf($checkedType)
                 ->yes();
         }
-        if (! $checkedType instanceof ConstantArrayType) {
+        if (! $checkedType instanceof ArrayType) {
             return $mainType->isSuperTypeOf($checkedType)
                 ->yes();
         }
-        return false;
-    }
-
-    private function areBothSameScalarType(Type $firstType, Type $secondType): bool
-    {
-        if ($firstType instanceof StringType && $secondType instanceof StringType) {
-            // prevents "class-string" vs "string"
-            return get_class($firstType) === get_class($secondType);
-        }
-        if ($firstType instanceof IntegerType && $secondType instanceof IntegerType) {
-            return true;
-        }
-        if ($firstType instanceof FloatType && $secondType instanceof FloatType) {
-            return true;
-        }
-        if (! $firstType instanceof BooleanType) {
-            return false;
-        }
-        return $secondType instanceof BooleanType;
+        return $this->arrayTypeComparator->isSubtype($checkedType, $mainType);
     }
 
     private function areAliasedObjectMatchingFqnObject(Type $firstType, Type $secondType): bool
