@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit7fb2d5658e4ea289f107d6169bb5629a
+class ComposerStaticInit91bf07a55a95e505c36fbac15917f6bd
 {
     public static $files = array (
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
@@ -2109,6 +2109,7 @@ class ComposerStaticInit7fb2d5658e4ea289f107d6169bb5629a
         'PharIo\\Version\\GreaterThanOrEqualToVersionConstraint' => __DIR__ . '/..' . '/phar-io/version/src/constraints/GreaterThanOrEqualToVersionConstraint.php',
         'PharIo\\Version\\InvalidPreReleaseSuffixException' => __DIR__ . '/..' . '/phar-io/version/src/exceptions/InvalidPreReleaseSuffixException.php',
         'PharIo\\Version\\InvalidVersionException' => __DIR__ . '/..' . '/phar-io/version/src/exceptions/InvalidVersionException.php',
+        'PharIo\\Version\\NoPreReleaseSuffixException' => __DIR__ . '/..' . '/phar-io/version/src/exceptions/NoPreReleaseSuffixException.php',
         'PharIo\\Version\\OrVersionConstraintGroup' => __DIR__ . '/..' . '/phar-io/version/src/constraints/OrVersionConstraintGroup.php',
         'PharIo\\Version\\PreReleaseSuffix' => __DIR__ . '/..' . '/phar-io/version/src/PreReleaseSuffix.php',
         'PharIo\\Version\\SpecificMajorAndMinorVersionConstraint' => __DIR__ . '/..' . '/phar-io/version/src/constraints/SpecificMajorAndMinorVersionConstraint.php',
@@ -2426,9 +2427,9 @@ class ComposerStaticInit7fb2d5658e4ea289f107d6169bb5629a
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit7fb2d5658e4ea289f107d6169bb5629a::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit7fb2d5658e4ea289f107d6169bb5629a::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit7fb2d5658e4ea289f107d6169bb5629a::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit91bf07a55a95e505c36fbac15917f6bd::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit91bf07a55a95e505c36fbac15917f6bd::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit91bf07a55a95e505c36fbac15917f6bd::$classMap;
 
         }, null, ClassLoader::class);
     }

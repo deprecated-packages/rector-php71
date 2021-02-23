@@ -30,7 +30,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => 'ecf4e562466ea7684b5ab1f464433c07e77bff72',
+    'reference' => 'eecf15dc1594cfa65f05bff66047a1b88b57100e',
     'name' => 'rector/rector',
   ),
   'versions' => 
@@ -305,12 +305,12 @@ private static $installed = array (
     ),
     'phar-io/version' => 
     array (
-      'pretty_version' => '3.0.4',
-      'version' => '3.0.4.0',
+      'pretty_version' => '3.1.0',
+      'version' => '3.1.0.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'e4782611070e50613683d2b9a57730e9a3ba5451',
+      'reference' => 'bae7c545bef187884426f042434e561ab1ddb182',
     ),
     'php-cs-fixer/diff' => 
     array (
@@ -584,7 +584,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => 'ecf4e562466ea7684b5ab1f464433c07e77bff72',
+      'reference' => 'eecf15dc1594cfa65f05bff66047a1b88b57100e',
     ),
     'rector/rector-prefixed' => 
     array (

@@ -25,7 +25,6 @@ use Rector\Testing\Configuration\AllRectorConfigFactory;
 use Rector\Testing\Contract\RunnableInterface;
 use Rector\Testing\Guard\FixtureGuard;
 use Rector\Testing\PHPUnit\Behavior\MovingFilesTrait;
-use Rector\Testing\ValueObject\InputFilePathWithExpectedFile;
 use Symplify\EasyTesting\DataProvider\StaticFixtureFinder;
 use Symplify\EasyTesting\DataProvider\StaticFixtureUpdater;
 use Symplify\EasyTesting\StaticFixtureSplitter;
@@ -163,9 +162,9 @@ abstract class AbstractRectorTestCase extends AbstractKernelTestCase
     }
 
     /**
-     * @param InputFilePathWithExpectedFile[] $extraFiles
+     * @param SmartFileInfo[] $extraFileInfos
      */
-    protected function doTestFileInfo(SmartFileInfo $fixtureFileInfo, array $extraFiles = []): void
+    protected function doTestFileInfo(SmartFileInfo $fixtureFileInfo, array $extraFileInfos = []): void
     {
         self::$fixtureGuard->ensureFileInfoHasDifferentBeforeAndAfterContent($fixtureFileInfo);
         $inputFileInfoAndExpectedFileInfo = StaticFixtureSplitter::splitFileInfoToLocalInputAndExpectedFileInfos($fixtureFileInfo, $this->autoloadTestFixture);
@@ -175,7 +174,7 @@ abstract class AbstractRectorTestCase extends AbstractKernelTestCase
         $nodeScopeResolver = $this->getService(NodeScopeResolver::class);
         $nodeScopeResolver->setAnalysedFiles([$inputFileInfo->getRealPath()]);
         $expectedFileInfo = $inputFileInfoAndExpectedFileInfo->getExpectedFileInfo();
-        $this->doTestFileMatchesExpectedContent($inputFileInfo, $expectedFileInfo, $fixtureFileInfo, $extraFiles);
+        $this->doTestFileMatchesExpectedContent($inputFileInfo, $expectedFileInfo, $fixtureFileInfo, $extraFileInfos);
         $this->originalTempFileInfo = $inputFileInfo;
         // runnable?
         if (! file_exists($inputFileInfo->getPathname())) {
@@ -250,22 +249,18 @@ abstract class AbstractRectorTestCase extends AbstractKernelTestCase
     }
 
     /**
-     * @param InputFilePathWithExpectedFile[] $extraFiles
+     * @param SmartFileInfo[] $extraFileInfos
      */
-    private function doTestFileMatchesExpectedContent(SmartFileInfo $originalFileInfo, SmartFileInfo $expectedFileInfo, SmartFileInfo $fixtureFileInfo, array $extraFiles = []): void
+    private function doTestFileMatchesExpectedContent(SmartFileInfo $originalFileInfo, SmartFileInfo $expectedFileInfo, SmartFileInfo $fixtureFileInfo, array $extraFileInfos = []): void
     {
         $this->parameterProvider->changeParameter(Option::SOURCE, [$originalFileInfo->getRealPath()]);
         if (! Strings::endsWith($originalFileInfo->getFilename(), '.blade.php') && in_array($originalFileInfo->getSuffix(), ['php', 'phpt'], true)) {
-            if ($extraFiles === []) {
+            if ($extraFileInfos === []) {
                 $this->fileProcessor->parseFileInfoToLocalCache($originalFileInfo);
                 $this->fileProcessor->refactor($originalFileInfo);
                 $this->fileProcessor->postFileRefactor($originalFileInfo);
             } else {
-                $fileInfosToProcess = [$originalFileInfo];
-
-                foreach ($extraFiles as $extraFile) {
-                    $fileInfosToProcess[] = $extraFile->getInputFileInfo();
-                }
+                $fileInfosToProcess = array_merge([$originalFileInfo], $extraFileInfos);
 
                 // life-cycle trio :)
                 foreach ($fileInfosToProcess as $fileInfoToProcess) {
