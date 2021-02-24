@@ -74,7 +74,7 @@ final class PHPUnitDataProviderParamTypeInferer implements ParamTypeInfererInter
         }
         /** @var Return_[] $returns */
         $returns = $this->betterNodeFinder->findInstanceOf((array) $dataProviderClassMethod->stmts, Return_::class);
-        if( $returns !== [] ) {
+        if ($returns !== []) {
             return $this->resolveReturnStaticArrayTypeByParameterPosition($returns, $parameterPosition);
         }
         /** @var Yield_[] $yields */
@@ -171,8 +171,7 @@ final class PHPUnitDataProviderParamTypeInferer implements ParamTypeInfererInter
         if ($paramOnPositionTypes === []) {
             return new MixedType();
         }
-        $p = $this->typeFactory->createMixedPassedOrUnionType($paramOnPositionTypes);
-        return $p;
+        return $this->typeFactory->createMixedPassedOrUnionType($paramOnPositionTypes);
     }
 
     private function getTypeFromClassMethodYield(Array_ $classMethodYieldArrayNode): Type

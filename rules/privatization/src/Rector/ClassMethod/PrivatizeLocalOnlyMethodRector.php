@@ -12,6 +12,7 @@ use Rector\AttributeAwarePhpDoc\Ast\PhpDoc\SymfonyRequiredTagNode;
 use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo;
 use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\ApiPhpDocTagNode;
 use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\Nette\NetteInjectTagNode;
+use Rector\BetterPhpDocParser\ValueObject\PhpDocNode\Symfony\SymfonyRouteTagValueNode;
 use Rector\Caching\Contract\Rector\ZeroCacheRectorInterface;
 use Rector\Core\Rector\AbstractRector;
 use Rector\Doctrine\PhpDocParser\DoctrineDocBlockResolver;
@@ -203,6 +204,9 @@ CODE_SAMPLE
             return true;
         }
         // possibly container service factories
-        return $this->isNames($classMethod, ['create', 'create*']);
+        if ($this->isNames($classMethod, ['create', 'create*'])) {
+            return true;
+        }
+        return $phpDocInfo->hasByType(SymfonyRouteTagValueNode::class);
     }
 }
