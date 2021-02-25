@@ -111,7 +111,7 @@ final class Versions
   'nette/di' => 'v3.0.7@33b188dd8fce8de15795a19ac89bb34227dfb37a',
   'nette/forms' => 'v3.1.2@54858a9eeb0c57c316a07cea5aa2fa135c6807ac',
   'nette/http' => 'v3.1.1@c903d0f0b793ed2045a442f338e756e1d3954c22',
-  'nette/php-generator' => 'v3.5.2@41dcc5d1cb322835e5950a76515166c90923c6b7',
+  'nette/php-generator' => 'v3.5.3@119f01a7bd590469cb01b538f20a125a28853626',
   'nette/routing' => 'v3.0.2@5532e7e3612e13def357f089c1a5c25793a16843',
   'nette/schema' => 'v1.2.0@9962564311f4affebd63f9cab014ab69266306ce',
   'phar-io/manifest' => '2.0.1@85265efd3af7ba3ca4b2a2c34dbfc5788dd29133',
@@ -163,8 +163,8 @@ final class Versions
   'symplify/phpstan-rules' => '9.2.1@c5dfcd1a6900e64c0d011f2db6b79a8cf76a0302',
   'theseer/tokenizer' => '1.2.0@75a63c33a8577608444246075ea0af0d052e452a',
   'tracy/tracy' => 'v2.8.3@342674bbf72365e8456de9855a8cd839ca695933',
-  'rector/rector-prefixed' => 'dev-master@8ccef95979194e052fde9243dd08448ee48ae245',
-  'rector/rector' => 'dev-master@8ccef95979194e052fde9243dd08448ee48ae245',
+  'rector/rector-prefixed' => 'dev-master@9a30a743a99eef98db63131a9bbec7bbd2a6dc85',
+  'rector/rector' => 'dev-master@9a30a743a99eef98db63131a9bbec7bbd2a6dc85',
 );
 
     private function __construct()

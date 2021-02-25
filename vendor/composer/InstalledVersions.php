@@ -30,7 +30,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '8ccef95979194e052fde9243dd08448ee48ae245',
+    'reference' => '9a30a743a99eef98db63131a9bbec7bbd2a6dc85',
     'name' => 'rector/rector',
   ),
   'versions' => 
@@ -235,12 +235,12 @@ private static $installed = array (
     ),
     'nette/php-generator' => 
     array (
-      'pretty_version' => 'v3.5.2',
-      'version' => '3.5.2.0',
+      'pretty_version' => 'v3.5.3',
+      'version' => '3.5.3.0',
       'aliases' => 
       array (
       ),
-      'reference' => '41dcc5d1cb322835e5950a76515166c90923c6b7',
+      'reference' => '119f01a7bd590469cb01b538f20a125a28853626',
     ),
     'nette/robot-loader' => 
     array (
@@ -584,7 +584,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '8ccef95979194e052fde9243dd08448ee48ae245',
+      'reference' => '9a30a743a99eef98db63131a9bbec7bbd2a6dc85',
     ),
     'rector/rector-prefixed' => 
     array (
