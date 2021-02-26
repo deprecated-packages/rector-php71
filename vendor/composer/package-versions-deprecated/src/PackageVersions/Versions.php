@@ -46,7 +46,7 @@ final class Versions
   'nette/utils' => 'v3.2.1@2bc2f58079c920c2ecbb6935645abf6f2f5f94ba',
   'nikic/php-parser' => 'v4.10.4@c6d052fc58cb876152f89f532b95a8d7907e7f0e',
   'phpstan/phpdoc-parser' => '0.4.11@2ce4c6623376d2613cf02e055ea1a926d906cef7',
-  'phpstan/phpstan' => '0.12.78@eecce8d2ee3cac6769f37b4cb1998b2715f82984',
+  'phpstan/phpstan' => '0.12.79@dd7769915648b704b9bd12925994457f1c2c8442',
   'phpstan/phpstan-phpunit' => '0.12.17@432575b41cf2d4f44e460234acaf56119ed97d36',
   'psr/cache' => '1.0.1@d11b50ad223250cf17b86e38383413f5a6764bf8',
   'psr/container' => '1.0.0@b7ce3b176482dbbc1245ebf52b181af44c2cf55f',
@@ -163,8 +163,8 @@ final class Versions
   'symplify/phpstan-rules' => '9.2.1@c5dfcd1a6900e64c0d011f2db6b79a8cf76a0302',
   'theseer/tokenizer' => '1.2.0@75a63c33a8577608444246075ea0af0d052e452a',
   'tracy/tracy' => 'v2.8.3@342674bbf72365e8456de9855a8cd839ca695933',
-  'rector/rector-prefixed' => 'dev-master@a9ca776ddc7da6dd000c7070681f2c6b64fccac2',
-  'rector/rector' => 'dev-master@a9ca776ddc7da6dd000c7070681f2c6b64fccac2',
+  'rector/rector-prefixed' => 'dev-master@38e8520635f7b4411d64f5713b7fd2e48abc89a8',
+  'rector/rector' => 'dev-master@38e8520635f7b4411d64f5713b7fd2e48abc89a8',
 );
 
     private function __construct()
