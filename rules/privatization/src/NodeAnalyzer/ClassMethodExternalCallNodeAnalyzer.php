@@ -8,6 +8,7 @@ use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
+use PHPStan\Type\ObjectType;
 use PHPStan\Type\TypeWithClassName;
 use Rector\NodeCollector\NodeCollector\NodeRepository;
 use Rector\NodeCollector\ValueObject\ArrayCallable;
@@ -128,7 +129,7 @@ final class ClassMethodExternalCallNodeAnalyzer
         if (! $classLike instanceof Class_) {
             return false;
         }
-        if (! $this->nodeTypeResolver->isObjectType($classLike, 'Symfony\Component\EventDispatcher\EventSubscriberInterface')) {
+        if (! $this->nodeTypeResolver->isObjectType($classLike, new ObjectType('Symfony\Component\EventDispatcher\EventSubscriberInterface'))) {
             return false;
         }
         $getSubscribedEventsClassMethod = $classLike->getMethod('getSubscribedEvents');

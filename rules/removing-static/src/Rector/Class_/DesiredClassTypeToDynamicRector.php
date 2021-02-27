@@ -28,9 +28,9 @@ use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 final class DesiredClassTypeToDynamicRector extends AbstractRector
 {
     /**
-     * @var class-string[]
+     * @var ObjectType[]
      */
-    private $classTypes = [];
+    private $staticObjectTypes = [];
 
     /**
      * @var PropertyNaming
@@ -44,7 +44,10 @@ final class DesiredClassTypeToDynamicRector extends AbstractRector
 
     public function __construct(PropertyNaming $propertyNaming, StaticCallPresenceAnalyzer $staticCallPresenceAnalyzer, ParameterProvider $parameterProvider)
     {
-        $this->classTypes = $parameterProvider->provideArrayParameter(Option::TYPES_TO_REMOVE_STATIC_FROM);
+        $typesToRemoveStaticFrom = $parameterProvider->provideArrayParameter(Option::TYPES_TO_REMOVE_STATIC_FROM);
+        foreach ($typesToRemoveStaticFrom as $typeToRemoveStaticFrom) {
+            $this->staticObjectTypes[] = new ObjectType($typeToRemoveStaticFrom);
+        }
         $this->propertyNaming = $propertyNaming;
         $this->staticCallPresenceAnalyzer = $staticCallPresenceAnalyzer;
     }
@@ -121,18 +124,17 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        foreach ($this->classTypes as $classType) {
+        foreach ($this->staticObjectTypes as $staticObjectType) {
             // do not any dependencies to class itself
-            if ($this->isObjectType($node, $classType)) {
+            if ($this->isObjectType($node, $staticObjectType)) {
                 continue;
             }
 
-            $this->completeDependencyToConstructorOnly($node, $classType);
+            $this->completeDependencyToConstructorOnly($node, $staticObjectType);
 
-            if ($this->staticCallPresenceAnalyzer->hasClassAnyMethodWithStaticCallOnType($node, $classType)) {
-                $singleObjectType = new ObjectType($classType);
-                $propertyExpectedName = $this->propertyNaming->fqnToVariableName($classType);
-                $this->addConstructorDependencyToClass($node, $singleObjectType, $propertyExpectedName);
+            if ($this->staticCallPresenceAnalyzer->hasClassAnyMethodWithStaticCallOnType($node, $staticObjectType)) {
+                $propertyExpectedName = $this->propertyNaming->fqnToVariableName($staticObjectType);
+                $this->addConstructorDependencyToClass($node, $staticObjectType, $propertyExpectedName);
 
                 return $node;
             }
@@ -140,31 +142,31 @@ CODE_SAMPLE
         return null;
     }
 
-    private function completeDependencyToConstructorOnly(Class_ $class, string $classType): void
+    private function completeDependencyToConstructorOnly(Class_ $class, ObjectType $objectType): void
     {
         $constructClassMethod = $class->getMethod(MethodName::CONSTRUCT);
         if (! $constructClassMethod instanceof ClassMethod) {
             return;
         }
-        $hasStaticCall = $this->staticCallPresenceAnalyzer->hasMethodStaticCallOnType($constructClassMethod, $classType);
+        $hasStaticCall = $this->staticCallPresenceAnalyzer->hasMethodStaticCallOnType($constructClassMethod, $objectType);
         if (! $hasStaticCall) {
             return;
         }
-        $propertyExpectedName = $this->propertyNaming->fqnToVariableName(new ObjectType($classType));
-        if ($this->isTypeAlreadyInParamMethod($constructClassMethod, $classType)) {
+        $propertyExpectedName = $this->propertyNaming->fqnToVariableName($objectType);
+        if ($this->isTypeAlreadyInParamMethod($constructClassMethod, $objectType)) {
             return;
         }
-        $constructClassMethod->params[] = new Param(new Variable($propertyExpectedName), null, new FullyQualified($classType));
+        $constructClassMethod->params[] = new Param(new Variable($propertyExpectedName), null, new FullyQualified($objectType->getClassName()));
     }
 
-    private function isTypeAlreadyInParamMethod(ClassMethod $classMethod, string $classType): bool
+    private function isTypeAlreadyInParamMethod(ClassMethod $classMethod, ObjectType $objectType): bool
     {
         foreach ($classMethod->getParams() as $param) {
             if ($param->type === null) {
                 continue;
             }
 
-            if ($this->isName($param->type, $classType)) {
+            if ($this->isName($param->type, $objectType->getClassName())) {
                 return true;
             }
         }

@@ -210,7 +210,7 @@ CODE_SAMPLE
 
     private function isMethodCallMatch(MethodCall $methodCall, ArrayArgumentToDataProvider $arrayArgumentToDataProvider): bool
     {
-        if (! $this->isObjectType($methodCall->var, $arrayArgumentToDataProvider->getClass())) {
+        if (! $this->isObjectType($methodCall->var, $arrayArgumentToDataProvider->getObjectType())) {
             return false;
         }
         return $this->isName($methodCall->name, $arrayArgumentToDataProvider->getOldMethod());

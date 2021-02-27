@@ -7,6 +7,7 @@ namespace Rector\PHPOffice\Rector\MethodCall;
 use PhpParser\Node;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Identifier;
+use PHPStan\Type\ObjectType;
 use Rector\Core\Rector\AbstractRector;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
@@ -59,7 +60,7 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        if (! $this->isOnClassMethodCall($node, 'PHPExcel_Worksheet', 'duplicateStyleArray')) {
+        if (! $this->isOnClassMethodCall($node, new ObjectType('PHPExcel_Worksheet'), 'duplicateStyleArray')) {
             return null;
         }
         $variable = clone $node->var;

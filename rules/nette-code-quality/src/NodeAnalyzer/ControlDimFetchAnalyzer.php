@@ -9,6 +9,7 @@ use PhpParser\Node\Expr\ArrayDimFetch;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Scalar\String_;
+use PHPStan\Type\ObjectType;
 use Rector\NodeTypeResolver\NodeTypeResolver;
 
 final class ControlDimFetchAnalyzer
@@ -25,12 +26,12 @@ final class ControlDimFetchAnalyzer
 
     public function matchNameOnFormOrControlVariable(Node $node): ?string
     {
-        return $this->matchNameOnVariableTypes($node, ['Nette\Application\UI\Form']);
+        return $this->matchNameOnVariableTypes($node, [new ObjectType('Nette\Application\UI\Form')]);
     }
 
     public function matchNameOnControlVariable(Node $node): ?string
     {
-        return $this->matchNameOnVariableTypes($node, ['Nette\Application\UI\Control']);
+        return $this->matchNameOnVariableTypes($node, [new ObjectType('Nette\Application\UI\Control')]);
     }
 
     public function matchName(Node $node): ?string
@@ -38,7 +39,7 @@ final class ControlDimFetchAnalyzer
         if (! $node instanceof ArrayDimFetch) {
             return null;
         }
-        if (! $this->isVariableTypes($node->var, ['Nette\ComponentModel\IContainer'])) {
+        if (! $this->isVariableTypes($node->var, [new ObjectType('Nette\ComponentModel\IContainer')])) {
             return null;
         }
         if (! $node->dim instanceof String_) {
@@ -48,31 +49,31 @@ final class ControlDimFetchAnalyzer
     }
 
     /**
-     * @param string[] $types
+     * @param ObjectType[] $objectTypes
      */
-    private function matchNameOnVariableTypes(Node $node, array $types): ?string
+    private function matchNameOnVariableTypes(Node $node, array $objectTypes): ?string
     {
         $matchedName = $this->matchName($node);
         if ($matchedName === null) {
             return null;
         }
         /** @var Assign $node */
-        if (! $this->isVariableTypes($node->var, $types)) {
+        if (! $this->isVariableTypes($node->var, $objectTypes)) {
             return null;
         }
         return $matchedName;
     }
 
     /**
-     * @param string[] $types
+     * @param ObjectType[] $objectTypes
      */
-    private function isVariableTypes(Node $node, array $types): bool
+    private function isVariableTypes(Node $node, array $objectTypes): bool
     {
         if (! $node instanceof Variable) {
             return false;
         }
-        foreach ($types as $type) {
-            if ($this->nodeTypeResolver->isObjectTypeOrNullableObjectType($node, $type)) {
+        foreach ($objectTypes as $objectType) {
+            if ($this->nodeTypeResolver->isObjectTypeOrNullableObjectType($node, $objectType)) {
                 return true;
             }
         }

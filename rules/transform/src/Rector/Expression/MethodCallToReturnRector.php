@@ -101,7 +101,7 @@ CODE_SAMPLE
     {
         $parent = $methodCall->getAttribute(AttributeKey::PARENT_NODE);
         foreach ($this->methodCallWraps as $methodCallWrap) {
-            if (! $this->isObjectType($methodCall->var, $methodCallWrap->getClass())) {
+            if (! $this->isObjectType($methodCall->var, $methodCallWrap->getObjectType())) {
                 continue;
             }
 

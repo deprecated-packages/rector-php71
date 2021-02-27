@@ -70,7 +70,7 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        if (! $this->isObjectTypes($node, $this->routerObjectTypes)) {
+        if (! $this->nodeTypeResolver->isObjectTypes($node, $this->routerObjectTypes)) {
             return null;
         }
         if (! isset($node->args[2])) {

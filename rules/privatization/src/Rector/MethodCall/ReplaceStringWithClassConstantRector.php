@@ -117,7 +117,7 @@ CODE_SAMPLE
 
     private function matchArg(MethodCall $methodCall, ReplaceStringWithClassConstant $replaceStringWithClassConstant): ?Arg
     {
-        if (! $this->isOnClassMethodCall($methodCall, $replaceStringWithClassConstant->getClass(), $replaceStringWithClassConstant->getMethod())) {
+        if (! $this->isOnClassMethodCall($methodCall, $replaceStringWithClassConstant->getObjectType(), $replaceStringWithClassConstant->getMethod())) {
             return null;
         }
         $desiredArg = $methodCall->args[$replaceStringWithClassConstant->getArgPosition()] ?? null;

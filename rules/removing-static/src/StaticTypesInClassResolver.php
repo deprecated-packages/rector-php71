@@ -9,7 +9,6 @@ use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Stmt\Class_;
 use PHPStan\Type\ObjectType;
 use Rector\NodeTypeResolver\NodeTypeResolver;
-use Rector\StaticTypeMapper\ValueObject\Type\FullyQualifiedObjectType;
 use Symplify\Astral\NodeTraverser\SimpleCallableNodeTraverser;
 
 final class StaticTypesInClassResolver
@@ -31,19 +30,19 @@ final class StaticTypesInClassResolver
     }
 
     /**
-     * @param string[] $types
+     * @param ObjectType[] $objectTypes
      * @return ObjectType[]
      */
-    public function collectStaticCallTypeInClass(Class_ $class, array $types): array
+    public function collectStaticCallTypeInClass(Class_ $class, array $objectTypes): array
     {
         $staticTypesInClass = [];
-        $this->simpleCallableNodeTraverser->traverseNodesWithCallable($class->stmts, function (Node $class) use ($types, &$staticTypesInClass) {
+        $this->simpleCallableNodeTraverser->traverseNodesWithCallable($class->stmts, function (Node $class) use ($objectTypes, &$staticTypesInClass) {
             if (! $class instanceof StaticCall) {
                 return null;
             }
-            foreach ($types as $type) {
-                if ($this->nodeTypeResolver->isObjectType($class->class, $type)) {
-                    $staticTypesInClass[] = new FullyQualifiedObjectType($type);
+            foreach ($objectTypes as $objectType) {
+                if ($this->nodeTypeResolver->isObjectType($class->class, $objectType)) {
+                    $staticTypesInClass[] = $objectType;
                 }
             }
             return null;

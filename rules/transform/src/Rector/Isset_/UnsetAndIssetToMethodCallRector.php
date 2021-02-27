@@ -79,7 +79,7 @@ CODE_SAMPLE
             }
 
             foreach ($this->issetUnsetToMethodCalls as $issetUnsetToMethodCall) {
-                if (! $this->isObjectType($arrayDimFetchNode, $issetUnsetToMethodCall->getType())) {
+                if (! $this->isObjectType($arrayDimFetchNode, $issetUnsetToMethodCall->getObjectType())) {
                     continue;
                 }
 

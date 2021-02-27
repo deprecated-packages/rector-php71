@@ -124,7 +124,7 @@ CODE_SAMPLE
     private function matchTypeAndMethodName(MethodCall $methodCall): ?FactoryMethod
     {
         foreach ($this->factoryMethods as $factoryMethod) {
-            if (! $this->isObjectType($methodCall->var, $factoryMethod->getType())) {
+            if (! $this->isObjectType($methodCall->var, $factoryMethod->getObjectType())) {
                 continue;
             }
 

@@ -12,6 +12,7 @@ use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Stmt\ClassLike;
 use PhpParser\Node\Stmt\ClassMethod;
+use PHPStan\Type\ObjectType;
 use Rector\Core\Contract\Rector\ConfigurableRectorInterface;
 use Rector\Core\NodeManipulator\ClassManipulator;
 use Rector\Core\Rector\AbstractRector;
@@ -81,12 +82,12 @@ CODE_SAMPLE
     public function refactor(Node $node): ?Node
     {
         foreach ($this->methodCallRenames as $methodCallRename) {
-            $implementsInterface = $this->classManipulator->hasParentMethodOrInterface($methodCallRename->getOldClass(), $methodCallRename->getOldMethod());
+            $implementsInterface = $this->classManipulator->hasParentMethodOrInterface($methodCallRename->getOldObjectType(), $methodCallRename->getOldMethod());
             if ($implementsInterface) {
                 continue;
             }
 
-            if (! $this->nodeTypeResolver->isMethodStaticCallOrClassMethodObjectType($node, $methodCallRename->getOldClass())) {
+            if (! $this->nodeTypeResolver->isMethodStaticCallOrClassMethodObjectType($node, $methodCallRename->getOldObjectType())) {
                 continue;
             }
 
@@ -127,7 +128,7 @@ CODE_SAMPLE
         if ($this->shouldSkipForAlreadyExistingClassMethod($node, $methodCallRename)) {
             return true;
         }
-        return $this->shouldSkipForExactClassMethodForClassMethodOrTargetInvokePrivate($node, $methodCallRename->getOldClass(), $methodCallRename->getNewMethod());
+        return $this->shouldSkipForExactClassMethodForClassMethodOrTargetInvokePrivate($node, $methodCallRename->getOldObjectType(), $methodCallRename->getNewMethod());
     }
 
     private function shouldSkipForAlreadyExistingClassMethod(ClassMethod $classMethod, MethodCallRenameInterface $methodCallRename): bool
@@ -139,7 +140,7 @@ CODE_SAMPLE
         return (bool) $classLike->getMethod($methodCallRename->getNewMethod());
     }
 
-    private function shouldSkipForExactClassMethodForClassMethodOrTargetInvokePrivate(ClassMethod $classMethod, string $type, string $newMethodName): bool
+    private function shouldSkipForExactClassMethodForClassMethodOrTargetInvokePrivate(ClassMethod $classMethod, ObjectType $objectType, string $newMethodName): bool
     {
         $className = $classMethod->getAttribute(AttributeKey::CLASS_NAME);
         $methodCalls = $this->nodeRepository->findMethodCallsOnClass($className);
@@ -147,8 +148,8 @@ CODE_SAMPLE
         if (isset($methodCalls[$name])) {
             return false;
         }
-        $isExactClassMethodForClasssMethod = $classMethod->getAttribute(AttributeKey::CLASS_NAME) === $type;
-        if ($isExactClassMethodForClasssMethod) {
+        $classMethodClass = $classMethod->getAttribute(AttributeKey::CLASS_NAME);
+        if ($classMethodClass === $objectType) {
             return true;
         }
         if ($classMethod->isPublic()) {

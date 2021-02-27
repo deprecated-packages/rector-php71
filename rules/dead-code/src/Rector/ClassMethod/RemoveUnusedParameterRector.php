@@ -9,6 +9,7 @@ use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
+use PHPStan\Type\ObjectType;
 use Rector\BetterPhpDocParser\PhpDocManipulator\PhpDocTagRemover;
 use Rector\Caching\Contract\Rector\ZeroCacheRectorInterface;
 use Rector\Core\NodeManipulator\ClassManipulator;
@@ -110,7 +111,7 @@ CODE_SAMPLE
             return null;
         }
         $methodName = $this->getName($node);
-        if ($this->classManipulator->hasParentMethodOrInterface($className, $methodName)) {
+        if ($this->classManipulator->hasParentMethodOrInterface(new ObjectType($className), $methodName)) {
             return null;
         }
         $childrenOfClass = $this->nodeRepository->findChildrenOfClass($className);

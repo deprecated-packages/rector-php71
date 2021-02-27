@@ -85,7 +85,7 @@ CODE_SAMPLE
             return null;
         }
         foreach ($this->parentClassToTraits as $parentClassToTrait) {
-            if (! $this->isObjectType($node, $parentClassToTrait->getParentType())) {
+            if (! $this->isObjectType($node, $parentClassToTrait->getParentObjectType())) {
                 continue;
             }
 

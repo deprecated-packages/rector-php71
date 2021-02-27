@@ -197,7 +197,7 @@ CODE_SAMPLE
             if (! $node->var instanceof ArrayDimFetch) {
                 return false;
             }
-            if ($this->isObjectTypes($node->expr, $this->routerObjectTypes)) {
+            if ($this->nodeTypeResolver->isObjectTypes($node->expr, $this->routerObjectTypes)) {
                 return true;
             }
             if ($node->expr instanceof StaticCall) {

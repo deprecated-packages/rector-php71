@@ -16,6 +16,7 @@ use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
+use PHPStan\Type\ObjectType;
 use Rector\Arguments\NodeAnalyzer\ArgumentAddingScope;
 use Rector\Arguments\ValueObject\ArgumentAdder;
 use Rector\Core\Contract\Rector\ConfigurableRectorInterface;
@@ -103,7 +104,7 @@ CODE_SAMPLE
     public function refactor(Node $node): ?Node
     {
         foreach ($this->addedArguments as $addedArgument) {
-            if (! $this->isObjectTypeMatch($node, $addedArgument->getClass())) {
+            if (! $this->isObjectTypeMatch($node, $addedArgument->getObjectType())) {
                 continue;
             }
 
@@ -129,13 +130,13 @@ CODE_SAMPLE
     /**
      * @param MethodCall|StaticCall|ClassMethod $node
      */
-    private function isObjectTypeMatch(Node $node, string $type): bool
+    private function isObjectTypeMatch(Node $node, ObjectType $objectType): bool
     {
         if ($node instanceof MethodCall) {
-            return $this->isObjectType($node->var, $type);
+            return $this->isObjectType($node->var, $objectType);
         }
         if ($node instanceof StaticCall) {
-            return $this->isObjectType($node->class, $type);
+            return $this->isObjectType($node->class, $objectType);
         }
         // ClassMethod
         /** @var Class_|null $classLike */
@@ -144,7 +145,7 @@ CODE_SAMPLE
         if (! $classLike instanceof Class_) {
             return false;
         }
-        return $this->isObjectType($classLike, $type);
+        return $this->isObjectType($classLike, $objectType);
     }
 
     /**

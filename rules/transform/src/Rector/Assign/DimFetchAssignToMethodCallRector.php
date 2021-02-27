@@ -110,10 +110,11 @@ CODE_SAMPLE
         /** @var ArrayDimFetch $arrayDimFetch */
         $arrayDimFetch = $assign->var;
         foreach ($this->dimFetchAssignToMethodCalls as $dimFetchAssignToMethodCall) {
-            if (! $this->isObjectType($arrayDimFetch->var, $dimFetchAssignToMethodCall->getListClass())) {
+            if (! $this->isObjectType($arrayDimFetch->var, $dimFetchAssignToMethodCall->getListObjectType())) {
                 continue;
             }
-            if (! $this->isObjectType($assign->expr, $dimFetchAssignToMethodCall->getItemClass())) {
+
+            if (! $this->isObjectType($assign->expr, $dimFetchAssignToMethodCall->getItemObjectType())) {
                 continue;
             }
             return $dimFetchAssignToMethodCall;

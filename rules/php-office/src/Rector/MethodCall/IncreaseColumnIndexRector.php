@@ -77,7 +77,7 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        if (! $this->isObjectTypes($node->var, $this->worksheetObjectTypes)) {
+        if (! $this->nodeTypeResolver->isObjectTypes($node->var, $this->worksheetObjectTypes)) {
             return null;
         }
         if (! $this->isName($node->name, '*ByColumnAndRow')) {

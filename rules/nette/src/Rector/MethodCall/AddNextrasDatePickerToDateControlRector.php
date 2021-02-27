@@ -12,6 +12,7 @@ use PhpParser\Node\Expr\New_;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Scalar\String_;
+use PHPStan\Type\ObjectType;
 use Rector\Core\Exception\ShouldNotHappenException;
 use Rector\Core\Rector\AbstractRector;
 use Rector\NodeTypeResolver\Node\AttributeKey;
@@ -72,7 +73,7 @@ CODE_SAMPLE
     {
         // 1. chain call
         if ($node->var instanceof MethodCall) {
-            if (! $this->isOnClassMethodCall($node->var, 'Nette\Application\UI\Form', 'addDatePicker')) {
+            if (! $this->isOnClassMethodCall($node->var, new ObjectType('Nette\Application\UI\Form'), 'addDatePicker')) {
                 return null;
             }
 
@@ -91,7 +92,7 @@ CODE_SAMPLE
             return $node;
         }
         // 2. assign call
-        if (! $this->isOnClassMethodCall($node, 'Nette\Application\UI\Form', 'addDatePicker')) {
+        if (! $this->isOnClassMethodCall($node, new ObjectType('Nette\Application\UI\Form'), 'addDatePicker')) {
             return null;
         }
         return $this->createAssign($node);

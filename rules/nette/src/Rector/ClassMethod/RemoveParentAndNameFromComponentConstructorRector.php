@@ -11,6 +11,7 @@ use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
+use PHPStan\Type\ObjectType;
 use Rector\Core\Rector\AbstractRector;
 use Rector\Core\ValueObject\MethodName;
 use Rector\Nette\NodeAnalyzer\StaticCallAnalyzer;
@@ -31,30 +32,12 @@ final class RemoveParentAndNameFromComponentConstructorRector extends AbstractRe
     /**
      * @var string
      */
-    private const COMPONENT_CONTAINER_CLASS = 'Nette\ComponentModel\IContainer';
-
-    /**
-     * @var string
-     */
     private const PARENT = 'parent';
 
     /**
      * @var string
      */
     private const NAME = 'name';
-
-    /**
-     * Package "nette/application" is required for DEV, might not exist for PROD.
-     * So access the class throgh the string
-     *
-     * @var string
-     */
-    private const CONTROL_CLASS = 'Nette\Application\UI\Control';
-
-    /**
-     * @var string
-     */
-    private const PRESENTER_CLASS = 'Nette\Application\UI\Presenter';
 
     /**
      * @var StaticCallAnalyzer
@@ -128,7 +111,7 @@ CODE_SAMPLE
         if ($node instanceof StaticCall) {
             return $this->refactorStaticCall($node);
         }
-        if ($this->isObjectType($node->class, self::CONTROL_CLASS)) {
+        if ($this->isObjectType($node->class, new ObjectType('Nette\Application\UI\Control'))) {
             return $this->refactorNew($node);
         }
         return null;
@@ -198,10 +181,10 @@ CODE_SAMPLE
         if (! $classLike instanceof Class_) {
             return false;
         }
-        if ($this->isObjectType($classLike, self::PRESENTER_CLASS)) {
+        if ($this->isObjectType($classLike, new ObjectType('Nette\Application\UI\Presenter'))) {
             return false;
         }
-        return $this->isObjectType($classLike, self::CONTROL_CLASS);
+        return $this->isObjectType($classLike, new ObjectType('Nette\Application\UI\Control'));
     }
 
     private function removeClassMethodParams(ClassMethod $classMethod): ClassMethod
@@ -211,7 +194,7 @@ CODE_SAMPLE
                 continue;
             }
 
-            if ($this->isObjectType($param, self::COMPONENT_CONTAINER_CLASS)) {
+            if ($this->isObjectType($param, new ObjectType('Nette\ComponentModel\IContainer'))) {
                 $this->removeNode($param);
                 continue;
             }

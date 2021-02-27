@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Rector\CodeQuality\Rector\ClassMethod;
 
-use DateTime;
-use DateTimeImmutable;
 use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\Assign;
@@ -111,7 +109,7 @@ CODE_SAMPLE
 
     private function isDateTimeParam(Param $param): bool
     {
-        return $this->nodeTypeResolver->isObjectTypeOrNullableObjectType($param, DateTime::class);
+        return $this->nodeTypeResolver->isObjectTypeOrNullableObjectType($param, new ObjectType('DateTime'));
     }
 
     private function refactorParamTypeHint(Param $param): void
@@ -126,7 +124,7 @@ CODE_SAMPLE
 
     private function refactorParamDocBlock(Param $param, ClassMethod $classMethod): void
     {
-        $types = [new ObjectType(DateTime::class), new ObjectType(DateTimeImmutable::class)];
+        $types = [new ObjectType('DateTime'), new ObjectType('DateTimeImmutable')];
         if ($param->type instanceof NullableType) {
             $types[] = new NullType();
         }

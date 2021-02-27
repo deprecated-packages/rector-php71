@@ -94,7 +94,7 @@ CODE_SAMPLE
             return null;
         }
         foreach ($this->singleToManyMethods as $singleToManyMethod) {
-            if (! $this->isObjectType($classLike, $singleToManyMethod->getClass())) {
+            if (! $this->isObjectType($classLike, $singleToManyMethod->getObjectType())) {
                 continue;
             }
 

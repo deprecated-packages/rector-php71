@@ -44,9 +44,9 @@ final class NewUniqueObjectToEntityFactoryRector extends AbstractRector implemen
     private $matchedObjectTypes = [];
 
     /**
-     * @var string[]
+     * @var ObjectType[]
      */
-    private $typesToServices = [];
+    private $serviceObjectTypes = [];
 
     /**
      * @var string[]
@@ -160,9 +160,15 @@ CODE_SAMPLE
         return $node;
     }
 
+    /**
+     * @param array<string, mixed> $configuration
+     */
     public function configure(array $configuration): void
     {
-        $this->typesToServices = $configuration[self::TYPES_TO_SERVICES] ?? [];
+        $typesToServices = $configuration[self::TYPES_TO_SERVICES] ?? [];
+        foreach ($typesToServices as $typeToService) {
+            $this->serviceObjectTypes[] = new ObjectType($typeToService);
+        }
     }
 
     /**
@@ -181,7 +187,7 @@ CODE_SAMPLE
         }
 
         foreach ($classes as $class) {
-            $hasTypes = (bool) $this->staticTypesInClassResolver->collectStaticCallTypeInClass($class, $this->typesToServices);
+            $hasTypes = (bool) $this->staticTypesInClassResolver->collectStaticCallTypeInClass($class, $this->serviceObjectTypes);
             if ($hasTypes) {
                 $name = $this->getName($class);
                 if ($name === null) {
