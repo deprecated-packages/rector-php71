@@ -30,7 +30,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '3bb327e797309bdc34790017e25e8cf8429b9a52',
+    'reference' => 'c480e0468c8e7d9b1a4d1f27e6707303088b3571',
     'name' => 'rector/rector',
   ),
   'versions' => 
@@ -584,7 +584,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '3bb327e797309bdc34790017e25e8cf8429b9a52',
+      'reference' => 'c480e0468c8e7d9b1a4d1f27e6707303088b3571',
     ),
     'rector/rector-prefixed' => 
     array (
@@ -1189,6 +1189,15 @@ private static $installed = array (
       array (
       ),
       'reference' => 'e29bf0e4077bb11c59dc8faea33e938d14c9d732',
+    ),
+    'symplify/monorepo-builder' => 
+    array (
+      'pretty_version' => '9.2.1',
+      'version' => '9.2.1.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '80f5fddf8e451d1bcfba71d256f52abbf492a87f',
     ),
     'symplify/package-builder' => 
     array (

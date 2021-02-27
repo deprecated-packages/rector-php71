@@ -159,12 +159,13 @@ final class Versions
   'symplify/coding-standard' => '9.2.1@48c9d95ca95c15c2df43c040320a88ca03bff1a0',
   'symplify/easy-ci' => '9.2.1@c453c5956be69e56908d098331e34b4b91187ee5',
   'symplify/easy-coding-standard' => '9.2.1@aba1ec5512c8e2afa189d4dc32755a146dd05b1a',
+  'symplify/monorepo-builder' => '9.2.1@80f5fddf8e451d1bcfba71d256f52abbf492a87f',
   'symplify/phpstan-extensions' => '9.2.1@3be109ed1630278ae46a0f0928448ac53a966aa5',
   'symplify/phpstan-rules' => '9.2.1@c5dfcd1a6900e64c0d011f2db6b79a8cf76a0302',
   'theseer/tokenizer' => '1.2.0@75a63c33a8577608444246075ea0af0d052e452a',
   'tracy/tracy' => 'v2.8.3@342674bbf72365e8456de9855a8cd839ca695933',
-  'rector/rector-prefixed' => 'dev-master@3bb327e797309bdc34790017e25e8cf8429b9a52',
-  'rector/rector' => 'dev-master@3bb327e797309bdc34790017e25e8cf8429b9a52',
+  'rector/rector-prefixed' => 'dev-master@c480e0468c8e7d9b1a4d1f27e6707303088b3571',
+  'rector/rector' => 'dev-master@c480e0468c8e7d9b1a4d1f27e6707303088b3571',
 );
 
     private function __construct()

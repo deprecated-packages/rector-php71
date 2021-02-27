@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit7a05a6596d5c1aa74094df7fe923d3f4
+class ComposerStaticInitfb32368b6e7befb4c3b7cbe8f7e0f16c
 {
     public static $files = array (
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
@@ -72,6 +72,12 @@ class ComposerStaticInit7a05a6596d5c1aa74094df7fe923d3f4
             'Symplify\\PHPStanRules\\CognitiveComplexity\\' => 42,
             'Symplify\\PHPStanRules\\' => 22,
             'Symplify\\PHPStanExtensions\\' => 27,
+            'Symplify\\MonorepoBuilder\\Testing\\' => 33,
+            'Symplify\\MonorepoBuilder\\Release\\' => 33,
+            'Symplify\\MonorepoBuilder\\Propagate\\' => 35,
+            'Symplify\\MonorepoBuilder\\Merge\\' => 31,
+            'Symplify\\MonorepoBuilder\\Init\\' => 30,
+            'Symplify\\MonorepoBuilder\\' => 25,
             'Symplify\\MarkdownDiff\\' => 22,
             'Symplify\\EasyTesting\\' => 21,
             'Symplify\\EasyCodingStandard\\SnippetFormatter\\' => 45,
@@ -403,6 +409,30 @@ class ComposerStaticInit7a05a6596d5c1aa74094df7fe923d3f4
         'Symplify\\PHPStanExtensions\\' => 
         array (
             0 => __DIR__ . '/..' . '/symplify/phpstan-extensions/src',
+        ),
+        'Symplify\\MonorepoBuilder\\Testing\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symplify/monorepo-builder/packages/testing/src',
+        ),
+        'Symplify\\MonorepoBuilder\\Release\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symplify/monorepo-builder/packages/release/src',
+        ),
+        'Symplify\\MonorepoBuilder\\Propagate\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symplify/monorepo-builder/packages/propagate/src',
+        ),
+        'Symplify\\MonorepoBuilder\\Merge\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symplify/monorepo-builder/packages/merge/src',
+        ),
+        'Symplify\\MonorepoBuilder\\Init\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symplify/monorepo-builder/packages/init/src',
+        ),
+        'Symplify\\MonorepoBuilder\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symplify/monorepo-builder/src',
         ),
         'Symplify\\MarkdownDiff\\' => 
         array (
@@ -2427,9 +2457,9 @@ class ComposerStaticInit7a05a6596d5c1aa74094df7fe923d3f4
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit7a05a6596d5c1aa74094df7fe923d3f4::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit7a05a6596d5c1aa74094df7fe923d3f4::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit7a05a6596d5c1aa74094df7fe923d3f4::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitfb32368b6e7befb4c3b7cbe8f7e0f16c::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitfb32368b6e7befb4c3b7cbe8f7e0f16c::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitfb32368b6e7befb4c3b7cbe8f7e0f16c::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "816fe02346c7844979c4a45f4c6367a3",
+    "content-hash": "843322c2842b2728aca839bc12077859",
     "packages": [
         {
             "name": "composer/package-versions-deprecated",
@@ -8459,6 +8459,78 @@
                 }
             ],
             "time": "2021-02-22T19:21:07+00:00"
+        },
+        {
+            "name": "symplify/monorepo-builder",
+            "version": "9.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symplify/monorepo-builder.git",
+                "reference": "80f5fddf8e451d1bcfba71d256f52abbf492a87f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symplify/monorepo-builder/zipball/80f5fddf8e451d1bcfba71d256f52abbf492a87f",
+                "reference": "80f5fddf8e451d1bcfba71d256f52abbf492a87f",
+                "shasum": ""
+            },
+            "require": {
+                "jean85/pretty-package-versions": "^1.6",
+                "nette/utils": "^3.2",
+                "phar-io/version": "^3.0.4",
+                "php": ">=7.3",
+                "symfony/console": "^4.4|^5.2",
+                "symfony/dependency-injection": "^5.2",
+                "symfony/finder": "^4.4|^5.2",
+                "symfony/process": "^4.4|^5.2",
+                "symplify/composer-json-manipulator": "^9.2.1",
+                "symplify/console-color-diff": "^9.2.1",
+                "symplify/package-builder": "^9.2.1",
+                "symplify/set-config-resolver": "^9.2.1",
+                "symplify/smart-file-system": "^9.2.1",
+                "symplify/symplify-kernel": "^9.2.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.5"
+            },
+            "bin": [
+                "bin/monorepo-builder"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "9.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symplify\\MonorepoBuilder\\": "src",
+                    "Symplify\\MonorepoBuilder\\Release\\": "packages/release/src",
+                    "Symplify\\MonorepoBuilder\\Init\\": "packages/init/src",
+                    "Symplify\\MonorepoBuilder\\Testing\\": "packages/testing/src",
+                    "Symplify\\MonorepoBuilder\\Merge\\": "packages/merge/src",
+                    "Symplify\\MonorepoBuilder\\Propagate\\": "packages/propagate/src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Not only Composer tools to build a Monorepo.",
+            "support": {
+                "source": "https://github.com/symplify/monorepo-builder/tree/9.2.1"
+            },
+            "funding": [
+                {
+                    "url": "https://www.paypal.me/rectorphp",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/tomasvotruba",
+                    "type": "github"
+                }
+            ],
+            "time": "2021-02-22T19:21:30+00:00"
         },
         {
             "name": "symplify/phpstan-extensions",
