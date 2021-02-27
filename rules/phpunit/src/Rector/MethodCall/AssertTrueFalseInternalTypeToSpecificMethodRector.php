@@ -74,7 +74,7 @@ final class AssertTrueFalseInternalTypeToSpecificMethodRector extends AbstractRe
     }
 
     /**
-     * @return string[]
+     * @return array<class-string<Node>>
      */
     public function getNodeTypes(): array
     {

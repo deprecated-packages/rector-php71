@@ -22,7 +22,7 @@ final class SimplifyStrposLowerRector extends AbstractRector
     }
 
     /**
-     * @return string[]
+     * @return array<class-string<Node>>
      */
     public function getNodeTypes(): array
     {

@@ -38,7 +38,7 @@ final class CallOnAppArrayAccessToStandaloneAssignRector extends AbstractRector
     }
 
     /**
-     * @return string[]
+     * @return array<class-string<Node>>
      */
     public function getNodeTypes(): array
     {

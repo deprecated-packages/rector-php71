@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Rector\NetteCodeQuality\Rector\ArrayDimFetch;
 
+use PhpParser\Node;
 use PhpParser\Node\Expr\ArrayDimFetch;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\Variable;
@@ -59,7 +60,7 @@ abstract class AbstractArrayDimFetchToAnnotatedControlVariableRector extends Abs
     }
 
     /**
-     * @return string[]
+     * @return array<class-string<Node>>
      */
     public function getNodeTypes(): array
     {

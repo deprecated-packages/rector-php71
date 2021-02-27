@@ -50,7 +50,7 @@ final class StaticCallToFuncCallRector extends AbstractRector implements Configu
     }
 
     /**
-     * @return string[]
+     * @return array<class-string<Node>>
      */
     public function getNodeTypes(): array
     {

@@ -44,7 +44,7 @@ final class ClassConstFetchToValueRector extends AbstractRector implements Confi
     }
 
     /**
-     * @return string[]
+     * @return array<class-string<Node>>
      */
     public function getNodeTypes(): array
     {

@@ -33,7 +33,7 @@ abstract class AbstractPregToNetteUtilsStringsRector extends AbstractRector impl
     }
 
     /**
-     * @return string[]
+     * @return array<class-string<Node>>
      */
     public function getNodeTypes(): array
     {
