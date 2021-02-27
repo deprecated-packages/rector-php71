@@ -43,7 +43,7 @@ final class MultiParentingToAbstractDependencyRector extends AbstractRector impl
     /**
      * @var ObjectType[]
      */
-    private $objectTypesToInject = [];
+    private $injectObjectTypes = [];
 
     /**
      * @var ClassMethodNodeRemover
@@ -153,7 +153,7 @@ CODE_SAMPLE
         }
         $abstractClassConstructorParamTypes = $this->resolveConstructorParamClassTypes($node);
         // process
-        $this->objectTypesToInject = [];
+        $this->injectObjectTypes = [];
         foreach ($childrenClasses as $childrenClass) {
             $constructorClassMethod = $childrenClass->getMethod(MethodName::CONSTRUCT);
             if (! $constructorClassMethod instanceof ClassMethod) {
@@ -171,6 +171,9 @@ CODE_SAMPLE
         return $node;
     }
 
+    /**
+     * @param array<string, string> $configuration
+     */
     public function configure(array $configuration): void
     {
         $this->framework = $configuration[self::FRAMEWORK];
@@ -219,14 +222,14 @@ CODE_SAMPLE
             $this->nodeRemover->removeParam($classMethod, $key);
             $this->classMethodNodeRemover->removeParamFromMethodBody($classMethod, $param);
 
-            $this->objectTypesToInject[] = $paramType;
+            $this->injectObjectTypes[] = $paramType;
         }
     }
 
     private function clearAbstractClassConstructor(ClassMethod $classMethod): void
     {
         foreach ($classMethod->getParams() as $key => $param) {
-            if (! $this->isObjectTypes($param, $this->objectTypesToInject)) {
+            if (! $this->isObjectTypes($param, $this->injectObjectTypes)) {
                 continue;
             }
 
@@ -240,10 +243,10 @@ CODE_SAMPLE
     {
         /** @var string $className */
         $className = $class->getAttribute(AttributeKey::CLASS_NAME);
-        if ($this->objectTypesToInject === []) {
+        if ($this->injectObjectTypes === []) {
             return;
         }
-        $injectClassMethod = $this->injectMethodFactory->createFromTypes($this->objectTypesToInject, $className, $this->framework);
+        $injectClassMethod = $this->injectMethodFactory->createFromTypes($this->injectObjectTypes, $className, $this->framework);
         $this->classInsertManipulator->addAsFirstMethod($class, $injectClassMethod);
     }
 

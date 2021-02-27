@@ -12,6 +12,7 @@ use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Class_;
+use PHPStan\Type\ObjectType;
 use Rector\Core\Contract\Rector\ConfigurableRectorInterface;
 use Rector\Core\Rector\AbstractRector;
 use Rector\Symfony\Exception\InvalidConfigurationException;
@@ -140,10 +141,10 @@ CODE_SAMPLE
 
     private function isKernelOrExtensionClass(Class_ $class): bool
     {
-        if ($this->isObjectType($class, 'Symfony\Component\HttpKernel\DependencyInjection\Extension')) {
+        if ($this->isObjectType($class, new ObjectType('Symfony\Component\HttpKernel\DependencyInjection\Extension'))) {
             return true;
         }
-        return $this->isObjectType($class, 'Symfony\Component\HttpKernel\Kernel');
+        return $this->isObjectType($class, new ObjectType('Symfony\Component\HttpKernel\Kernel'));
     }
 
     private function validateConfiguration(string $from, string $to): void
@@ -166,7 +167,7 @@ CODE_SAMPLE
         if (! $node->var instanceof Variable) {
             return null;
         }
-        if (! $this->isObjectType($node->var, 'Symfony\Component\Config\Loader\LoaderInterface')) {
+        if (! $this->isObjectType($node->var, new ObjectType('Symfony\Component\Config\Loader\LoaderInterface'))) {
             return null;
         }
         if (! $this->isName($node->name, 'load')) {

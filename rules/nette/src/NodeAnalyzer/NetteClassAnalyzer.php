@@ -6,6 +6,7 @@ namespace Rector\Nette\NodeAnalyzer;
 
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
+use PHPStan\Type\ObjectType;
 use Rector\NodeTypeResolver\Node\AttributeKey;
 use Rector\NodeTypeResolver\NodeTypeResolver;
 
@@ -31,9 +32,9 @@ final class NetteClassAnalyzer
         if (! $class instanceof Class_) {
             return false;
         }
-        if (! $this->nodeTypeResolver->isObjectType($class, 'Nette\Application\UI\Control')) {
+        if (! $this->nodeTypeResolver->isObjectType($class, new ObjectType('Nette\Application\UI\Control'))) {
             return false;
         }
-        return ! $this->nodeTypeResolver->isObjectType($class, 'Nette\Application\UI\Presenter');
+        return ! $this->nodeTypeResolver->isObjectType($class, new ObjectType('Nette\Application\UI\Presenter'));
     }
 }

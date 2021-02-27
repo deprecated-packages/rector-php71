@@ -11,6 +11,7 @@ use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\Ternary;
 use PhpParser\Node\Expr\Variable;
 use PHPStan\Analyser\Scope;
+use PHPStan\Type\ObjectType;
 use Rector\Core\Rector\AbstractRector;
 use Rector\NodeTypeResolver\Node\AttributeKey;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
@@ -97,7 +98,7 @@ CODE_SAMPLE
                 return $this->refactorIfHasReturnTypeWasCalled($node->expr);
             }
 
-            if ($node->expr instanceof Variable && $this->isObjectType($node->expr, 'ReflectionType')) {
+            if ($node->expr instanceof Variable && $this->isObjectType($node->expr, new ObjectType('ReflectionType'))) {
                 return $this->nodeFactory->createMethodCall($node->expr, self::GET_NAME);
             }
         }
@@ -167,7 +168,7 @@ CODE_SAMPLE
 
     private function isReflectionParameterGetTypeMethodCall(MethodCall $methodCall): bool
     {
-        if (! $this->isObjectType($methodCall->var, 'ReflectionParameter')) {
+        if (! $this->isObjectType($methodCall->var, new ObjectType('ReflectionParameter'))) {
             return false;
         }
         return $this->isName($methodCall->name, 'getType');
@@ -184,7 +185,7 @@ CODE_SAMPLE
 
     private function isReflectionFunctionAbstractGetReturnTypeMethodCall(MethodCall $methodCall): bool
     {
-        if (! $this->isObjectType($methodCall->var, 'ReflectionFunctionAbstract')) {
+        if (! $this->isObjectType($methodCall->var, new ObjectType('ReflectionFunctionAbstract'))) {
             return false;
         }
         return $this->isName($methodCall->name, 'getReturnType');

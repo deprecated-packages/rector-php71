@@ -7,6 +7,7 @@ namespace Rector\Doctrine\Rector\MethodCall;
 use PhpParser\Node;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Stmt\Class_;
+use PHPStan\Type\ObjectType;
 use Rector\Core\Rector\AbstractRector;
 use Rector\NodeTypeResolver\Node\AttributeKey;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
@@ -78,7 +79,7 @@ CODE_SAMPLE
         if ($this->shouldSkip($node)) {
             return null;
         }
-        if (! $this->isObjectType($node->var, 'Doctrine\ORM\EntityRepository')) {
+        if (! $this->isObjectType($node->var, new ObjectType('Doctrine\ORM\EntityRepository'))) {
             return null;
         }
         if (! $this->isNames($node->name, self::ENTITY_REPOSITORY_PUBLIC_METHODS)) {
@@ -94,6 +95,6 @@ CODE_SAMPLE
         if (! $classLike instanceof Class_) {
             return true;
         }
-        return ! $this->isObjectType($classLike, 'Doctrine\ORM\EntityRepository');
+        return ! $this->isObjectType($classLike, new ObjectType('Doctrine\ORM\EntityRepository'));
     }
 }

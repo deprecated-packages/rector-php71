@@ -11,6 +11,7 @@ use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Namespace_;
+use PHPStan\Type\ObjectType;
 use Rector\Core\Rector\AbstractRector;
 use Rector\FileSystemRector\ValueObject\AddedFileWithNodes;
 use Rector\NetteToSymfony\Collector\OnFormVariableMethodCallsCollector;
@@ -130,7 +131,7 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        if (! $this->isObjectType($node, 'Nette\Application\UI\Control')) {
+        if (! $this->isObjectType($node, new ObjectType('Nette\Application\UI\Control'))) {
             return null;
         }
         foreach ($node->getMethods() as $classMethod) {

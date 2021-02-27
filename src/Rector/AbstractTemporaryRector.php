@@ -317,7 +317,7 @@ abstract class AbstractTemporaryRector extends NodeVisitorAbstract implements Ph
     }
 
     /**
-     * @param string[]|ObjectType[] $requiredTypes
+     * @param ObjectType[] $requiredTypes
      */
     protected function isObjectTypes(Node $node, array $requiredTypes): bool
     {

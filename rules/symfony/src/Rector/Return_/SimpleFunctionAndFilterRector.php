@@ -100,7 +100,7 @@ CODE_SAMPLE
         if (! $classLike instanceof ClassLike) {
             return null;
         }
-        if (! $this->isObjectType($classLike, 'Twig_Extension')) {
+        if (! $this->isObjectType($classLike, new ObjectType('Twig_Extension'))) {
             return null;
         }
         $methodName = $node->getAttribute(AttributeKey::METHOD_NAME);
